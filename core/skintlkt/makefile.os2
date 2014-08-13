@@ -1,0 +1,37 @@
+
+#---[ Dados do projeto ]---------------------------------------------------------------#
+
+#Nome do executavel final
+
+!IFDEF NDEBUG
+
+   #---[ Sem DEBUG - Monta DLL ]-----#
+   PROJECT     = icqskin
+   EXETYPE     = VIO
+   USETHREAD   = 1
+   SRC         = dllmain.c
+   EXEPATH     = w:\private\pwicq2
+   SAVELIB     = w:\public\pwicq2\os2\lib
+   RELEASEPATH = w:\public\pwicq2\os2\bin
+
+!ELSE
+
+   #----[ DEBUG - Monta EXE ]-------#
+   PROJECT     = skintest
+   EXETYPE     = PM
+   MAKEEXE     = 1
+   SRC         = loader.c
+   RESOURCES   = skintest.res
+   EXEPATH     = w:\temp
+
+!ENDIF
+
+EXTRALIB  = mmpm2.lib
+
+# Lista de modulos
+SOURCES   = menu.c listbox.c defwinp.c slider.c skmain.c bitmap.c btnclass.c load.c \
+            register.c create.c sizemain.c control.c images.c $(SRC)
+
+!include <pwMake.mak>
+
+

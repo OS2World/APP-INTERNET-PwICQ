@@ -1,0 +1,102 @@
+#define INCL_WIN
+#define INCL_NLS
+
+#define __OS2__
+#include <os2.h>
+#include <pwicqgui.h>
+
+ bitmap    100    icons.bmp
+ bitmap    101    icons16.bmp
+ bitmap    102    masc16.bmp
+
+ bitmap   1001    sysbutton.bmp
+ bitmap   1002    cfgtree.bmp
+
+ icon       20    pwICQ3.ico
+ bitmap     20    login.bmp
+
+ bitmap    200    userinfo.bmp
+ bitmap    201    sysconfig.bmp
+
+STRINGTABLE
+BEGIN
+    100,                "icons.gif"
+    1001,               "sysbutton.gif"
+END
+
+
+ACCELTABLE 1
+BEGIN
+    VK_F12,     2000,   AF_VIRTUALKEY|AF_ALT
+    VK_F11,     2001,   AF_VIRTUALKEY|AF_ALT
+    VK_F10,     2002,   AF_VIRTUALKEY|AF_ALT
+    VK_F4,      2003,   AF_VIRTUALKEY|AF_ALT
+    VK_NEWLINE, 2004,   AF_VIRTUALKEY
+    VK_UP,      2005,   AF_VIRTUALKEY
+    VK_DOWN,    2006,   AF_VIRTUALKEY
+END
+
+ACCELTABLE 1000
+BEGIN
+
+    /* Closing buttons */
+    VK_ESC,      500,   AF_VIRTUALKEY
+    'c',         500,   AF_CHAR|AF_ALT
+
+    /* Send message */
+    VK_F2,       501,   AF_VIRTUALKEY
+    VK_NEWLINE,  501,   AF_VIRTUALKEY|AF_ALT
+    's',         501,   AF_CHAR|AF_ALT
+
+    /* Other buttons */
+    'a',         502,   AF_CHAR|AF_ALT
+    'r',         505,   AF_CHAR|AF_ALT
+    'p',         506,   AF_CHAR|AF_ALT
+    'f',         507,   AF_CHAR|AF_ALT
+    'b',         508,   AF_CHAR|AF_ALT
+    'n',         509,   AF_CHAR|AF_ALT
+    't',         515,   AF_CHAR|AF_ALT
+
+END
+
+ACCELTABLE 1001
+BEGIN
+
+    VK_F2,       501,   AF_VIRTUALKEY
+    VK_NEWLINE,  501,   AF_VIRTUALKEY|AF_ALT
+    's',         501,   AF_CHAR|AF_ALT
+
+    'c',         500,   AF_CHAR|AF_ALT
+    'l',         515,   AF_CHAR|AF_ALT
+    'r',         502,   AF_CHAR|AF_ALT
+
+END
+
+DLGTEMPLATE 20
+BEGIN
+        DIALOG "PWICQ Startup", 100, 142, 93, 200, 62, FS_DLGBORDER | FS_SCREENALIGN | WS_VISIBLE | WS_CLIPSIBLINGS | WS_SAVEBITS, FCF_TITLEBAR | FCF_TASKLIST
+        PRESPARAMS PP_FONTNAMESIZE "8.Helv"
+        BEGIN
+                CONTROL "", 100, 106, 46, 86, 8, WC_ENTRYFIELD, ES_LEFT | ES_AUTOSCROLL | ES_MARGIN | ES_ANY | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+                CONTROL "", 101, 106, 32, 86, 8, WC_ENTRYFIELD, ES_LEFT | ES_AUTOSCROLL | ES_MARGIN | ES_UNREADABLE | ES_ANY | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+                CONTROL "Save Password", 102, 106, 18, 79, 10, WC_BUTTON, BS_AUTOCHECKBOX | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+                CONTROL "Logon", 103, 58, 1, 47, 14, WC_BUTTON, BS_PUSHBUTTON | BS_DEFAULT | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+                CONTROL "New User", 104, 106, 1, 47, 14, WC_BUTTON, BS_PUSHBUTTON | BS_NOPOINTERFOCUS | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP
+                CONTROL "Cancel", 105, 153, 1, 47, 14, WC_BUTTON, BS_PUSHBUTTON | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+                CONTROL "", 103, 0, 1, 56, 59, WC_STATIC, SS_BKGNDRECT | WS_VISIBLE | WS_GROUP
+                PRESPARAMS PP_BACKGROUNDCOLOR , 0x0L
+                CONTROL 20, 102, 1, 22, 54, 36, WC_STATIC, SS_BITMAP | WS_VISIBLE
+                CONTROL "", 900, 58, 16, 141, 47, WC_STATIC, SS_GROUPBOX | DT_LEFT | DT_TOP | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+                CONTROL "User's UIN:", 900, 63, 46, 37, 8, WC_STATIC, SS_TEXT | DT_LEFT | DT_VCENTER | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+                CONTROL "Password:", 900, 63, 32, 36, 8, WC_STATIC, SS_TEXT | DT_LEFT | DT_VCENTER | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+                CONTROL "Unregistered", 104, 2, 11, 51, 8, WC_STATIC, SS_TEXT | DT_CENTER | DT_VCENTER | DT_MNEMONIC | WS_VISIBLE
+                PRESPARAMS PP_FOREGROUNDCOLOR , 0xff00L
+PRESPARAMS PP_BACKGROUNDCOLOR , 0x0L
+                CONTROL "Version", 105, 2, 2, 51, 8, WC_STATIC, SS_TEXT | DT_CENTER | DT_VCENTER | DT_MNEMONIC | WS_VISIBLE
+                PRESPARAMS PP_FOREGROUNDCOLOR , 0xff00L
+PRESPARAMS PP_BACKGROUNDCOLOR , 0x0L
+        END
+
+END
+
+

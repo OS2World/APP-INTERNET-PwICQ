@@ -1,0 +1,346 @@
+--- 05/07/2003 19:00:43 Message from Pagotti (ICQ#4804958) ---
+
+Perry ?
+
+--- 05/07/2003 20:48:57 Message to Pagotti (ICQ#4804958) ---
+
+Eu mesmo.
+
+
+--- 06/07/2003 12:18:41 Message from Pagotti (ICQ#4804958) ---
+
+quais as boas ?
+
+--- 06/07/2003 12:19:05 Message from Pagotti (ICQ#4804958) ---
+
+estamos tentando garantir a sobrevivencia da TECHISA, independente do que acontecer
+
+--- 06/07/2003 13:43:55 Message to Pagotti (ICQ#4804958) ---
+
+Valeu mesmo!! Tenho que admitir que estou preocupado. 
+
+--- 06/07/2003 18:18:59 Message from Pagotti (ICQ#4804958) ---
+
+fica tranquilo...estamos trabalhando pra isso
+
+--- 12/07/2003 23:16:13 Message from Pagotti (ICQ#4804958) ---
+
+soube das novidades ?
+
+--- 13/07/2003 10:41:35 Message to Pagotti (ICQ#4804958) ---
+
+Sim. Sexta no final da tarde.
+
+
+--- 15/07/2003 21:01:50 Message from Pagotti (ICQ#4804958) ---
+
+srv de e-mail da TECHISA deve ta bixado
+
+--- 15/07/2003 21:18:50 Message to Pagotti (ICQ#4804958) ---
+
+O que houve?
+
+
+--- 15/07/2003 21:19:32 Message to Pagotti (ICQ#4804958) ---
+
+Está tentando enviar pelo Notes do Banco?
+
+
+--- 15/07/2003 21:20:08 Message to Pagotti (ICQ#4804958) ---
+
+Andei tendo problemas para enviar mails esses dias tambem, porem, uso o SMTP do Terra.
+
+
+--- 16/07/2003 13:27:56 Message from Pagotti (ICQ#4804958) ---
+
+ja empacotou o PWICQ ?
+
+--- 16/07/2003 13:28:50 Message to Pagotti (ICQ#4804958) ---
+
+Sim. Mandando p'ro seu e-mail.
+
+
+--- 16/07/2003 13:29:02 Message from Pagotti (ICQ#4804958) ---
+
+blz
+
+--- 16/07/2003 14:26:56 Message to Pagotti (ICQ#4804958) ---
+
+Já enviei, se você não receber até à noite me avise. Tenho tido alguns problemas no envio de e-mail.
+
+
+--- 17/07/2003 13:33:31 Message from Pagotti (ICQ#4804958) ---
+
+nao recebi....mpagotti@uol.com.br ou mpagotti@brturbo.com
+
+--- 17/07/2003 13:59:07 Message to Pagotti (ICQ#4804958) ---
+
+Imaginei! Meu e-mail está falhando direto.
+
+
+--- 17/07/2003 20:00:57 Message to Pagotti (ICQ#4804958) ---
+
+Quando der faca um teste: pwicq --uin=[SEU_UIN] --password=[SUA_SENHA] --save
+
+
+--- 16/10/2003 13:56:13 Message from Pagotti (ICQ#4804958) ---
+
+perry ??
+
+--- 16/10/2003 13:56:18 Message to Pagotti (ICQ#4804958) ---
+
+Eu.
+
+
+--- 16/10/2003 13:56:34 Message from Pagotti (ICQ#4804958) ---
+
+blz ? news sobre o PWICQ no RH ?
+
+--- 16/10/2003 13:56:59 Message to Pagotti (ICQ#4804958) ---
+
+Nope. Não cheguei a testar mais.
+
+--- 16/10/2003 13:57:18 Message from Pagotti (ICQ#4804958) ---
+
+ok...
+
+--- 16/10/2003 13:57:31 Message from Pagotti (ICQ#4804958) ---
+
+to precisando de um clinete BOM para Linux...o LICQ Ã© muito rest
+
+--- 16/10/2003 13:57:39 Message from Pagotti (ICQ#4804958) ---
+
+muito restrito
+
+--- 16/10/2003 13:57:47 Message to Pagotti (ICQ#4804958) ---
+
+Tentou o Kopete (para KDE)?
+
+
+--- 16/10/2003 13:58:13 Message from Pagotti (ICQ#4804958) ---
+
+nao...vou procura-lo no google
+
+--- 16/10/2003 13:58:34 Message to Pagotti (ICQ#4804958) ---
+
+Eu achei meio pesado mas funciona legal.
+
+
+--- 16/10/2003 13:59:00 Message from Pagotti (ICQ#4804958) ---
+
+Blz...acho que vou instalar o Mandrake sÃ³ por causa do PWICQ...rs
+
+--- 16/10/2003 14:01:36 Message from Pagotti (ICQ#4804958) ---
+
+valeu
+
+--- 16/10/2003 14:01:44 Message to Pagotti (ICQ#4804958) ---
+
+Por nada.
+
+
+--- 19/11/2003 14:04:06 Message from Pagotti (ICQ#4804958) ---
+
+instalei o Mandrake...será que agora o pwicq vai ??
+
+--- 19/11/2003 14:04:25 Message to Pagotti (ICQ#4804958) ---
+
+Vai. O pacote foi criado no Mandrake 9.2
+
+
+--- 19/11/2003 14:05:14 Message from Pagotti (ICQ#4804958) ---
+
+blz..poderia mandar o pacote novamente ??
+mpagotti@bb.com.br e mpagotti@uol.com.br ...para os dois ok ?
+
+--- 19/11/2003 14:05:45 Message to Pagotti (ICQ#4804958) ---
+
+Enviado.
+
+
+--- 19/11/2003 14:05:52 Message from Pagotti (ICQ#4804958) ---
+
+valeu...
+
+--- 19/11/2003 20:51:56 Message from Pagotti (ICQ#4804958) ---
+
+Perry,
+ta dando o seguinte erro qdo executo:
+bash: pwicq --uin=4804958 --password=aaaa : command not found
+
+
+--- 19/11/2003 20:54:53 Message to Pagotti (ICQ#4804958) ---
+
+Oxi. Não tem um pwicq.sh no /usr/bin?
+
+
+--- 19/11/2003 22:04:28 Message from Pagotti (ICQ#4804958) ---
+
+lrwxrwxrwx    1 root     root           25 Nov 19 20:01 pwicq -> /usr/share/pwicq/pwicq.sh*
+
+
+
+--- 19/11/2003 22:10:52 Message to Pagotti (ICQ#4804958) ---
+
+Uai, deveria ter rodado o script.
+
+--- 19/11/2003 22:11:24 Message from Pagotti (ICQ#4804958) ---
+
+pois é....tb acho....
+alguma outra tentativa ??
+
+--- 19/11/2003 22:12:18 Message to Pagotti (ICQ#4804958) ---
+
+/usr/share/pwicq/pwicq --nodaemon --uin=SEU_UIN --password=SUA_SENHA --save
+
+
+--- 19/11/2003 22:12:24 Message from Pagotti (ICQ#4804958) ---
+
+o script tá assim:
+[root@Pagotti bin]# cat pwicq
+cd /usr/share/pwicq
+export LD_LIBRARY_PATH=/usr/share/pwicq
+/usr/share/pwicq/pwicq $@
+
+é isso mesmo ?
+
+--- 19/11/2003 22:12:32 Message to Pagotti (ICQ#4804958) ---
+
+Isso mesmo.
+
+
+--- 19/11/2003 22:12:55 Message from Pagotti (ICQ#4804958) ---
+
+pois é...to usando kde...
+
+--- 19/11/2003 22:13:23 Message to Pagotti (ICQ#4804958) ---
+
+Eu usava com o kde, não deveria interferir na execução de scripts.
+
+
+--- 19/11/2003 22:13:54 Message from Pagotti (ICQ#4804958) ---
+
+tento como root ?
+
+--- 19/11/2003 22:14:09 Message to Pagotti (ICQ#4804958) ---
+
+É uma tentativa mas ele vai dar um alerta.
+
+
+--- 19/11/2003 22:14:45 Message to Pagotti (ICQ#4804958) ---
+
+E não vai rodar; ele testa o usuário.
+
+
+--- 19/11/2003 22:15:06 Message from Pagotti (ICQ#4804958) ---
+
+nao rodou mesmo...
+
+--- 19/11/2003 22:15:13 Message to Pagotti (ICQ#4804958) ---
+
+Fez alguma coisa?
+
+
+--- 19/11/2003 22:16:12 Message from Pagotti (ICQ#4804958) ---
+
+soh deu a msg que nao é uma boa ideia rodar como root
+
+--- 19/11/2003 22:16:27 Message to Pagotti (ICQ#4804958) ---
+
+Uai. Então está rodando corretamente; chegou a carregar o executavel.
+
+
+--- 19/11/2003 22:16:54 Message to Pagotti (ICQ#4804958) ---
+
+Tente rodar /usr/share/pwicq/pwicq.sh --uin=SEU_UIN --password=SUA_SENHA --save --nodaemon
+
+--- 19/11/2003 22:17:07 Message to Pagotti (ICQ#4804958) ---
+
+Isso vai chamar o script direto, sem passar pelo link.
+
+
+--- 19/11/2003 22:18:02 Message from Pagotti (ICQ#4804958) ---
+
+minuto
+
+
+--- 19/11/2003 22:18:37 Message from Pagotti (ICQ#4804958) ---
+
+foi
+
+
+--- 19/11/2003 22:18:52 Message from Pagotti (ICQ#4804958) ---
+
+perai
+
+--- 19/11/2003 22:19:03 Message to Pagotti (ICQ#4804958) ---
+
+Ainda não entendi porque direto não funcionou.
+
+
+--- 19/11/2003 22:19:22 Message from Pagotti (ICQ#4804958) ---
+
+agora foi direitinho
+
+--- 19/11/2003 22:19:41 Message to Pagotti (ICQ#4804958) ---
+
+Ótimo!
+
+--- 19/11/2003 22:19:51 Message to Pagotti (ICQ#4804958) ---
+
+(-:
+
+
+--- 19/11/2003 22:20:14 Message from Pagotti (ICQ#4804958) ---
+
+mas nao trouxe a lista de usuarios
+
+--- 19/11/2003 22:20:23 Message to Pagotti (ICQ#4804958) ---
+
+Entrou online?
+
+--- 19/11/2003 22:20:45 Message from Pagotti (ICQ#4804958) ---
+
+sim,...to nele...mas só traz vc
+
+--- 19/11/2003 22:20:59 Message to Pagotti (ICQ#4804958) ---
+
+Já ví esse problema acontecer, por isso estou refazendo a interface gráfica. É só fechar e abrir que funciona.
+
+
+--- 19/11/2003 22:21:10 Message to Pagotti (ICQ#4804958) ---
+
+A lista que não atualizou.
+
+
+--- 19/11/2003 22:21:26 Message from Pagotti (ICQ#4804958) ---
+
+vou tentar
+
+--- 19/11/2003 22:21:32 Message to Pagotti (ICQ#4804958) ---
+
+Ok.
+
+
+--- 19/11/2003 22:22:14 Message from Pagotti (ICQ#4804958) ---
+
+legal....
+
+--- 19/11/2003 22:22:28 Message from Pagotti (ICQ#4804958) ---
+
+agora eu posso só chamar o .sh sem os parametros ??
+
+--- 19/11/2003 22:23:12 Message to Pagotti (ICQ#4804958) ---
+
+Sim. P'ra isso que tinha o --save (((-:
+Esse parâmetro cria um diretório no seu home e grava tudo lá.
+
+
+--- 19/11/2003 22:23:26 Message from Pagotti (ICQ#4804958) ---
+
+valeu...ficou muito legal
+
+--- 19/11/2003 22:23:33 Message to Pagotti (ICQ#4804958) ---
+
+Obrigado.
+

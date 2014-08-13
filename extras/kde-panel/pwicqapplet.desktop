@@ -1,0 +1,7 @@
+
+[Desktop Entry]
+Name = pwICQ
+Comment = pwICQ Applet
+X-KDE-Library = libpwicqkde_applet.so
+X-KDE-UniqueApplet = true
+

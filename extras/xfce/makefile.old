@@ -1,0 +1,84 @@
+#
+# Makefile for the pwICQ's XFCE plugin
+#
+
+PROJECT = icqxfce
+PACKET  = xfce4-pwicq
+VERSION = 1.0.0
+SOURCES = pwicq.c
+INCLUDE = icqdefs.h icqqueue.h icqxpde.h
+
+#
+# Rules
+#
+ifdef DEBUG
+   DBGFLAGS = -DDEBUG
+else
+   DBGFLAGS = -DNDEBUG
+endif
+
+GCCFLAGS = -DPROJECT=\"$(PROJECT)\" -DHOSTNAME=\"$(HOSTNAME)\" \
+           -DBUILD=\"`date +%G%m%d`\" -DXBUILD=0x`date +%G%m%d` \
+		   -DUSER=\"$(USER)\" -Wall $(DBGFLAGS)\
+		   $(CFLAGS) \
+		   `pkg-config --cflags xfce4-panel-1.0`
+
+
+%.o : %.c $(INCLUDE)
+	@gcc $(GCCFLAGS) -o $@ -c $<
+ifdef DEBUG
+	@echo $< [DEBUG] Ok.
+else
+	@echo $< Ok.
+endif
+
+%.so : 
+	@gcc -shared -Wl,-soname,$(@F) -o $@ $?
+	@echo $@ Ok.
+
+%.la : %.so
+	@libtool --quiet gcc -o $@ $< -rpath `pkg-config xfce4-panel-1.0 --variable=pluginsdir` -lm
+	@echo $@ Ok.
+
+%.tar.gz:
+	@rm -fr /tmp/$@
+	@mkdir /tmp/$@
+	@mkdir /tmp/$@/$(subst .tar.gz,,$@)
+	@cp $(SOURCES) /tmp/$@/$(subst .tar.gz,,$@)/
+	@cp $(INCLUDE) /tmp/$@/$(subst .tar.gz,,$@)/
+	@cp makefile /tmp/$@/$(subst .tar.gz,,$@)/Makefile
+	@tar --create --gzip --remove-files --file=$@ --directory=/tmp/$@ ./$(subst .tar.gz,,$@)
+	@rm -fr /tmp/$@
+	@echo $@ Ok.
+
+#
+# Build files
+#
+all:							lib$(PROJECT).la lib$(PROJECT).so
+
+release:						lib$(PROJECT).la lib$(PROJECT).so
+
+tgz:  							$(PACKET)-$(VERSION).tar.gz
+
+$(PACKET)-$(VERSION).tar.gz:	$(SOURCES) $(INCLUDE) makefile pwicq-xfce.spec
+
+lib$(PROJECT).so:				$(SOURCES:.c=.o)
+
+lib$(PROJECT).la:				lib$(PROJECT).so
+
+install:			lib$(PROJECT).la lib$(PROJECT).so
+	@echo Installing into `pkg-config xfce4-panel-1.0 --variable=pluginsdir`
+	@rm -f /tmp/$(PROJECT).dbg
+	@cp -f lib$(PROJECT).la `pkg-config xfce4-panel-1.0 --variable=pluginsdir`
+	@cp -f lib$(PROJECT).so `pkg-config xfce4-panel-1.0 --variable=pluginsdir`/lib$(PROJECT).so.0
+	@ln -f -s `pkg-config xfce4-panel-1.0 --variable=pluginsdir`/lib$(PROJECT).so.0 \
+	          `pkg-config xfce4-panel-1.0 --variable=pluginsdir`/lib$(PROJECT).so
+	@killall -USR1 xfce4-panel
+			  
+	
+clean:
+	@rm -f $(SOURCES:.c=.o)
+	@rm -f lib$(PROJECT).so
+	@rm -f lib$(PROJECT).la
+	@rm -f $(PACKET)-$(VERSION).tar.gz
+	

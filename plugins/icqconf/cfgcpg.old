@@ -1,0 +1,169 @@
+ /*
+  * CodePage Translation dialog box
+  */
+
+ #pragma strings(readonly)
+
+#ifndef __OS2__
+ #error OS/2 only
+#endif
+
+ #define INCL_WIN
+ #define INCL_DOSNLS
+
+ #include <malloc.h>
+ #include <string.h>
+ #include <stdlib.h>
+
+ #include "icqconf.h"
+
+/*---[ Definitions ]-----------------------------------------------------------------------------------------*/
+
+ #pragma pack(1)
+ struct config
+ {
+    ULONG               uin;
+    HICQ                icq;
+    char                buffer[0x0100];
+ };
+
+/*---[ Prototipes ]------------------------------------------------------------------------------------------*/
+
+ static void configure(HWND, struct cfgdlgparm *);
+ static void destroy(HWND);
+ static void load(HWND);
+ static void save(HWND);
+
+/*---[ Implement ]-------------------------------------------------------------------------------------------*/
+
+ MRESULT EXPENTRY cfgcpg(HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2)
+ {
+    BOOL flag;
+
+    switch(msg)
+    {
+    case WM_INITDLG:
+       configure(hwnd,(struct cfgdlgparm * ) mp2);
+       return WinDefDlgProc(hwnd,msg,mp1,mp2);
+
+    case WM_DESTROY:
+       destroy(hwnd);
+       return WinDefDlgProc(hwnd,msg,mp1,mp2);
+
+    case WMICQ_LOAD:               /* Load information     */
+       load(hwnd);
+       break;
+
+    case WMICQ_SAVE:               /* Save information     */
+       save(hwnd);
+       break;
+
+    case WMICQ_SELECTED:           /* Dialog was selected  */
+    case WMICQ_EVENT:              /* pwICQ event          */
+       break;
+
+    default:
+       return WinDefDlgProc(hwnd,msg,mp1,mp2);
+    }
+
+    return 0;
+ }
+
+ static void configure(HWND hwnd, struct cfgdlgparm *parm)
+ {
+    struct config *cfg = malloc(sizeof(struct config));
+
+    CHKPoint();
+
+    if(!cfg)
+    {
+       WinEnableWindow(hwnd,FALSE);
+       return;
+    }
+
+    memset(cfg,0,sizeof(struct config));
+
+    cfg->uin = parm->uin;
+    cfg->icq = parm->icq;
+
+
+
+    WinSetWindowPtr(hwnd,QWL_USER,cfg);
+ }
+
+ static void destroy(HWND hwnd)
+ {
+    struct config *cfg = WinQueryWindowPtr(hwnd,QWL_USER);
+
+    if(!cfg)
+       return;
+
+
+
+    free(cfg);
+ }
+
+ static void load(HWND hwnd)
+ {
+    struct config       *cfg    = WinQueryWindowPtr(hwnd,QWL_USER);
+    USHORT              id      = 6200;
+    HAB                 hab     = WinQueryAnchorBlock(hwnd);
+    HWND                h       = WinWindowFromID(hwnd,102);
+    ULONG               cpg     = 0;
+    USHORT              pos;
+    int                 current;
+    char                *ptr;
+
+    if(!cfg)
+       return;
+
+    current = icqQueryRemoteCodePage(cfg->icq);
+
+    while(WinLoadString(hab, module, id, 0xFF, cfg->buffer) > 0)
+    {
+       for(ptr = cfg->buffer;*ptr && *ptr != '.';ptr++);
+
+       if(*ptr == '.')
+       {
+          *(ptr++) = 0;
+           pos = SHORT1FROMMR(WinSendMsg(h,LM_INSERTITEM,MPFROMSHORT(LIT_END),MPFROMP(ptr)));
+
+           cpg = atoi(cfg->buffer);
+           DBGTrace(cpg);
+
+           if(pos != LIT_ERROR)
+           {
+              WinSendMsg(h,LM_SETITEMHANDLE,MPFROMSHORT(pos),MPFROMLONG(cpg));
+              if(cpg == current)
+                 WinSendMsg(h,LM_SELECTITEM,MPFROMSHORT(pos),MPFROMSHORT(TRUE));
+           }
+       }
+       id++;
+    }
+
+    WinCheckButton(hwnd,103,icqLoadValue(cfg->icq,"cnvtUsersFile", 0));
+
+ }
+
+ static void save(HWND hwnd)
+ {
+    struct config       *cfg    = WinQueryWindowPtr(hwnd,QWL_USER);
+    HWND                h       = WinWindowFromID(hwnd,102);
+    USHORT		pos;
+    ULONG		cpg;
+
+    pos = SHORT1FROMMR(WinSendMsg(h,LM_QUERYSELECTION,MPFROMSHORT(LIT_FIRST),0));
+
+    if(!cfg || pos == LIT_NONE)
+       return;
+
+    cpg = LONGFROMMR(WinSendMsg(h,LM_QUERYITEMHANDLE,MPFROMSHORT(pos),0));
+
+    DBGTrace(cpg);
+
+    icqSetRemoteCodePage(cfg->icq,cpg);
+
+    icqSaveValue(cfg->icq,"cnvtUsersFile",WinSendDlgItemMsg(hwnd,103,BM_QUERYCHECK,0,0) ? 1 : 0);
+
+ }
+

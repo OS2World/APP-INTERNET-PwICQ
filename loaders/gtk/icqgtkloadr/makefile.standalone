@@ -1,0 +1,56 @@
+
+#---[ Dados do projeto ]---------------------------------------------------------------#
+
+PROJECT   = icqgtk
+USETHREAD = 1
+SOURCES   = mainwin.c main.c user.c pwicqlib.c system.c
+EXEPATH   = $(HOME)/public/pwicq2/linux/bin/plugins
+
+# EXEC      = $(HOME)/public/pwicq2/linux/bin/pwicq2 --uin=6838492 --inifile=/home/perry/icq2/config/pwicq.conf  --config-files=/home/perry/icq2/config/ --plugins=0 --module=icqgtk.so
+
+#---[ Regras de montagem ]-------------------------------------------------------------#
+
+# gcc -I/usr/include/gtk-1.2 -I/usr/include/glib-1.2 -I/usr/lib/glib/include 
+#-I/usr/X11R6/include -I/home/perry/include -I/home/perry/include/pwicq 
+#-L/usr/lib -lgdk_pixbuf -L/usr/lib -L/usr/X11R6/lib -lgtk -lgdk -rdynamic -lgmodule -lglib -ldl -lXi 
+#-lXext -lX11 -lm -DSTAND_ALONE -o gtktest mainwin.c
+#
+
+OBJECT = $(SOURCES:.c=.o)
+
+%.o : %.c
+	gcc -I/usr/include/gtk-1.2 -I/usr/include/glib-1.2 -I/usr/lib/glib/include \
+	 -I/usr/X11R6/include -I/home/perry/include -I/home/perry/include/pwicq \
+	 -c $<
+
+$(PROJECT): $(OBJECT)
+	gcc -L/usr/lib -lgdk_pixbuf -L/usr/lib -L/usr/X11R6/lib \
+	    -lgtk -lgdk -rdynamic -lgmodule -lglib -ldl -lXext -lXi -lX11 -lm \
+	    -o $(PROJECT) $(OBJECT)
+
+run: $(OUTFILE)
+ifdef EXEC
+	$(EXEC)
+else
+	$(OUTFILE)
+endif
+
+clean:
+	rm -f $(OBJECT)
+	rm -f $(PROJECT)$(EXTFILE)
+	rm -f $(PROJECT).map
+	rm -f $(PROJECT).dbg
+	rm -f $(PROJECT).out
+	rm -f *.obj
+	rm -f *.rwp
+	rm -f *.res
+	rm -f *.res
+	rm -f *.log
+	rm -f *.sym
+	rm -f *.~rc
+	rm -f *.?~
+	echo $(PROJECT) is clean!
+
+
+
+

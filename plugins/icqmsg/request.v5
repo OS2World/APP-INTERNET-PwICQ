@@ -1,0 +1,404 @@
+/*
+ * request.c - Send/View authorization request
+ */
+
+ #include <string.h>
+ #include <stdio.h>
+ #include <malloc.h>
+ #include <ctype.h>
+
+ #include "icqmsg.h"
+
+/*----------------------------------------------------------------------------------------------------*/
+
+ static const char * _System title(HICQ, HUSER, ULONG, BOOL, ICQMSG *, char *, int);
+ static void         _System formatLog(HICQ, BOOL, ICQMSG *, char *, int);
+ static int          _System formatWindow(const MSGEDITHELPER *, MSGEDITWINDOW, HICQ, ULONG, USHORT, BOOL, HMSG);
+ static int          _System send(const MSGEDITHELPER *, MSGEDITWINDOW, HICQ, ULONG);
+
+/*----------------------------------------------------------------------------------------------------*/
+
+      /* Read default message dialog controls, format packet and send */
+      /* Executes the SEND-TO button */
+      /* Called when the window is receiving another message */
+      /* Event processor for the message-edit window */
+
+
+ MSGMGR icqmsg_request = {      sizeof(MSGMGR),
+                                MSG_NORMAL,
+                                ICQMSGMF_LOADUSERFIELDS|ICQMSGMF_SYSTEMMESSAGE, /* Flags                                     */
+                                { 8,9 },                     /* Icons                                     */
+                                FILTER_REQUEST,              /* Message pre-processor                       */
+                                title,                       /* Query the message title */
+                                formatLog,                   /* format the log entry for the message */
+                                NULL,                        /* View/edit message, if not defined the internal MSG Edit box is called */
+                                formatWindow,                /* Show/Hide default msg-edit window controls, fill values from the message */
+                                NULL,                        /* Button override, return FALSE if the button wasn't processed */
+                                send,                        /* Read default message dialog controls, format packet and send */
+                                NULL,                        /* Executes the SEND-TO button */
+                                icqmsg_requestWindowChanged, /* Called when the window is receiving another message */
+#ifdef __OS2__
+                                NULL,                        /* Event processor for the message-edit window */
+                                NULLHANDLE
+#else
+                                NULL
+#endif
+                        };
+
+
+/*----------------------------------------------------------------------------------------------------*/
+
+#ifdef OLD_FORMAT
+ void _System icqmsg_filterRequest(HICQ icq, UCHAR *src, ICQMSG *msg)
+ {
+    int   qtd       = 0;
+    UCHAR *txt;
+    UCHAR *ptr;
+
+    ptr = txt = src;
+
+    while(*txt)
+    {
+       if(*txt == 0xFE)
+       {
+          qtd++;
+          *txt = ICQ_FIELD_SEPARATOR;
+          ptr  = txt+1;
+       }
+       txt++;
+    }
+
+    DBGTrace(qtd);
+
+    if(msg->type == MSG_REQUEST)
+    {
+
+       // Check for SPAM
+
+       if(qtd < 5)
+       {
+#ifdef EXTENDED_LOG
+             icqWriteSysLog(NULL,PROJECT,"Authorization request with unexpected number of parameters");
+#endif
+          msg->msgFlags |= MSGF_EMPTY;
+       }
+       else
+       {
+          while(*ptr && isspace(*ptr))
+             ptr++;
+
+          if(!*ptr)
+          {
+#ifdef EXTENDED_LOG
+             icqWriteSysLog(NULL,PROJECT,"Authorization request without text received");
+#endif
+             msg->msgFlags |= MSGF_EMPTY;
+          }
+       }
+    }
+
+ }
+#endif
+
+ static const char * _System title(HICQ icq, HUSER usr, ULONG uin, BOOL out, ICQMSG *msg, char *buffer, int sz)
+ {
+    char        temp[0x0100];
+
+#ifdef OLD_FORMAT
+
+    char        *ptr            = (char *) (msg+1);
+    const char  *nick           = "";
+
+    CHKPoint();
+
+    strcpy(buffer, out ? "Ask for authorization to " : "Authorization request from ");
+
+    *temp = 0;
+
+    if(msg)
+    {
+       strncpy(temp,ptr,0xFF);
+       for(ptr = temp;*ptr && *ptr != ICQ_FIELD_SEPARATOR;ptr++);
+       *ptr = 0;
+       nick = temp;
+    }
+
+    if(!*nick && usr)
+       nick = icqQueryUserNick(usr);
+
+    if(nick && *nick)
+    {
+       strncat(buffer,nick,sz);
+       sprintf(temp," (ICQ#%lu)",uin);
+    }
+    else
+    {
+       sprintf(temp,"ICQ#%lu",uin);
+    }
+
+    strncat(buffer,temp,sz);
+
+    DBGMessage(buffer);
+
+#else
+
+    strcpy(buffer, out ? "Ask for authorization to " : "Authorization request from ");
+    strncat(buffer,icqQueryUserNick(usr),sz);
+
+    sprintf(temp, usr ? " (ICQ#%lu)" : "ICQ#%lu", uin);
+    strncat(buffer,temp,sz);
+
+
+#endif
+
+    return buffer;
+
+ }
+
+ static void _System formatLog(HICQ icq, BOOL out, ICQMSG *msg, char *buffer, int sz)
+ {
+#ifdef OLD_FORMAT
+    static const char *tbl[] = { "\nName:\t\t"," ","\nE-Mail:\t\t", "\nAuthorize:\t", "\n\n", "" };
+
+    int         pos    = 0;
+    char        *ptr   = (char *) (msg+1);
+    int         s;
+#ifdef DEBUG
+    char        *txt   = buffer;
+#endif
+
+    strcpy(buffer,"\nNickname:\t");
+    sz     -= 11;
+    buffer += 11;
+
+    DBGTrace(sz);
+
+    while(*ptr && sz > 0 && pos < 6)
+    {
+       if(*ptr == ICQ_FIELD_SEPARATOR)
+       {
+          strncpy(buffer,tbl[pos],sz);
+          s = strlen(buffer);
+          sz     -= s;
+          buffer += s;
+          pos++;
+       }
+       else
+       {
+          *(buffer++) = *ptr;
+          sz--;
+       }
+       ptr++;
+    }
+
+    DBGTrace(sz);
+    DBGTrace(pos);
+    DBGMessage(txt);
+#else
+    strncpy(buffer,(char *)(msg+1), sz);
+#endif
+ }
+
+ static int _System formatWindow(const MSGEDITHELPER *dlg, MSGEDITWINDOW hwnd, HICQ icq, ULONG uin, USHORT type, BOOL out, HMSG msg)
+ {
+    static const USHORT hide[] = {       ICQMSGC_ENTRY,
+                                         ICQMSGC_BROWSE,
+                                         ICQMSGC_SENDTO,
+                                         ICQMSGC_REJECT,
+                                         ICQMSGC_STATICSUBJ,
+                                         ICQMSGC_SUBJECT,
+                                         ICQMSGC_CHECKBOX,
+                                         ICQMSGC_OPEN,
+                                         0 };
+
+    const USHORT           *wdg;
+    BOOL                   in           = !out;
+    const char             *ptr;
+    int                    qtd;
+
+    for(wdg = hide; *wdg; wdg++)
+       dlg->setVisible(hwnd,*wdg,FALSE);
+
+    dlg->setVisible(hwnd, ICQMSGC_ADD,        in);
+    dlg->setVisible(hwnd, ICQMSGC_REPLY,      in);
+    dlg->setVisible(hwnd, ICQMSGC_NEXT,       in);
+    dlg->setVisible(hwnd, ICQMSGC_SEND,       out);
+    dlg->setVisible(hwnd, ICQMSGC_ACCEPT,     in);
+    dlg->setVisible(hwnd, ICQMSGC_REFUSE,     in);
+    dlg->setVisible(hwnd, ICQMSGC_STATICSUBJ, in);
+    dlg->setVisible(hwnd, ICQMSGC_SUBJECT,    in);
+
+    if(msg)
+    {
+       ptr = (const char *) (msg+1);
+       for(qtd=5;*ptr && qtd;ptr++)
+       {
+          if(*ptr == ICQ_FIELD_SEPARATOR)
+             qtd--;
+       }
+       dlg->setString(hwnd,ICQMSGC_TEXT,ptr);
+    }
+    else
+    {
+       dlg->setString(hwnd,ICQMSGC_TEXT,"");
+    }
+
+    if(out)
+    {
+       dlg->loadString(hwnd, ICQMSGC_STATICEMAIL, ICQMSGS_EMAIL);
+       dlg->loadUserFields(hwnd);
+    }
+    else
+    {
+       icqmsg_loadUserInfoFromRequest(dlg, hwnd, icq, uin, msg);
+    }
+
+    return 0;
+ }
+
+ static int _System send(const MSGEDITHELPER *dlg, MSGEDITWINDOW hwnd, HICQ icq, ULONG uin)
+ {
+    char *text  = malloc(MAX_MSG_SIZE);
+
+#ifdef EXTENDED_LOG
+    icqWriteSysLog(icq,PROJECT,"Sending authorization request");
+#endif
+
+    if(!text)
+    {
+       icqWriteSysLog(icq,PROJECT,"Memory allocation error when sending authorization request");
+       return -1;
+    }
+
+    dlg->getString(hwnd,ICQMSGC_TEXT,MAX_MSG_SIZE,text);
+
+    icqSendConfirmation(icq, uin, MSG_REQUEST, TRUE, text);
+
+    free(text);
+    return 0;
+ }
+
+ void icqmsg_loadUserInfoFromRequest(const MSGEDITHELPER *dlg, MSGEDITWINDOW hwnd, HICQ icq, ULONG uin, HMSG msg)
+ {
+#ifdef OLD_FORMAT
+    const USHORT tbl[] = { ICQMSGC_NICKNAME, 0, ICQMSGC_SUBJECT, ICQMSGC_NAME };
+
+    UCHAR       buffer[0x0100];
+    UCHAR       *txt;
+    int         pos;
+    int         field;
+
+    if(!msg)
+       return;
+
+    dlg->loadString(hwnd, ICQMSGC_STATICNAME,  ICQMSGS_EMAIL);
+    dlg->loadString(hwnd, ICQMSGC_STATICEMAIL, ICQMSGS_DATE);
+    dlg->loadString(hwnd, ICQMSGC_STATICSUBJ,  ICQMSGS_NAME);
+
+    if(msg->msgTime)
+       dlg->showTime(hwnd, ICQMSGC_EMAIL, msg->msgTime);
+
+
+    txt   = (char *) (msg+1);
+    field =
+    pos   = 0;
+
+    while(*txt && field < 4 && pos < 0xFF)
+    {
+       if(*txt == ICQ_FIELD_SEPARATOR)
+       {
+          if(field == 1)
+          {
+             *(buffer+pos) = ' ';
+             pos++;
+          }
+          else
+          {
+             *(buffer+pos) = 0;
+             pos = 0;
+          }
+
+          if( *(tbl+field) )
+             dlg->setString(hwnd,*(tbl+field),buffer);
+
+          field++;
+          txt++;
+       }
+       else
+       {
+          *(buffer+pos) = *(txt++);
+          pos++;
+       }
+    }
+
+    sprintf(buffer,"%lu",uin);
+    dlg->setString(hwnd,ICQMSGC_UIN,buffer);
+
+#else
+
+    if(msg)
+       dlg->setString(hwnd,ICQMSGC_TEXT,(const char *)(msg+1));
+    else
+       dlg->setString(hwnd,ICQMSGC_TEXT,"");
+
+#endif
+ }
+
+ void _System icqmsg_requestWindowChanged(const MSGEDITHELPER *dlg, MSGEDITWINDOW hwnd, HICQ icq, ULONG uin, USHORT oldType, USHORT newType)
+ {
+    static const USHORT tbl[] = { ICQMSGC_NICKNAME, ICQMSGC_NAME, ICQMSGC_SUBJECT };
+
+    char buffer[0x0100];
+
+    int  sz             = 0xFF;
+    int  bytes;
+    char *ptr           = buffer;
+    char *fields[]      = { NULL, NULL, NULL };
+    char *lastName      = NULL;
+
+    int  f;
+
+    if(oldType == newType)
+       return;
+
+    dlg->loadString(hwnd, ICQMSGC_STATICNAME,  ICQMSGS_NAME);
+    dlg->loadString(hwnd, ICQMSGC_STATICSUBJ,  ICQMSGS_SUBJECT);
+
+//    if(newType == MSG_NORMAL && !icqQueryUserHandle(icq,uin))
+    if(!icqQueryUserHandle(icq,uin))
+    {
+       /*
+        * Add user as a temporary to keep information
+        */
+       for(f=0;f<3 && sz > 5;f++)
+       {
+          fields[f] = ptr;
+          dlg->getString(hwnd,*(tbl+f),sz,ptr);
+          bytes = strlen(ptr)+1;
+          ptr   += bytes;
+          sz    -= bytes;
+       }
+
+       if(fields[2])
+       {
+          ptr = fields[2];
+
+          while(*ptr && !isspace(*ptr))
+             ptr++;
+
+          if(*ptr)
+          {
+             *(ptr++) = 0;
+             lastName = ptr;
+          }
+          else
+          {
+             lastName = "";
+          }
+       }
+       icqUpdateUserInfo(icq, uin, FALSE, fields[0], fields[2], lastName, fields[1], FALSE);
+
+    }
+
+ }
+

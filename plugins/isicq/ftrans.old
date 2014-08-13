@@ -1,0 +1,113 @@
+/*
+ * FTRANS.C - File transfer procedures
+ */
+
+#ifdef __OS2__
+ #pragma strings(readonly)
+#endif
+
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+
+ #include "ishared.h"
+
+/*---[ Prototipes ]--------------------------------------------------------------------------------------*/
+
+
+/*---[ Implementation ]----------------------------------------------------------------------------------*/
+
+ int ICQAPI ishare_requestFile(ISHARED_CONFIG *cfg, long ip, USHORT port, USHORT fileID, const UCHAR *md5, const char *fileName, ULONG fileSize)
+ {
+    /*
+     * Try to request a specific file
+     */
+    ISHARED_TRANSFER	*trf;
+    int 		sock;
+    char		buffer[0x0100];
+    ISHARE_TCP_ERROR    sts;
+    ISHARE_TCP_FILEREQ  req;
+
+    sock = ishare_OpenTCP(0);
+
+    if(sock < 0)
+    {
+       netlog(cfg,"Can't create file request sock");
+       return -1;
+    }
+
+    sock = ishare_ConnectSock(sock,ip,ISHARE_TCP_PORT);
+
+    DBGTrace(sock);
+
+    if(sock < 0)
+    {
+       log(cfg,"Can't connect user");
+       return -1;
+    }
+
+    memset(&sts,0,sizeof(sts));
+
+    sts.h.marker = ISHARE_TCP_MARKER;
+    sts.h.id     = ISHARETCP_BEGINTRANSFER;
+
+    memset(&req,0,sizeof(req));
+
+    ishare_Send(sock,&sts.h,sizeof(sts.h));
+
+    req.r.fileID = fileID;
+    req.speed    = 0xFFFF;
+    req.mtu      = 0xFFFF;
+    req.start    = 0;
+    req.end      = fileSize;
+
+    ishare_Send(sock,&req,sizeof(req));
+
+    memset(&sts,0,sizeof(sts));
+    ishare_RecBlock(sock, sizeof(sts), &sts, NULL);
+
+    trf = malloc(sizeof(ISHARED_TRANSFER)+strlen(fileName)+1);
+
+    if(!trf)
+    {
+       log(cfg,"Memory allocation error when starting transfer");
+    }
+    else
+    {
+       memset(trf,0,sizeof(ISHARED_TRANSFER));
+       trf->adm.type = 1;
+       trf->adm.sock = sock;
+       trf->adm.cfg  = cfg;
+       strcpy(trf->filename,fileName);
+       ishare_insertItem(&cfg->admUsers,&trf->adm.l);
+       return ishare_beginSession((ISHARED_ADMIN *) trf);
+    }
+
+    ishare_CloseSocket(sock);
+
+    return -1;
+ }
+
+ BEGIN_TCP_PACKET_PROCESSOR( BEGINTRANSFER )
+ {
+    ISHARE_TCP_FILEREQ req;
+
+    CHKPoint();
+
+    if(!ishare_RecBlock(adm->sock, sizeof(ISHARE_TCP_FILEREQ), &req, &adm->rc))
+    {
+       adm->rc = ISHARE_STATUS_MALFORMED;
+       return 0;
+    }
+
+    DBGTrace(req.r.fileID);
+    DBGTrace(req.speed);
+    DBGTrace(req.mtu);
+    DBGTrace(req.start);
+    DBGTrace(req.end);
+
+
+    END_TCP_PACKET_PROCESSOR( BEGINTRANSFER );
+ }
+
+

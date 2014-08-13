@@ -1,0 +1,247 @@
+/*
+ * msg.c - Receive Greetings message
+ */
+
+#ifdef __OS2__
+ #pragma strings(readonly)
+ #define INCL_DOSPROCESS
+#endif
+
+ #include <stdio.h>
+ #include <string.h>
+ #include <malloc.h>
+
+ #include "peer.h"
+
+ #pragma pack(1)
+
+/*---[ Prototipes ]-------------------------------------------------------------------------------------------*/
+
+/*---[ Implement ]--------------------------------------------------------------------------------------------*/
+
+ int icqv8_rcvGreet(HICQ icq, PEERSESSION *cfg, int sz, PEER_MSG_HEADER *h)
+ {
+    #pragma pack(1)
+
+    struct _pkt
+    {
+       USHORT cmd;          // WORD.L  xx xx   GCMD  The command in this packet. Valid values are:
+                            // 0x0029 =  41 - file request
+                            // 0x002d =  45 - chat request
+                            // 0x0032 =  50 - file request granted/refused
+                            // 0x003a =  58 - Send / Start ICQ Chat
+
+       UCHAR  x1[16];       // 16 ... ID Those 16 bytes seem to be fixed for different commands. Seen:
+                            // bf f7 20 b2 37 8e d4 11 bd 28 00 04 ac 96 d9 05 - chat request
+                            // f0 2d 12 d9 30 91 d3 11 8d d7 00 10 4b 06 46 2e - file request or file request granted/refused
+       USHORT x2;           // EMPTY  Unknown: empty.
+       USHORT txtSize;
+       USHORT x3;
+    } *pkt = (struct _pkt *) (h+1);
+
+    char   *reason   = NULL;
+    char   *filename = NULL;
+    char   *msgBlock = NULL;
+    char   *title    = NULL;
+    ULONG  msgNumber = cfg->seqMasc|((ULONG) h->sequence);
+    char   *ptr      = (char *) (pkt+1);
+    char   *req;
+    int    rc        = 0;
+    int    port      = 0;
+    USHORT wrk;
+    ULONG  fileSize  = 0;
+
+    icqDumpPacket(icq, 0, "*************************", sz - sizeof(PEER_MSG_HEADER), (unsigned char *) (h+1));
+
+
+    pkt->txtSize = SHORT_VALUE(pkt->txtSize);
+
+    DBGTracex(pkt->cmd);
+    DBGTrace(pkt->txtSize);
+
+    title = malloc(pkt->txtSize+5);
+
+    if(!title)
+    {
+       icqWriteSysLog(icq,PROJECT,"Memory allocation error when processing title in " __FUNCTION__ );
+       return -1;
+    }
+
+    DBGMessage(ptr);
+    DBGMessage( (pkt+1) );
+    strncpy(title,ptr,pkt->txtSize+1);
+    *(title+pkt->txtSize) = 0;
+
+    ptr += (pkt->txtSize + 15);
+
+
+    sz -= (sizeof(PEER_MSG_HEADER)+sizeof(struct _pkt)+pkt->txtSize+15);
+
+    DBGTrace(sz);
+
+    if(sz < 0)
+    {
+       icqWriteSysLog(icq,PROJECT,"Invalid msg_greet size");
+       return -1;
+    }
+
+    wrk =  (USHORT) *( (ULONG *) ptr );
+    wrk = SHORT_VALUE(wrk);
+
+    ptr += 4;
+    sz  -= 4;
+
+    DBGTrace(sz);
+    DBGTrace(wrk);
+
+    if(wrk != sz)
+    {
+       icqWriteSysLog(icq,PROJECT,"Invalid size indicator in " __FUNCTION__);
+       return -1;
+    }
+
+    ptr++;  /* Gatilho! */
+    sz--;
+
+    DBGTrace( *((ULONG *) ptr) );
+
+    wrk = (USHORT) *((ULONG *) ptr);
+
+    ptr += 4;
+    sz  -= 4;
+
+    if(sz < wrk)
+    {
+       icqWriteSysLog(icq,PROJECT,"Invalid reason indicator in " __FUNCTION__ );
+       return -1;
+    }
+
+    reason = malloc(wrk+5);
+
+    if(!reason)
+    {
+       icqWriteSysLog(icq,PROJECT,"Memory allocation error when processing reason in " __FUNCTION__ );
+       return -1;
+    }
+
+    strncpy(reason,ptr,wrk+1);
+    *(reason+wrk) = 0;
+
+    DBGMessage(reason);
+
+    sz  -= wrk;
+    ptr += wrk;
+
+
+    wrk = *( (USHORT *) ptr );
+    wrk = SHORT_VALUE(wrk);
+
+    port = wrk;
+    ptr  += 4;
+    sz   -= 4;
+
+    if(sz > 0)
+    {
+       wrk = *( (USHORT *) ptr );
+       DBGTrace(wrk);
+
+       if(sz < wrk)
+       {
+          icqWriteSysLog(icq,PROJECT,"Invalid filename size in " __FUNCTION__);
+          rc = -1;
+       }
+       else
+       {
+          ptr += 2;
+          sz  -= 2;
+
+          filename = malloc(wrk+5);
+
+          if(!filename)
+          {
+             icqWriteSysLog(icq,PROJECT,"Memory allocation error when processing file name");
+             rc = -1;
+          }
+          else
+          {
+             strncpy(filename,ptr,wrk+1);
+             *(filename+wrk)=0;
+             sz  -= wrk;
+             ptr += wrk;
+             icqDumpPacket(icq, NULL, "x1", sz, ptr);
+             fileSize = *( (ULONG *) ptr );
+
+             /* Cria a requisicao */
+             req = icqCreateRequest(	icq,
+             				FALSE,
+             				(ULONG) cfg,
+             				msgNumber,
+             				&icqv8_peerDescriptor,
+             				cfg,
+             				strlen(title)+strlen(reason)+strlen(filename)+12 );
+             if(req)
+             {
+                *( (ULONG *) req) =  fileSize;
+                req += 4;
+
+                *( (USHORT *) req) = pkt->cmd;
+                req += 2;
+
+                sprintf(req,"%s\x00%s\x00%s",title,reason,filename);
+             }    				
+
+             /* Registra a mensagem */
+             msgBlock = malloc(strlen(title)+strlen(reason)+strlen(filename)+60);
+
+             if(!msgBlock)
+             {
+                icqWriteSysLog(icq,PROJECT,"Memory allocation error when creating request message");
+                rc = -1;
+             }
+             else
+             {
+                sprintf(msgBlock,"%s\x01%s\x01%s\x01%ld",
+                                        title,
+                			reason,
+                			filename,
+                			fileSize);
+                DBGMessage(msgBlock);
+                icqInsertMessage(icq, cfg->uin, msgNumber, MSG_GREET, 0, 0, strlen(msgBlock), msgBlock);             			
+             }
+          }
+       }
+    }
+
+    DBGTrace(rc);
+
+
+    DBGTrace(port);
+    DBGTrace(fileSize);
+
+    if(filename);
+    {
+       DBGPrint("Filename= \"%s\"",filename);
+       free(filename);
+    }
+
+    if(reason)
+    {
+       DBGPrint("Reason= \"%s\"",reason);
+       free(reason);
+    }
+
+    if(title)
+    {
+       DBGPrint("Title= \"%s\"",title);
+       free(title);
+    }
+
+    if(msgBlock)
+    {
+       DBGMessage(msgBlock);
+       free(msgBlock);
+    }
+
+    return rc;
+ }
+

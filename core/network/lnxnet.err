@@ -1,0 +1,21 @@
+lnxnet.c(6): Error! E1091: Linux only
+S:\watcom\H\OS2\netinet/in.h(58): Error! E1022: Missing or misspelled data type near 'u_long'
+S:\watcom\H\OS2\netinet/in.h(145): Error! E1022: Missing or misspelled data type near 'u_short'
+S:\watcom\H\OS2\netinet/in.h(149): Error! E1022: Missing or misspelled data type near 'u_char'
+S:\watcom\H\OS2\netinet/in.h(150): Error! E1022: Missing or misspelled data type near 'u_char'
+S:\watcom\H\OS2\netinet/in.h(151): Error! E1022: Missing or misspelled data type near 'u_short'
+s:\watcom\h\nt\winsock2.h(54): Error! E1019: Tag 'fd_set' already defined
+s:\watcom\h\nt\winsock2.h(102): Error! E1019: Tag 'timeval' already defined
+s:\watcom\h\nt\winsock2.h(109): Error! E1100: Definition of macro 'timercmp' not identical to previous definition
+s:\watcom\h\nt\winsock2.h(113): Error! E1019: Tag 'hostent' already defined
+s:\watcom\h\nt\winsock2.h(121): Error! E1019: Tag 'linger' already defined
+s:\watcom\h\nt\winsock2.h(125): Error! E1100: Definition of macro 'IOCPARM_MASK' not identical to previous definition
+s:\watcom\h\nt\winsock2.h(126): Error! E1100: Definition of macro 'IOC_VOID' not identical to previous definition
+s:\watcom\h\nt\winsock2.h(127): Error! E1100: Definition of macro 'IOC_OUT' not identical to previous definition
+s:\watcom\h\nt\winsock2.h(128): Error! E1100: Definition of macro 'IOC_IN' not identical to previous definition
+s:\watcom\h\nt\winsock2.h(132): Error! E1100: Definition of macro '_IO' not identical to previous definition
+s:\watcom\h\nt\winsock2.h(133): Error! E1100: Definition of macro '_IOR' not identical to previous definition
+s:\watcom\h\nt\winsock2.h(134): Error! E1100: Definition of macro '_IOW' not identical to previous definition
+s:\watcom\h\nt\winsock2.h(135): Error! E1100: Definition of macro 'FIONBIO' not identical to previous definition
+s:\watcom\h\nt\winsock2.h(138): Error! E1100: Definition of macro 'FIONREAD' not identical to previous definition
+s:\watcom\h\nt\winsock2.h(139): Error! E1147: Too many errors: compilation aborted

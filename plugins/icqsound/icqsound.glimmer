@@ -1,0 +1,88 @@
+<file>
+filename=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqsound/icqsound.c
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=4
+line=14
+directory=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqsound
+compiler=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 %3.o 2>&1
+debugger=%term% gdb %3
+execution=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 run
+</file>
+<file>
+filename=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqsound/lnxplay.c
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=4
+line=13
+directory=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqsound
+compiler=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 %3.o 2>&1
+debugger=%term% gdb %3
+execution=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 run
+</file>
+<file>
+filename=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqsound/makefile
+over_ride=0
+bracketmatch=1
+highlight=0
+use_spaces=0
+tab_stop=4
+line=31
+directory=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqsound
+compiler=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 %3.o 2>&1
+debugger=%term% gdb %3
+execution=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 run
+</file>
+<file>
+filename=/mnt/os2data/data/ibmcpp/sources/icq2/loaders/gtk/main.c
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=4
+line=55
+directory=/mnt/os2data/data/ibmcpp/sources/icq2/loaders/gtk
+compiler=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 %3.o 2>&1
+debugger=%term% gdb %3
+execution=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 run
+</file>
+<file>
+filename=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqsound/sndconfig.c
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=4
+line=103
+directory=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqsound
+compiler=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 %3.o 2>&1
+debugger=%term% gdb %3
+execution=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 run
+</file>
+<file>
+filename=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqsound/icqsound.h
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=4
+line=19
+directory=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqsound
+compiler=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 %3.o 2>&1
+debugger=%term% gdb %3
+execution=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 run
+</file>
+<file>
+filename=/home/perry/icq2/pwicq2.spec
+over_ride=0
+bracketmatch=1
+highlight=0
+use_spaces=0
+tab_stop=3
+line=8
+directory=file:///home/perry/icq2/
+</file>

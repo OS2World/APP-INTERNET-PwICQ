@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>
+	OSCAR Protocol: Section 3: Connection Management
+    </title>
+  </head>
+
+  <body bgcolor="#FFFFFF" link="#444444" vlink="#666666">
+    <table width="1" border="0" align="center">
+      <tr>
+	<td><img src="/images/blank.gif" height="1" width="540">
+      </tr>
+      <tr>
+	<td align="right">
+	  <img src="/faim/faim.gif" border="0" width="111" height="50"><br>
+	  <A href="/pst/"><img src="/pst/pst_small.gif" border="0"></a>
+	</td>
+      </tr>
+      <tr>
+	<td align="center">
+	  <b><font size="+1">AIM/Oscar Protocol Specification: Section 3: Connection Management</font></b>
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  <hr noshade>
+	  <table width="100%" border="0" align="center">
+	    <tr>
+	      <td width="1%" valign="top">
+		<img src="/images/blank.gif" width="5" height="1" border="0"><br>
+	      </td>
+	      <td width="1%" bgcolor="#BBBBBB">
+
+	      </td>
+	      <td width="1%">
+		<img src="/images/blank.gif" width="5" height="1" border="0">
+	      </td>
+	      <td width="98%">
+		<img src="/images/blank.gif" width="460" height="1" border="0"><br>
+		<font size="+1"><b>3.0 Connection Management</b></font>
+		<p>
+		  Every protocol begins with a single step...
+		</p>
+		<b>3.1 The Life and Times of OSCAR, the Real-Time Messenger (Overview)</b>
+		<p>
+		  Before connections are made to any of the BOS or special-purpose servers, you must first be authorized by the Authorization Server (login.oscar.aol.com).  This will return a cookie that automatically authorizes you to connect to any of the BOS or special-purpose (eg, Advertisement, Chat, etc) servers.  This streamlines the login process quite a bit.  
+		</p>
+		<p>
+		  The normal steps taken to create an average AIM session are as follows:
+		</p>
+		<ol>
+		  <li>Connect to Authorizer and retrieve Cookie.</li>
+		  <li>Connect to the Authorizer-recommended BOS server and initiate BOS service</li>
+		  <li>(Optional) Connect to Advertisements server and retrieve first block of ads (repeat at regular interval)</li>
+		  <li>(Optional) Connect to any other non-BOS services that may be available (AFAIK, none at this point)</li>
+		</ol>
+		<p>
+		  The last three steps may actually be done in any order (and for the third and fourth step, probably not at all).  But, authorization must always come first.
+		</p>
+
+		<b>3.2 OSCAR Authorization</b>
+		<p>
+		  OSCAR has a sense of the "single-login" concept.  You login once and get a "cookie" that automatically authorizes you to use any of the OSCAR-associated services, just by sending them your cookie.  
+		</p>
+		<p>
+		  The first step of the process is connecting to the Authorizer.  This currently resides at the DNS address login.oscar.aol.com.  It also appears that you may connect to any port and get the same response.  (The AIM clients use 5190, James uses 443, I've used 21 (telnet) before as well.)  
+		</p>
+		<p>
+		  After the connection, the client must send the "<a href="auth_request.html">Authorization Request</a>" command.  The server also sends a 4b+FLAP command to the client after each new connection, called the "<a href="conn_ack.html">Connection Acknowledge</a>" command.  This may be accepted and processed before or after the inital command from the client (for use it dispatch routines, this can be used as a sign that the inital login should be sent).  The response to this (<a href="auth_response.html">"Authorization Response</a>") contains the cookie to be used for the BOS and other connections.  But, if the the Authorization Request fails, you'll get back any one of the several "<a href="auth_errors.html">Authorization Errors</a>". After you've gotten your cookie, it's safe to disconnect yourself from the Authorizer.  
+		</p>
+
+		<b>3.3 BOS Singon</b>
+		<p>
+		  The next step is usually to connect to and initiate service with the BOS.  The address of the BOS you should connect to is listed in the <A href="auth_response.html">Authorization Response</a>.  The first step for this connection is to send the <a href="bos_signon.html">BOS-Signon</a> command to the server.  But, for the purposes of dispatching, it may be best to wait to send this command until the <a href="conn_ack.html">Connection Acknowledge</a> command is recieved from the server immediatly after the connection opens, although this is optional and can be processed afterwards.
+		</p>
+		<p>
+		  Normal BOS signon looks something like this...
+		</p>
+		<ol>
+		  <li>Server sends <a href="conn_ack.html">Connection Acknowledge</a></li>
+		  <li>Client sends <a href="bos_signon.html">BOS SignOn</a> command.</li>
+		  <li>Server sends <a href="bos_hostready.html">BOS Host-Ready</a>.</li>
+		  <li>Client sends <a href="bos_rate_req.html">Rate Information Request</a>.</li>
+		  <li>Server sends <a href="bos_rate_resp.html">Rate Information Response</a>.</li>
+		  <li>Client sends <a href="bos_rate_ack.html">Rate Information Acknowledge</a>.</li>
+		  <li>Client requests (in no particular order):
+		    <ul>
+		      <li><A href="bos_setprivacy.html">Set Privacy Flags</a></li>
+		      <li><a href="bos_req_ourinfo.html">Request Our User Information</a></li>
+		      <li><a href="bos_service_req.html">Request New Service</a></li>
+		      <li>Optional: <a href="bos_req_rights.html">Request BOS Rights</a></li>
+		      <li>Optional: <a href="bos_req_buddy_rights.html">Request Buddy List Rights</a></li>
+		      <li>Optional: <a href="bos_req_locate_rights.html">Request Locate Rights</a></li>
+		      <li>Optional: <a href="bos_req_icbm_param.html">Request ICBM Parameter Information</a></li>
+		    </ul>
+		  </li>
+		  <li>Server sends all the information requested (again, in no particular order):
+		    <ul>
+		      <li><a href="bos_resp_ourinfo.html">Our User Information Response</a></li>
+		      <li><a href="bos_resp_rights.html">BOS Rights Response</a></li>
+		      <li><a href="bos_resp_buddy_rights.html">Buddy List Rights Response</a></li>
+		      <li><a href="bos_resp_locate_rights.html">Locate Rights Response</a></li>
+		      <li><a href="bos_resp_icbm_param.html">ICBM Parameter Information Response</a></li>
+		      <li><a href="bos_service_redirect.html">New Service Redirect</a></li>
+		    </ul>
+		  </li>
+		  <li>(Aparently Optional) Client sends a SNAC of family 0x0009, subtype 0x0004, data {0x0000, 0x001f}. </li>
+		  <li>(Aparently Optional) Client sends a SNAC of family 0x0009, subtype 0x0007, no data.</li>
+		  <li>Client sends up buddy list using the <a href="buddy_add_buddy.html">Add Buddy to Buddy List</a> command.</li>
+		  <li>Client sends up user's profile using the <a href="setuserinfo.html">Set User Information</a> command.</li>
+		  <li>Client sends the <A href="icbm_param_initial.html">Set Initial ICBM Parameter</a> command.</li>
+		  <li>Client sends the <a href="bos_client_ready.html">Client Ready</a> command.
+		</ol>		 
+		<p>
+		  At that point, you can either quit and begin processing live events, or you may use the information provided in the <a href="bos_service_redirect.html">New Service Redirect</a> command to connect to the Advertisments or other server.
+		</p>
+
+		
+		<b>3.4 Logout</b>
+		<p>
+		  Logging off of AIM is about the simplest thing you can do.  The abrupt way to do it is just closing the connection to the main message server.  That will normally do it.  Sometimes, though, the AIM client sends a small command to the server before it closes, but expects no response.  I've found the best way is just to close it forget about it.
+		</p>
+		<p>
+		  This "logout command" is just a FLAP without a Data Field, and the Data Field Length set to 0x0000.  
+		</p>
+
+
+	      </td>
+
+	      <td width="1%">
+		<img src="/images/blank.gif" width="10" height="1" border="0">
+	      </td>
+	      <td width="1%" bgcolor="#BBBBBB">
+		&nbsp;
+	      </td>
+	      <td width="1%" valign="top">
+		<img src="/images/blank.gif" width="50" height="1" border="0"><br>
+		<a href="/pst/"><img src="/pst/bar_home.gif" width="50" height="15" border="0"></a><br>
+		<a href="/pst/software/"><img src="/pst/bar_software.gif" width="50" height="15" border="0"></a>
+	      </td>
+	    </tr>
+	  </table>
+	  <hr noshade>
+	  <Center>
+	    <address><a href="mailto:afritz@iname.com">Adam Fritzler</a></address>
+	      <!-- Created: Sat Jun 20 20:35:10 MST 1998 -->
+	    <!-- hhmts start -->
+Last modified: Fri Jul 24 21:21:53 MST 1998
+<!-- hhmts end -->	
+	  </center>
+	</td>
+      </tr>
+    </table>
+  </body>
+</html>

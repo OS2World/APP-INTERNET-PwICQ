@@ -1,0 +1,65 @@
+Frame 1 (127 on wire, 127 captured)
+    Arrival Time: Oct  8, 2001 23:15:52.418237
+    Time delta from previous packet: 0.000000 seconds
+    Time relative to first packet: 0.000000 seconds
+    Frame Number: 1
+    Packet Length: 127 bytes
+    Capture Length: 127 bytes
+Ethernet II
+    Destination: 00:c0:49:40:9f:fe (US_40:9f:fe)
+    Source: 00:a0:c9:0a:ee:6e (Intel_0a:ee:6e)
+    Type: IP (0x0800)
+Internet Protocol, Src Addr: 172.17.31.230 (172.17.31.230), Dst Addr: 205.188.1.216 (205.188.1.216)
+    Version: 4
+    Header length: 20 bytes
+    Differentiated Services Field: 0x00 (DSCP 0x00: Default; ECN: 0x00)
+        0000 00.. = Differentiated Services Codepoint: Default (0x00)
+        .... ..0. = ECN-Capable Transport (ECT): 0
+        .... ...0 = ECN-CE: 0
+    Total Length: 113
+    Identification: 0xa100
+    Flags: 0x04
+        .1.. = Don't fragment: Set
+        ..0. = More fragments: Not set
+    Fragment offset: 0
+    Time to live: 128
+    Protocol: TCP (0x06)
+    Header checksum: 0xbdfa (correct)
+    Source: 172.17.31.230 (172.17.31.230)
+    Destination: 205.188.1.216 (205.188.1.216)
+Transmission Control Protocol, Src Port: 1036 (1036), Dst Port: aol (5190), Seq: 190296, Ack: 170088066
+    Source port: 1036 (1036)
+    Destination port: aol (5190)
+    Sequence number: 190296
+    Next sequence number: 190369
+    Acknowledgement number: 170088066
+    Header length: 20 bytes
+    Flags: 0x0018 (PSH, ACK)
+        0... .... = Congestion Window Reduced (CWR): Not set
+        .0.. .... = ECN-Echo: Not set
+        ..0. .... = Urgent: Not set
+        ...1 .... = Acknowledgment: Set
+        .... 1... = Push: Set
+        .... .0.. = Reset: Not set
+        .... ..0. = Syn: Not set
+        .... ...0 = Fin: Not set
+    Window size: 8849
+    Checksum: 0x4140 (correct)
+AOL Instant Messenger
+    Command Start: 0x2a
+    Channel ID: 0x02
+    Sequence Number: 31231
+    Data Field Length: 67
+    FNAC
+        FNAC Family ID: 0x0004
+        FNAC Subtype ID: 0x0006
+        Screen Name: 13614305
+
+0000  00 c0 49 40 9f fe 00 a0 c9 0a ee 6e 08 00 45 00   ..I@.......n..E.             
+0010  00 71 a1 00 40 00 80 06 bd fa ac 11 1f e6 cd bc   .q..@...........             
+0020  01 d8 04 0c 14 46 00 02 e7 58 0a 23 56 82 50 18   .....F...X.#V.P.             
+0030  22 91 41 40 00 00 2a 02 79 ff 00 43 00 04 00 06   ".A@..*.y..C....             
+0040  00 00 00 01 00 06 eb 24 05 00 c4 47 00 00 00 01   .......$...G....             
+0050  08 31 33 36 31 34 33 30 35 00 02 00 1e 05 01 00   .13614305.......             
+0060  01 01 01 01 00 15 00 00 00 00 6d 65 6e 73 61 67   ..........mensag             
+0070  65 6d 20 74 65 73 74 65 2e 2e 2e 00 06 00 00      em teste.......              

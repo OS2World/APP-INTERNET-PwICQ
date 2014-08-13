@@ -1,0 +1,21 @@
+
+[executer]
+RunInTerminal=true
+
+[Project DBase]
+ShowLocals=true
+
+[filenumbers]
+0=55
+1=25
+2=84
+
+[filemarkers]
+0=
+1=
+2=
+
+[filelist]
+0=/mnt/os2data/data/ibmcpp/sources/icq2/loaders/linux/lnxloader.c
+1=/mnt/os2data/data/ibmcpp/sources/icq2/loaders/linux/makefile
+2=/mnt/os2data/data/ibmcpp/sources/icq2/core/kernel/icqcore.spec

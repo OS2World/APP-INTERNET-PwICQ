@@ -1,0 +1,18 @@
+/NOIGNORECASE+     
+/MAP /A:2 /PACKCODE /EXEPACK:2 /NODEBUG /NOEXTDICTIONARY+ 
+/NODEFAULTLIBRARYSEARCH /PACKDATA /PMTYPE:VIO+ 
+icqskmgr.obj+
+ init.obj+
+ mainwin.obj+
+ sysevent.obj+
+ sysmenu.obj+
+ timer.obj+
+ ulist.obj+
+ userevent.obj+
+ usrmenu.obj+
+ away.obj+
+ config.obj+
+ drag.obj+
+
+w:\private\pwicq2\plugins\icqskmgr.dll     
+icqskmgr.map    

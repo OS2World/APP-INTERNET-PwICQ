@@ -1,0 +1,74 @@
+/*
+ * mactions.c - Message Dialog actions
+ */
+
+ #include <string.h>
+ #include <pwicqgui.h>
+
+/*---[ Macros ]-------------------------------------------------------------------------------*/
+
+ #define icqDeclareActionProcessor(e)     int icqMsgAction_##e(hWindow,ICQMSGDIALOG *,USHORT)
+ #define icqActionProcessor(e)            { e, (int(*)(hWindow,ICQMSGDIALOG *,USHORT)) icqMsgAction_##e }
+ #define icqBeginActionProcessor(e)       int icqMsgAction_##e(hWindow hwnd, ICQMSGDIALOG *cfg, USHORT id)
+
+/*---[ Processor Functions ]------------------------------------------------------------------*/
+
+ icqDeclareActionProcessor(MSGID_CLOSEBUTTON);
+ icqDeclareActionProcessor(MSGID_SENDBUTTON);
+ icqDeclareActionProcessor(MSGID_ADDBUTTON);
+
+/*---[ Processor table ]----------------------------------------------------------------------*/
+
+ static const struct icqMsgActionProcessors
+ {
+    USHORT id;
+    int    (*exec)(hWindow,ICQMSGDIALOG *, USHORT);
+ }
+ proctable[] =
+ {
+    icqActionProcessor(MSGID_CLOSEBUTTON),
+    icqActionProcessor(MSGID_SENDBUTTON),
+    icqActionProcessor(MSGID_ADDBUTTON)
+ };
+
+/*---[ Implementation ]-----------------------------------------------------------------------*/
+
+ void PWICQDECL icqskin_msgWindowAction(hWindow hwnd, USHORT id)
+ {
+    ICQMSGDIALOG *cfg = icqskin_getWindowDataBlock(hwnd);
+    int          f;
+
+    for(f=0;f< (sizeof(proctable)/sizeof(struct icqMsgActionProcessors));f++)
+    {
+       if(proctable[f].id == id)
+       {
+          proctable[f].exec(hwnd,cfg,id);
+          return;
+       }
+    }
+
+    DBGPrint("Unexpected action code %d",id);
+
+ }
+
+ icqBeginActionProcessor(MSGID_CLOSEBUTTON)
+ {
+    CHKPoint();
+    icqskin_closeWindow(hwnd);
+    return 0;
+ }
+
+ icqBeginActionProcessor(MSGID_SENDBUTTON)
+ {
+    CHKPoint();
+    return 0;
+ }
+
+ icqBeginActionProcessor(MSGID_ADDBUTTON)
+ {
+    CHKPoint();
+    return 0;
+ }
+
+
+

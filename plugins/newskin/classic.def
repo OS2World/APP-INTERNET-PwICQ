@@ -1,0 +1,14 @@
+;========================================================================
+; ICQGUI.DEF - Definicoes para o gerenciador de skins do pwICQ
+;========================================================================
+
+LIBRARY      CLASSIC INITINSTANCE TERMINSTANCE
+
+PROTMODE
+
+DATA         MULTIPLE READWRITE LOADONCALL NONSHARED
+CODE         LOADONCALL
+
+EXPORTS      pwICQ_Configure
+
+

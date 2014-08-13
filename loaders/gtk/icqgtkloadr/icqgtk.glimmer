@@ -1,0 +1,117 @@
+<file>
+filename=/mnt/os2data/data/ibmcpp/sources/icq2/include/icqdefs.h
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=8
+line=209
+directory=/mnt/os2data/data/include/linux
+compiler=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 %3.o 2>&1
+debugger=%term% gdb %3
+execution=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 run
+</file>
+<file>
+filename=/home/perry/icq2/loaders/gtk/lnxloader.c
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=4
+line=254
+directory=file:///home/perry/icq2/loaders/gtk/
+compiler=glimmerout gcc -g %2 -o %3 2>&1
+debugger=%term% gdb %3
+execution=%term% %1/%3
+</file>
+<file>
+filename=/home/perry/icq2/loaders/gtk/user.c
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=4
+line=138
+directory=file:///home/perry/icq2/loaders/gtk/
+compiler=glimmerout gcc -g %2 -o %3 2>&1
+debugger=%term% gdb %3
+execution=%term% %1/%3
+</file>
+<file>
+filename=/home/perry/icq2/loaders/gtk/timer.c
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=4
+line=222
+directory=file:///home/perry/icq2/loaders/gtk/
+compiler=glimmerout gcc -g %2 -o %3 2>&1
+debugger=%term% gdb %3
+execution=%term% %1/%3
+</file>
+<file>
+filename=/home/perry/icq2/loaders/gtk/makefile
+over_ride=0
+bracketmatch=1
+highlight=0
+use_spaces=0
+tab_stop=8
+line=15
+directory=file:///home/perry/icq2/loaders/gtk/
+compiler=glimmerout gcc -g %2 -o %3 2>&1
+debugger=%term% gdb %3
+execution=%term% %1/%3
+</file>
+<file>
+filename=/home/perry/icq2/loaders/gtk/lnxloader.c
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=4
+line=10
+directory=file:///home/perry/icq2/loaders/gtk/
+compiler=glimmerout gcc -g %2 -o %3 2>&1
+debugger=%term% gdb %3
+execution=%term% %1/%3
+</file>
+<file>
+filename=/home/perry/icq2/loaders/gtk/msgdlg.c
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=4
+line=588
+directory=file:///home/perry/icq2/loaders/gtk/
+compiler=glimmerout gcc -g %2 -o %3 2>&1
+debugger=%term% gdb %3
+execution=%term% %1/%3
+</file>
+<file>
+filename=/home/perry/icq2/include/msgdlg.h
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=4
+line=44
+directory=file:///home/perry/icq2/include/
+compiler=glimmerout gcc -g %2 -o %3 2>&1
+debugger=%term% gdb %3
+execution=%term% %1/%3
+</file>
+<file>
+filename=/home/perry/icq2/include/icqdefs.h
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=4
+line=222
+directory=file:///home/perry/icq2/include/
+compiler=glimmerout gcc -g %2 -o %3 2>&1
+debugger=%term% gdb %3
+execution=%term% %1/%3
+</file>

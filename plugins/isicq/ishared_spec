@@ -1,0 +1,44 @@
+Summary: IShare Daemon
+Name: ishared
+Version: 0.1.0
+Copyright: Perry Werneck
+Release: 0
+Group: Applications/Internet
+Packager: Perry Werneck
+BuildRoot: /tmp/ishared.$
+
+%description
+IShare standalone client
+
+%install
+rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT/usr/bin
+mkdir -p $RPM_BUILD_ROOT/etc
+mkdir -p $RPM_BUILD_ROOT/etc/init.d
+
+install -m 755 /mnt/os2data/public/pwicq2/linux/ishare $RPM_BUILD_ROOT/usr/bin
+install -m 755 /mnt/os2data/data/ibmcpp/sources/icq2/plugins/isicq/install/ishare.sh $RPM_BUILD_ROOT/etc/init.d/ishared
+install -m 444 /mnt/os2data/data/ibmcpp/sources/icq2/plugins/isicq/install/ishare.folder $RPM_BUILD_ROOT/etc
+install -m 444 /mnt/os2data/data/ibmcpp/sources/icq2/plugins/isicq/install/ishare.lst $RPM_BUILD_ROOT/etc
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root)
+
+/usr/bin/ishare
+/etc/ishare.folder
+/etc/ishare.lst
+/etc/init.d/ishared
+
+%config
+
+%pre
+
+%preun
+
+%post
+
+%postun
+

@@ -1,0 +1,43 @@
+<html>
+<body>
+  <h2>File Transfers</h2><br>
+  <table cellspacing=0 cellpadding=2>
+    <tr><td colspan="5">Command: 0x02 - File Request/Response</td></tr>
+    <tr bgcolor=#CCCCCC valign=top><td colspan=2 width=100>Data type</td><td width=100>Content</td><td width=100>Name</td><td width=200>Description</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td colspan=2>DWORD</td><td>xx xx xx xx</td><td>CHECKSUM</td><td>Checksum of the packet</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td colspan=2>WORD.L</td><td>EE 07</td><td>COMMAND</td><td>Should be 0xEE07 for request, 0xDA07 for response</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td colspan=2>WORD.L</td><td>0E 00</td><td>UNKNOWN</td><td>Unknown, always 0x0E00 (14)</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td colspan=2>WORD.L</td><td>xx xx</td><td>SEQ</td><td>Sequence number</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td colspan=2>12 BYTES</td><td>00 ..</td><td>UNKNOWN</td><td>12 empty bytes</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td colspan=2>WORD.L</td><td>1A 00</td><td>SUBCMD</td><td>A subcommand: advanced message format</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td colspan=2>WORD</td><td>xx xx</td><td>UNKNOWN</td><td>Unknown, 0x0000 - for accept, 0x0100 - for decline, also seen 0x0400</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td colspan=2>WORD.L</td><td>xx xx</td><td>STATUS</td><td>Current status of the user:<br> 00 00 - Online<br> 00 01 - Invisible<br> 01 00 - Away<br>02 00 - DND<br>04 00 - N/A<br>10 00 - Occupied<br>20 00 - Free For Chat<br></td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td colspan=2>WORD.L</td><td>xx xx</td><td>MSGLEN</td><td>Message length.  Should be at least one byte.</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td colspan=2>STRING</td><td>xx .. 00</td><td>UNKNOWN</td><td>NULL terminated message. If it's a file decline this message contains reason.</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td colspan=2>WORD.L</td><td>xx xx</td><td>LEN</td><td>Message length</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td width=10>&nbsp;</td><td>16 BYTES</td><td>xx ..</td><td>SIGNATURE</td><td>Signature of the message. Identical in every message type.</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td width=10>&nbsp;<td>WORD</td><td>00 00</td><td>UNKNOWN</td><td>Always empty</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td width=10>&nbsp;</td><td>DWORD.L</td><td>xx xx xx xx</td><td>TEXTLEN</td><td>Length of a text command</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td width=10>&nbsp;</td><td>STRING</td><td>xx ..</td><td>TEXTCMD</td><td>Text command, should be 'File'</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td>&nbsp;</td><td>15 BYTES</td><td>00 00 xx 00 00 01 00 00<br>00 00 00 00 00 00 00</td><td>UNKNOWN</td><td>Seen xx = 0x00(Sending contacts, contact requests), 0x01(File and Chat requests/responses)</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td colspan=2>DWORD.L</td><td>xx xx xx xx</td><td>DATALEN</td><td>Length of remaining data in the packet</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td width=10>&nbsp;</td><td>DWORD.L</td><td>xx xx xx xx</td><td>LEN</td><td>Length of files description</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td width=10>&nbsp;</td><td>STRING</td><td>xx ..</td><td>TEXT</td><td>Files description</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td width=10>&nbsp;</td><td>WORD</td><td>xx xx</td><td>PORT</td><td>On response: bind server to this Port, after sending this packet client will connect to it and continue file acks; On request: there's set the port for unknown reasons, but server doesn't bind to it(may be recommended port).</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td width=10>&nbsp;</td><td>WORD.L</td><td>xx xx</td><td>SEQ2</td><td>Sequence number, increased by 1 when file was sent successfull. Empty in responses.</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td width=10>&nbsp;</td><td>WORD.L</td><td>xx xx</td><td>LEN</td><td>Length of filename</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td width=10>&nbsp;</td><td>STRING</td><td>xx ..</td><td>FILENAME</td><td>Filename</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td width=10>&nbsp;</td><td>DWORD.L</td><td>xx xx xx xx</td><td>FILELEN</td><td>Length of all files</td></tr>
+    <tr bgcolor=#EEEEEE valign=top><td width=10>&nbsp;</td><td>DWORD.L</td><td>xx xx xx xx</td><td>PORT</td><td>Port again</td></tr>
+
+
+
+
+    <!--<tr bgcolor=#EEEEEE><td>27 BYTES</td><td>xx ..</td><td>UNKNOWN3</td><td>27 mostly unknown bytes of data</td></tr>
+    <tr bgcolor=#EEEEEE><td>19 BYTES</td><td>xx ..</td><td>UNKNOWN4</td><td>Another 19 bytes of unknown data</td></tr>
+    <tr bgcolor=#EEEEEE><td>DWORD.L</td><td>xx xx xx xx</td><td>TEXTLEN</td><td>Length of text command</td></tr>
+    <tr bgcolor=#EEEEEE><td>STRING</td><td>xx ..</td><td>TEXTCMD</td><td>Text command, should be 'File'</td></tr>
+    <tr bgcolor=#AAAAAA height=2><td></td><td></td><td></td><td></td></tr>-->
+  </table>
+</body>
+</html>

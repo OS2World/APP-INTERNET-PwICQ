@@ -1,0 +1,168 @@
+/*
+ * added.c - "You were added"  message processing
+ */
+
+ #include <string.h>
+ #include <stdio.h>
+ #include <malloc.h>
+ #include <ctype.h>
+
+ #include "icqmsg.h"
+
+/*----------------------------------------------------------------------------------------------------*/
+
+ static const char * _System title(HICQ, HUSER, ULONG, BOOL, ICQMSG *, char *, int);
+ static void         _System formatLog(HICQ, BOOL, ICQMSG *, char *, int);
+ static int          _System formatWindow(const MSGEDITHELPER *, MSGEDITWINDOW, HICQ, ULONG, USHORT, BOOL, HMSG);
+
+/*----------------------------------------------------------------------------------------------------*/
+
+ MSGMGR icqmsg_added = {        sizeof(MSGMGR),
+                                MSG_NORMAL,              /* type of reply for this kind of message    */
+                                ICQMSGMF_LOADUSERFIELDS|ICQMSGMF_SYSTEMMESSAGE, /* Flags                                     */
+                                { 29,30 },                   /* Icons                                     */
+                                FILTER_REQUEST,              /* Message pre-processor                       */
+                                title,                       /* Query the message title */
+                                formatLog,                   /* format the log entry for the message */
+                                NULL,                        /* View/edit message, if not defined the internal MSG Edit box is called */
+                                formatWindow,                /* Show/Hide default msg-edit window controls, fill values from the message */
+                                NULL,                        /* Button override, return FALSE if the button wasn't processed */
+                                NULL,                        /* Read default message dialog controls, format packet and send */
+                                NULL,                        /* Executes the SEND-TO button */
+                                icqmsg_requestWindowChanged, /* Called when the window is receiving another message */
+#ifdef __OS2__
+                                NULL,                        /* Event processor for the message-edit window */
+                                NULLHANDLE
+#else
+                                NULL
+#endif
+
+                        };
+
+
+/*----------------------------------------------------------------------------------------------------*/
+
+ static const char * _System title(HICQ icq, HUSER usr, ULONG uin, BOOL out, ICQMSG *msg, char *buffer, int sz)
+ {
+    char        temp[0x0100];
+    char        *ptr            = (char *) (msg+1);
+
+    CHKPoint();
+
+    strcpy(buffer,"You were added from ");
+
+    if(msg)
+    {
+       strncpy(temp,ptr,0xFF);
+       for(ptr = temp;*ptr && *ptr != ICQ_FIELD_SEPARATOR;ptr++);
+       *ptr = 0;
+       strncat(buffer,temp,sz);
+
+       sprintf(temp," (ICQ#%lu)",uin);
+    }
+    else
+    {
+       sprintf(temp," ICQ#%lu",uin);
+    }
+
+    strncat(buffer,temp,sz);
+
+    DBGMessage(buffer);
+
+    return buffer;
+
+ }
+
+ static void _System formatLog(HICQ icq, BOOL out, ICQMSG *msg, char *buffer, int sz)
+ {
+    static const char *tbl[] = { "\nName:\t\t"," ","\nE-Mail:\t\t", "\nAuthorize:\t", "\n\n", "" };
+
+    int         pos    = 0;
+    char        *ptr   = (char *) (msg+1);
+    int         s;
+#ifdef DEBUG
+    char        *txt   = buffer;
+#endif
+
+    strcpy(buffer,"\nNickname:\t");
+    sz     -= 11;
+    buffer += 11;
+
+    DBGTrace(sz);
+
+    while(*ptr && sz > 0 && pos < 6)
+    {
+       if(*ptr == ICQ_FIELD_SEPARATOR)
+       {
+          strncpy(buffer,tbl[pos],sz);
+          s = strlen(buffer);
+          sz     -= s;
+          buffer += s;
+          pos++;
+       }
+       else
+       {
+          *(buffer++) = *ptr;
+          sz--;
+       }
+       ptr++;
+    }
+
+    DBGTrace(sz);
+    DBGTrace(pos);
+    DBGMessage(txt);
+ }
+
+
+ static int _System formatWindow(const MSGEDITHELPER *dlg, MSGEDITWINDOW hwnd, HICQ icq, ULONG uin, USHORT type, BOOL out, HMSG msg)
+ {
+    static const USHORT hide[] = {       ICQMSGC_ENTRY,
+                                         ICQMSGC_BROWSE,
+                                         ICQMSGC_REJECT,
+                                         ICQMSGC_STATICSUBJ,
+                                         ICQMSGC_SUBJECT,
+                                         ICQMSGC_SEND,
+                                         ICQMSGC_ACCEPT,
+                                         ICQMSGC_REFUSE,
+                                         ICQMSGC_CHECKBOX,
+                                         ICQMSGC_SENDTO,
+                                         ICQMSGC_OPEN,
+                                         0 };
+
+    const USHORT           *wdg;
+    const char             *ptr;
+    int                    qtd;
+
+    for(wdg = hide; *wdg; wdg++)
+       dlg->setVisible(hwnd,*wdg,FALSE);
+
+    dlg->setVisible(hwnd,ICQMSGC_REPLY, TRUE);
+
+    if(msg)
+    {
+       ptr = (const char *) (msg+1);
+       for(qtd=5;*ptr && qtd;ptr++)
+       {
+          if(*ptr == ICQ_FIELD_SEPARATOR)
+             qtd--;
+       }
+    }
+    else
+    {
+       ptr = "";
+    }
+
+    while(*ptr && isspace(*ptr))
+       ptr++;
+
+    if(!*ptr)
+       ptr = "You were added!";
+
+    icqmsg_loadUserInfoFromRequest(dlg, hwnd, icq, uin, msg);
+
+    dlg->setString(hwnd,ICQMSGC_TEXT,ptr);
+
+    return 0;
+ }
+
+

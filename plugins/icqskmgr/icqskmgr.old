@@ -1,0 +1,381 @@
+/*
+ * ICQSKMGR.C - pwICQ GUI Manager Plugin (Version with Skin support)
+ */
+
+ #define INCL_DOSPROCESS
+
+ #pragma strings(readonly)
+
+ #include <time.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <stdio.h>
+ #include <io.h>
+
+ #include "icqskmgr.h"
+
+/*---[ Prototipos ]--------------------------------------------------------------------------*/
+
+ static int    _System executeSkin(HICQ icq,ULONG);
+ static void   _System warning(HICQ, HUSER, USHORT);
+ static ULONG  _System loadSkin(HICQ, void (* _System)(int), int, char ** );
+ static void   _System preProcess(HICQ, HUSER, ULONG, struct icqmsg *, BOOL);
+ static void   _System view(HICQ, ULONG, HMSG);
+ static void   _System newMessage(HICQ, ULONG, USHORT);
+ static void   _System ajustMsgDialog(HWND, HICQ, ULONG, USHORT, BOOL);
+ static int    _System insertMenu(HICQ, USHORT, const char *, short, ULONG, MENUCALLBACK *);
+ static int    _System openConfig(HICQ, ULONG, USHORT, PAGELOADER *);
+ static BOOL   _System awayMessage(HICQ, ULONG, const char *, char *);
+
+/*---[ Constantes ]--------------------------------------------------------------------------*/
+
+ static SKINMGR caps = {       sizeof(SKINMGR),
+                               NULL,
+                               loadSkin,
+                               executeSkin,
+                               NULL,
+                               warning,
+                               preProcess,
+                               view,
+                               newMessage,
+                               awayMessage,
+                               insertMenu,
+                               openConfig,
+                               ajustMsgDialog
+                       };
+
+ extern const SKINELEMENT       winElements[] =
+ {
+        STANDARD_SKIN_STUFF
+
+        CMD_ICONBAR,    0,              0,                      "Icons",
+        CMD_XBITMAP,    0,              0,                      "Logo",
+
+        CMD_SLIDER,  1000,              0,                      "ScrollBar",
+
+        CMD_BUTTON,  1001,              0,                      "Up",
+        CMD_BUTTON,  1002,              0,                      "Down",
+
+        CMD_FONT,    1003,              0,                      "UserListFont",
+        CMD_FONT,    101,               0,                      "ModeButtonFont",
+        CMD_FONT,    102,               0,                      "SystemButtonFont",
+        CMD_FONT,    103,               0,                      "SysMessageFont",
+
+        CMD_LISTBOX, 1003,              WMSKS_CACHEDLB,         "UserList",
+
+        CMD_PALLETE, SKC_USER1,         0,                      "OfflineColor",
+        CMD_PALLETE, SKC_USER3,         0,                      "OnlineColor",
+        CMD_PALLETE, SKC_USER4,         0,                      "SysMessageColor",
+
+        CMD_BUTTON,  101,               WS_VISIBLE,             "ModeButton",
+        CMD_BUTTON,  102,               WS_VISIBLE,             "SysButton",
+        CMD_BUTTON,  103,               WS_VISIBLE,             "SysMessage",
+
+        0,             0,               0,                      NULL
+ };
+
+/*---[ Statics ]-----------------------------------------------------------------------------*/
+
+ static HWND    mainWindow      = NULLHANDLE;
+ static HWND    mainFrame       = NULLHANDLE;
+ extern HMODULE module          = NULLHANDLE;
+
+/*---[ Implementacao ]-----------------------------------------------------------------------*/
+
+ int EXPENTRY ICQConfigure(HICQ icq, HMODULE hmod)
+ {
+    char        key[20];
+    char        *ptr;
+
+#ifdef DEBUG
+    icqWriteSysLog(icq,PROJECT,"Loading pwICQ Skin manager " __DATE__ " " __TIME__ " (Debug Version)");
+#else
+    icqWriteSysLog(icq,PROJECT,"Loading pwICQ Skin manager Build " BUILD);
+#endif
+
+#ifdef EXTENDED_LOG
+    icqWriteSysLog(icq,PROJECT,"Extensive logging enabled");
+#endif
+
+    CHKPoint();
+
+    if(icqQueryUserDataBlockLength() != sizeof(ICQUSER))
+    {
+       CHKPoint();
+       icqWriteSysLog(icq,PROJECT,"Can't start protocol manager due to invalid pwICQ core version");
+       return -1;
+    }
+
+    if(!icqRegisterSkinManager(icq,&caps))
+    {
+       CHKPoint();
+       icqWriteSysLog(icq,PROJECT,"Can't register skin manager");
+       return -2;
+    }
+
+    icqSetSkinDataBlock(icq,0);
+    caps.msgMgr = icqQueryDefaultMsgMgr(icq);
+
+    module = hmod;
+
+    key[19] = 0;
+    strncpy(key,sknQueryIDString(),19);
+    for(ptr = key;*ptr && *ptr != ':';ptr++);
+    *ptr = 0;
+
+    for(ptr = (char *) sknQueryIDString();*ptr && *ptr != ':';ptr++);
+
+    if(*ptr)
+       icqWriteSysLog(icq,key,ptr+1);
+
+    return 0;
+ }
+
+ void EXPENTRY ICQTimer(HICQ icq, void *lixo)
+ {
+    if(mainWindow)
+       WinPostMsg(mainWindow,WM_USER+12,0,0);
+ }
+
+ void EXPENTRY ICQSystemEvent(HICQ icq, void *lixo, USHORT event)
+ {
+    if(mainWindow)
+       WinPostMsg(mainWindow,WM_USER+13,MPFROMSHORT(event),0);
+ }
+
+ void EXPENTRY ICQUserEvent(HICQ icq, void *lixo, HUSER usr, USHORT event)
+ {
+    if(mainWindow)
+       WinPostMsg(mainWindow,WM_USER+14,MPFROMSHORT(event),MPFROMLONG(usr->uin));
+ }
+
+ void _System view(HICQ icq, ULONG uin, HMSG m)
+ {
+    icqOpenMsgWindow(icq,uin,0,m);
+ }
+
+ char *querySkinName(HICQ icq, char *skin)
+ {
+    char        *ptr;
+    int         sz;
+    char        buffer[0x0100];
+
+    icqLoadString(icq, "skin", "", skin, 0xFF);
+
+    if(!*skin || access(skin,0))
+    {
+       icqQueryPath(icq,"skins\\",skin,0xFF);
+       sz  = strlen(skin);
+       ptr = skin + sz;
+       sz  = 0xFF - sz;
+
+       DBGMessage(skin);
+       icqLoadString(icq, "skin", "default.skn", ptr, sz);
+
+    }
+
+    DBGMessage(skin);
+
+    if(access(skin,0))
+    {
+       strcpy(buffer,"Can't find ");
+       strncat(buffer,skin,0xFF);
+       icqWriteSysLog(icq,PROJECT,buffer);
+       return NULL;
+    }
+    strcpy(buffer,"Loading ");
+    strncat(buffer,skin,0xFF);
+    icqWriteSysLog(icq,PROJECT,buffer);
+
+    DBGMessage(buffer);
+    DBGMessage(skin);
+
+
+    return skin;
+ }
+
+ ULONG _System loadSkin(HICQ icq, void (* _System startupStage)(int), int numpar, char **param )
+ {
+    HAB         hab     = icqQueryAnchorBlock(icq);
+    char        skin[0x0100];
+
+    DBGMessage("Iniciando skin manager");
+    icqWriteSysLog(icq,PROJECT,"Starting Skin Manager");
+
+    startupStage(ICQSTARTUP_STARTINGSKIN);
+
+    if(sknInitialize(hab) && sknRegisterClass(hab,"pwICQ2Skin",sknProcedure,sizeof(void *)))
+    {
+       icqStartWindowTools(icq,hab);
+
+       startupStage(ICQSTARTUP_LOADINGSKIN);
+
+       DBGTrace(icqQueryLogonStatus(icq));
+
+       if(!icqQueryLogonStatus(icq))
+       {
+          startupStage(-1000);
+          icqLogonDialog(icq);
+          if(!icqQueryLogonStatus(icq))
+             return -2;
+          startupStage(-1001);
+          startupStage(ICQSTARTUP_LOADINGSKIN);
+       }
+
+       mainWindow = sknCreateWindow("pwICQ2Skin",querySkinName(icq, skin),&mainFrame,"pwICQ",module,FCF_TASKLIST|FCF_NOMOVEWITHOWNER|FCF_ICON|FCF_ACCELTABLE|FCF_NOBYTEALIGN,1);
+       DBGTracex(mainWindow);
+
+       if(mainWindow)
+       {
+          icqRegisterConfigurationWindow(icq,hab);
+          WinSendMsg(mainWindow,WM_USER+10,MPFROMP(icq),0);
+          startupStage(ICQSTARTUP_SKINLOADED);
+          if(icqInitialize(icq,startupStage))
+             WinPostMsg(mainWindow,WM_CLOSE,0,0);
+          return (ULONG) mainWindow;
+       }
+    }
+    return 0;
+ }
+
+#ifdef DEBUG
+
+ int _System testMenu(HICQ icq,USHORT type,ULONG uin)
+ {
+    DBGMessage("Menu callback");
+    DBGTracex(type);
+    DBGTrace(uin);
+
+    return 0;
+ }
+
+#endif
+
+ int _System executeSkin(HICQ icq, ULONG parm)
+ {
+    if(parm != mainWindow)
+    {
+       icqWriteSysLog(icq,PROJECT,"Unexpected parameter received");
+       return -1;
+    }
+
+    icqRestoreWindow(mainFrame, icq, 0, "pos:MainWindow", 150, 375);
+
+#ifdef DEBUG
+    icqInsertMenuOption(icq, ICQMENU_SYSTEM, "Teste de menu", -1, 1, testMenu);
+#endif
+
+/*
+    The icqExecuteWindowLoop() procedure basically does:
+
+    while(WinGetMsg(hab,&qmsg,0,0,0))
+       WinDispatchMsg(hab,&qmsg);
+
+    I'm using it only to allow some extra debbuging in the message dialog box before the main
+    message loop processing.
+
+    pw 09/29/2001
+*/
+    icqExecuteWindowLoop(icq);
+
+    icqStoreWindow(mainFrame, icq, 0, "pos:MainWindow");
+
+    icqStopWindowTools(icq);
+    icqTerminate(icq);
+
+    DBGMessage("Skin terminado");
+
+    icqWriteSysLog(icq,PROJECT,"Skin Manager stopped");
+    DBGMessage("Skin manager terminado");
+
+    return 0;
+ }
+
+ void _System warning(HICQ icq, HUSER usr, USHORT id)
+ {
+    ULONG uin   = 0;
+
+    if(usr)
+       uin = usr->uin;
+
+    if(mainWindow)
+       WinPostMsg(mainWindow,WM_USER+15,MPFROMLONG(uin),MPFROMSHORT(id));
+
+ }
+
+ void  _System preProcess(HICQ icq, HUSER usr, ULONG uin, struct icqmsg *msg, BOOL convert)
+ {
+    icqDefaultMsgPreProcessor(icq, usr, uin, msg, convert);
+ }
+
+ void _System newMessage(HICQ icq, ULONG uin, USHORT type)
+ {
+    icqOpenMsgWindow(icq, uin, type, NULL);
+ }
+
+ void ajustTasklist(ICQWNDINFO *ctl, char *txt)
+ {
+    icqAjustFrameTitle(ctl->icq, mainFrame, ctl->buffer, txt, ctl->ptrMode);
+ }
+
+ static void _System ajustMsgDialog(HWND hwnd, HICQ icq, ULONG flags, USHORT type, BOOL out)
+ {
+    icqAjustDefaultMsgDialog(hwnd, icq, flags, type, out);
+ }
+
+ static int _System openConfig(HICQ icq, ULONG uin, USHORT type, PAGELOADER *loader)
+ {
+    DBGMessage("Abrir dialog de configuracao");
+    return icqOpenDefaultConfigurationWindow(icq,uin,type,loader);
+ }
+
+ static int _System insertMenu(HICQ icq, USHORT menu, const char *text, short pos, ULONG icon, MENUCALLBACK *cbk)
+ {
+    MNUHANDLER mnu;
+
+    DBGMessage("Pediu insercao manual de menu");
+    DBGTrace(menu);
+    DBGTracex(WinWindowFromID(mainWindow,menu));
+
+    memset(&mnu,0,sizeof(MNUHANDLER));
+
+    mnu.text    = text;
+    mnu.after   = 9999;
+    mnu.handler = (ULONG) cbk;
+    mnu.itemID  = icon;
+
+    sknInsertMenuHandler(mainWindow,menu,&mnu);
+    return 0;
+ }
+
+ static BOOL   _System awayMessage(HICQ icq, ULONG uin, const char *title, char *txt)
+ {
+    struct awayDialogParameters p;
+    int                         f;
+
+    CHKPoint();
+
+    p.sz        = sizeof(struct awayDialogParameters);
+    p.flag      = 0xFF;
+    p.uin       = uin;
+    p.title     = title;
+    p.txt       = txt;
+    p.icq       = icq;
+    p.usr       = icqQueryUserHandle(icq,uin);
+
+    WinPostMsg(mainWindow,WM_USER+18,MPFROMP(&p),0);
+
+    for(f=0;p.flag && f<200;f++)
+       DosSleep(10);
+
+    if(p.flag)
+    {
+       icqSysLog(icq,"Timeout passing information to the main window");
+       icqAbend(icq,0);
+       return FALSE;
+    }
+
+    return TRUE;
+ }
+
+

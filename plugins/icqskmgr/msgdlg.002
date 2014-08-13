@@ -1,0 +1,265 @@
+/*
+ * MSGDLG.C - Message dialog editor
+ */
+
+ #define INCL_WIN
+ #define INCL_DOSPROCESS
+ #include <os2.h>
+
+ #include <string.h>
+ #include <time.h>
+ #include <malloc.h>
+
+ #include "icqskmgr.h"
+ #include "msgdlg.h"
+
+
+/*---[ Types/Structs/Defines ]----------------------------------------------------------------------*/
+
+ #pragma pack(1)
+ struct parm
+ {
+    BOOL	flag;
+    ULONG	uin;
+    USHORT	type;
+    HMSG	msg;
+ };
+
+ typedef struct msgedit
+ {
+    HWND	hwnd;
+
+    HMSG	msg;
+    HAB		hab;
+    HMQ		hmq;
+    QMSG	qmsg;
+
+    HICQ        icq;
+    BOOL        out;
+    ULONG       uin;
+    USHORT      type;
+    void        ( * _System format)(HICQ, ULONG, BOOL, ICQMSG *, HWND, USHORT, USHORT);
+    char        buffer[0x0100];
+
+ } MSGEDIT;
+
+ struct dlgparm
+ {
+    USHORT	sz;
+    MSGEDIT	*ctl;
+ };
+
+/*---[ Prototipes ]---------------------------------------------------------------------------------*/
+
+ void _System msgThread(ICQTHREAD *);
+ void _System stopthread(ICQTHREAD *);
+
+ MRESULT EXPENTRY procMsgWindow(HWND, ULONG, MPARAM, MPARAM);
+
+ static void ajustMsgType(HWND, MSGEDIT *, HMSG );
+ static void ajustMsgType(HWND, MSGEDIT *, HMSG );
+ static void createMsgWin(HWND, struct dlgparm *);
+ static void resize(HWND, PSWP);
+ static void ajustMsgSize(HWND, MSGEDIT *, HMSG, USHORT, USHORT);
+
+/*---[ Constants ]----------------------------------------------------------------------------------*/
+
+ extern const char	*msgClass	= "pwICQMsgEditor";
+
+
+/*---[ Implementation ]-----------------------------------------------------------------------------*/
+
+ void openMessageWindow(HICQ icq, ULONG uin, USHORT type, HMSG msg)
+ {
+    struct parm p;
+    int		f;
+
+    p.flag	= TRUE;
+    p.uin	= uin;
+    p.type	= type;
+    p.msg	= msg;
+
+    icqCreateThread(icq, &msgThread, 16384, sizeof(MSGEDIT), &p, "msg");
+
+    for(f=0;f<1000 && p.flag;f++)
+       DosSleep(10);
+
+    if(p.flag)
+    {
+       icqWriteSysLog(icq,PROJECT,"**** Timeout starting message-edit thread");
+       DosSleep(1000);
+    }
+ }
+
+ void _System msgThread(ICQTHREAD *thd)
+ {
+    MSGEDIT 		*m	  	= (MSGEDIT *) (thd+1);
+    struct dlgparm 	p;
+
+    thd->stopthread 	= stopthread;
+
+    m->uin	  	= ((struct parm *) thd->parm)->uin;
+    m->type	  	= ((struct parm *) thd->parm)->type;
+    m->msg	  	= ((struct parm *) thd->parm)->msg;
+    m->icq		= thd->icq;
+    m->out		= TRUE;
+
+    ((struct parm *) thd->parm)->flag = FALSE;
+
+    DBGMessage("Thread de edicao de mensagems iniciada");
+
+    m->hab = WinInitialize(0);
+
+    if(m->hab != NULLHANDLE)
+    {
+       if( (m->hmq = WinCreateMsgQueue(m->hab,0)) != NULLHANDLE)
+       {
+          p.sz  = sizeof(struct dlgparm);
+          p.ctl = m;
+
+          WinDlgBox(	HWND_DESKTOP,
+     			HWND_DESKTOP,
+     			procMsgWindow,
+     			module,
+     			1,
+     			&p
+     	   	   );
+
+          WinDestroyMsgQueue(m->hmq);
+       }
+
+       WinTerminate(m->hab);
+    }
+
+
+    DBGMessage("Thread de edicao de mensagems terminada");
+ }
+
+ void _System stopthread(ICQTHREAD *thd)
+ {
+    MSGEDIT *m	  = (MSGEDIT *) (thd+1);
+
+    DBGMessage("Parando janela de edicao de mensagems");
+
+    if(m->hwnd)
+       WinPostMsg(m->hwnd,WM_CLOSE,0,0);
+ }
+
+ MRESULT EXPENTRY procMsgWindow(HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2)
+ {
+    switch(msg)
+    {
+    case WM_INITDLG:
+       createMsgWin(hwnd,PVOIDFROMMP(mp2));
+       return WinDefDlgProc(hwnd,msg,mp1,mp2);
+
+    case WM_ADJUSTWINDOWPOS:
+       resize(hwnd,PVOIDFROMMP(mp1));
+       break;
+
+    default:
+       return WinDefDlgProc(hwnd,msg,mp1,mp2);
+    }
+
+    return 0;
+
+ }
+
+ static void resize(HWND hwnd, PSWP swp)
+ {
+    MSGEDIT  *ctl = WinQueryWindowPtr(hwnd,QWL_USER);
+    SWP      s;
+
+    DBGTracex(ctl);
+
+    if(ctl && swp->fl & SWP_SIZE)
+    {
+       WinQueryWindowPos(WinWindowFromID(hwnd,FID_TITLEBAR),&s);
+       ajustMsgSize(hwnd, ctl, NULL, swp->cx, swp->cy);
+    }
+ }
+
+ static void createMsgWin(HWND hwnd, struct dlgparm *p)
+ {
+    MSGEDIT             *ctl    = p->ctl;
+    const MSGMGR        *mgr    = NULL;
+    SWP                 swp;
+    HWND                h;
+
+    DBGTracex(ctl);
+
+    ctl->hwnd = hwnd;
+    DBGTracex(hwnd);
+
+    WinSetWindowPtr(hwnd,QWL_USER,ctl);
+
+    if(ctl->msg && ctl->msg->mgr)
+    {
+       ctl->format = ctl->msg->mgr->formatWindow;
+    }
+    else if( (mgr = icqQueryMessageManager(ctl->icq, ctl->type)) != NULL )
+    {
+       ctl->format = mgr->formatWindow;
+    }
+
+    if(!ctl->msg)
+    {
+       /* Create a clean messsage identifier to force the formatter fill the window controls */
+       memset(ctl->buffer,0,0xFF);
+       ctl->msg          = (HMSG) ctl->buffer;
+       ctl->msg->mgr     = mgr;
+    }
+
+    DBGTracex(mgr);
+    DBGTracex(ctl->format);
+
+    ajustMsgType(hwnd, ctl, ctl->msg);
+
+    h = WinWindowFromID(hwnd,IDC_URGENT);
+    WinEnableWindow(h,FALSE);
+
+    h = WinWindowFromID(hwnd,IDC_AUTOOPEN);
+    WinEnableWindow(h,FALSE);
+
+ }
+
+ static void ajustMsgSize(HWND hwnd, MSGEDIT *ctl, HMSG msg, USHORT cx, USHORT cy)
+ {
+    if(ctl->format)
+       ctl->format(ctl->icq, ctl->uin, ctl->out, msg, hwnd, cx, cy);
+
+    WinSetWindowPos(    WinWindowFromID(hwnd, ctl->out ? IDC_URGENT : IDC_AUTOOPEN),
+                        0,
+                        4,4,
+                        0,0,
+                        SWP_MOVE);
+
+
+ }
+
+ static void ajustMsgType(HWND hwnd, MSGEDIT *ctl, HMSG msg)
+ {
+    char                buffer[0x0100];
+    SWP                 swp;
+
+    if(ctl->out)
+    {
+       SHOW(IDC_URGENT);
+       HIDE(IDC_AUTOOPEN);
+    }
+    else
+    {
+       HIDE(IDC_URGENT);
+       SHOW(IDC_AUTOOPEN);
+    }
+
+    WinQueryWindowPos(hwnd,&swp);
+    ajustMsgSize(hwnd,ctl,msg,swp.cx,swp.cy);
+
+    icqQueryMessageTitle(ctl->icq, ctl->uin, ctl->out, msg, buffer, 0xFF);
+    WinSetWindowText(hwnd,buffer);
+
+ }
+
+
+

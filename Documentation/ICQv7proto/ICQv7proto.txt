@@ -1,0 +1,744 @@
+ICQv7 (personal) protocol notes
+by Massimo Melina, rejetto@libero.it
+www.2000b.cjb.net
+last update Sep 15, 2001
+
+THESE ARE ONLY _PERSONAL_ NOTES
+USE IT AT YOUR OWN RISK
+if you want to tell me about additional info or wrong info in this file, contact me
+
+important note:
+* this doc is very bad written for several reasons i won't list here.
+* i don't earn money from this, i'm a student, i'm only having some fun.
+* a list of people who contributed to this doc is at bottom
+
+some notes:
+* communication over FLAP
+* client/server sends (channel)
+* password is xored with these bytes: F3,26,81,C4,39,86,DB,92,71,A3,B9,E6,53,7A,95,7C
+* BYTE is a 8 bit integer
+* WORD is a 2-byte integer big endian
+* DWORD is a 4-byte integer big endian
+* COLOR is a quadruple of bytes: R,G,B,N   where N is not used (you should set it zero)
+* STRING is a succession of (ascii) characters without length-leading or null-char-ending
+* UIN is a little-endian DWORD that codifies the uin number
+* B-UIN is a BYTE preceded STRING: the byte indicates the length of the string and the string report an uin number
+* UINLIST is a raw succession of B-UINs
+* NTS is a Null Termined String
+* LNTS is a WORD preceded NTS: the word is little-endian and indicates the length of the NTS string (null char included)
+* msg-subtype is a BYTE:
+   CODE   FORMAT        MEANING
+    01    plain         msg
+    02    ?             chat
+    03    ?             file
+    04    url-msg       url
+    06    user-msg      authorization request
+    07    plain         authorization denied
+    08    00010000      authorization given
+    0C    user-msg      user added you
+    0E    email-msg     emailExpress
+    13    contacts-msg  contacts
+    E?    plain         auto-message request (E8)
+* msg-flags is a BYTE:
+    00 = normal
+    80 = multiple
+    03 = special (used for auto-message request)
+* user-msg is a LNTS: nick FE first FE last FE email FE unk-char FE msg
+* url-msg is a LNTS: msg FE url
+* contacts-msg is a LNTS: contacts# FE uin FE nick FE uin FE nick FE...
+* email-msg is a LNTS: name FE FE FE email FE unk-char FE body
+* gmt offset is a signed byte, specifies negative half hours from GMT 0 (e.g. -3 = GMT+1:30)
+* status codes
+    WORD flags
+      2000  direct connection only for contact list
+      1000  direct connection by request
+      0001  webaware
+    WORD status
+      0000  online
+      0020  free4chat
+      0001  away
+      0004  n/a
+      0005  n/a
+      0010  occupied
+      0011  occupied
+      0013  dnd
+      0100  invisible
+* override-status codes
+    0=don't override
+    4=away
+    9=occupied
+    A=dnd
+    E=na
+* direct-connection-info
+    IPADDR  ip address
+    DWORD   port where listening for connections
+    BYTE    unknown, usually 04
+    3 WORD  unknown, usually 0007 xxxx xxxx
+                        licq 0006 xxxx xxxx
+    2 DWORD unknown, usually 00000050 00000003
+    DWORD   a date? usually 3AA773EE or 39656F0F or 3AA773EE licq 7D800352
+    DWORD   a date? usually 3AA66380 or 3AA5146F or 3AA66380 licq 00000000
+    DWORD   a date? usually 3A877A42 or 00000000 or 3A877A42 licq 00000010
+    WORD    unknown, usually 0000
+* wp-short-request-info
+    LNTS    first
+    LNTS    last
+    LNTS    nick
+* wp-full-request-info
+    wp-short-request-info
+    LNTS    email
+    WORD    minimum age (little-endian), 0 if disabled
+    WORD    maximum age (little-endian), 0 if disabled
+    BYTE    sex (0=disabled, other=see table)
+    BYTE    language (0=disabled, other=see table)
+    LNTS    city
+    LNTS    state
+    WORD    country (0=disabled, other=see table)
+    LNTS    company-name
+    LNTS    department
+    LNTS    position
+    BYTE    occupation field (0=disabled)
+    WORD    past information category (0=disabled, other=see table)
+    LNTS    desc
+    WORD    interests-category (0=disabled, other=see table)
+    LNTS    interests-specific (comma separated)
+    WORD    affiliation/organization (0=disabled, other=see table)
+    LNTS    desc
+    WORD    homepage category
+    LNTS    desc
+    BYTE    only-online-users, (0=off, 1=on)
+* wp-result-info
+    WORD    unknown xx00
+    UIN     his uin
+    LNTS    nick
+    LNTS    first
+    LNTS    last
+    LNTS    email
+    BYTE    auth (0=required, 1=always)
+    BYTE    status (00 offline, 01 online, 02 not webaware)
+    BYTE    unknown, usually 0
+* main-home-info
+    LNTS    nick
+    LNTS    first
+    LNTS    last
+    LNTS    email
+    LNTS    city
+    LNTS    state
+    LNTS    phone
+    LNTS    fax
+    LNTS    street
+    LNTS    cellular (if SMS-able string contains an ending ' SMS')
+    LNTS    zip
+    WORD    country (LE)
+    BYTE    gmt
+    BYTE    unknown, usually 0
+* work-info
+    LNTS    city
+    LNTS    state
+    DWORD   0
+    LNTS    street
+    LNTS    zip
+    WORD    country (LE)
+    LNTS    company-name
+    LNTS    company-dept
+    LNTS    company-position
+    WORD    0 (LE?)
+    LNTS    company-web
+* homepage-more-info
+    BYTE    age
+    BYTE    0
+    BYTE    sex
+    LNTS    homepage
+    WORD    birth-year (LE)
+    BYTE    birth-month
+    BYTE    birth-day
+    BYTE    lang1
+    BYTE    lang2
+    BYTE    lang3
+* work-info
+    LNTS    city
+    LNTS    state
+    LNTS    unk
+    LNTS    unk
+    LNTS    street address
+    LNTS    zip code
+    WORD    unk, 2700
+    LNTS    company name
+    LNTS    unk
+    LNTS    position
+    WORD    unk, 0500
+    LNTS    unk
+* more-email-info
+    BYTE    number (of addresses)
+    for number times
+      BYTE   unknown, usually 00
+      LNTS   address
+* personal-interests-in
+    BYTE    # of categories to follow
+     for # times
+      WORD    category (6800 => Computers, 7100 => Music)
+      LNTS    specific
+* past-background-info
+    012F01  university
+    LNTS    specific
+    00616E
+* capability is a 4 DWORD number
+   2 capabilities are known
+     1) 09461349 4C7F11D1 82224445 53540000      // direct-message capability?
+     2) 09461344 4C7F11D1 82224445 53540000
+* capability-info is a succession of capabilities
+    note: icq2000b sends 1) and 2), licq sends only 2)
+
+
+
+***********************************
+------LOGIN SESSION-----------
+connection to login server
+
+server sends (1)
+ DWORD   1
+
+client sends (1)
+ DWORD   1
+ TLV(1)  UIN
+ TLV(2)  encrypted password
+ TLV(3)  client profile, usually "ICQ Inc. - Product of ICQ (TM).2000b.4.63.1.3279.85"
+ TLV(16) unknown, usually 0x010A
+ TLV(17) major version (4 for icq2000b)
+ TLV(18) minor version
+ TLV(19) lesser version
+ TLV(1A) build version
+ TLV(14) dunno version
+ TLV(0F) language, usually "en"
+ TLV(0E) country, usually "us"
+
+server sends (4)
+ TLV(1)  UIN
+ if all goes right
+   TLV(5)  string, BOS-address:port
+   TLV(6)  cookie
+ else
+   TLV(8)  WORD message-error 
+     0001 bad uin
+     0005 bad password
+     0018 rate exceeded
+     001D probably: you're trying to reconnect too fast, wait a second and retry
+   TLV(4)  url                  // not always present
+   TLV(c)  WORD unknown
+
+close connection
+
+-----SERVICE SESSION---------
+connection to service server
+
+server sends (1)
+ RAW     0x00000001
+
+client sends (1)
+ RAW     0x00000001
+ TLV(6)  cookie
+
+------SNAC COMMANDS------------
+
+server sends                   // Server is ready
+ SNAC 1,03
+ 12 WORD  unknown, usually 0001 0002 0003 0004 0006 0008
+                           0009 000A 000B 000C 0013 0015
+
+client sends                   // hey, i'm an icq client, not aim
+ SNAC 1,17
+ 16 WORD unknown, usually 0001 0003 0002 0001 0003 0001 0015 0001
+                          0004 0001 0006 0001 0009 0001 000A 0001
+
+server sends                   // got it, ack to 1,17
+ SNAC 1,18
+ 24 WORD unknown, usually 0001 0003 0002 0001 0003 0001
+                          0004 0001 0006 0001 0008 0001
+                          0009 0001 000A 0001 000B 0001
+                          000C 0001 0013 0002 0015 0001
+
+client sends                   // request rate
+ SNAC 1,06
+
+server sends                   // response to 1,06
+ SNAC 1,07
+ 181 BYTE  unknown
+ WORD      # of known messagges (N)
+ N DWORD   known messages, a known message is a words pair: FAMILY/SUBTYPE
+ 17 DWORD  unknown, they seems messagge IDs too
+
+client sends                   // ack to 1,07
+ SNAC 1,08
+ 5 WORD   unknown, usually 0001 0002 0003 0004 0005
+
+client sends                   // Requests personal information.
+ SNAC 1,0E
+
+client sends                   // Request rights information for location service
+ SNAC 2,02
+
+client sends                   // Request rights information for buddy list
+ SNAC 3,02
+
+client sends                   // Requests rights for ICBM (Instant Message) operations.
+ SNAC 4,04
+
+client sends                   // Requests BOS rights
+ SNAC 9,02
+
+server sends                   //  response to 1,0E
+ SNAC 1,0F
+ B-UIN   my uin
+ WORD    warning level
+ WORD    user class?
+ TLV(1)  class2, usually 0000 or 0050
+ TLV(C)  direct-connection-info, usually 0s
+ TLV(A)  my ip address
+ TLV(4)  idle time, usually 0000
+ TLV(6)  status code
+ TLV(F)  unknown, it seems to be an incrementing value usually 0000 xxxx (session length?)
+ TLV(2)  date: member since
+ TLV(3)  date: online since
+
+server sends                   // response to 2,02
+ SNAC 2,03
+ TLV(1)  unknown, usually 0400
+ TLV(2)  unknown, usually 0010
+ TLV(3)  unknown, usually 0007
+
+server sends                   // response to 3,02
+ SNAC 3,03
+ TLV(1)  unknown, usually 0258
+ TLV(2)  unknown, usually 02EE
+ TLV(3)  unknown, usually 0200
+
+server sends                   // response to 4,04
+ SNAC 4,05
+ 8 WORD unknown, usually 0002 0000 0003 0200 03E7 03E7 0000 03E8
+
+server sends                   // response to 9,02
+ SNAC 9,03
+ TLV(2)  unknown, usually 00A0
+ TLV(1)  unknown, usually 00A0
+
+client sends                   // Add ICBM parameter
+ SNAC 4,02
+ 8 WORD unknown, usually 0000 0000 0003 1F40 03E7 03E7 0000 0000
+
+client sends                   // set user info
+ SNAC 2,04
+ TLV(5) capability-info
+
+client sends                  // add to contact list
+ SNAC 3,04
+ UIN-LIST
+
+client sends                   // send visible list
+ SNAC 9,05
+ UIN-LIST
+
+client sends                // set status code
+ SNAC 1,1E
+ TLV(6) status-code
+ TLV(8) unknown, usually 0000
+ TLV(C) direct-connection-info
+ TLV(11) 01 0A 19 0B 3B       // sent when change user info
+         01 2E 19 0B 3B
+         01 5E 19 0B 3B
+ TLV(12) 00 00                // sent when change user info
+
+client sends                // unknown (usually after set status code)
+ SNAC 1,11
+ DWORD 00000000
+
+client sends                // client ready
+ SNAC 1,02
+ RAW unknown, usually
+  0001 0003 0110 028A 0002 0001 0101 028A 0003 0001
+  0110 028A 0015 0001 0110 028A 0004 0001 0110 028A
+  0006 0001 0110 028A 0009 0001 0110 028A 000A 0001
+  0110 028A
+
+client sends                   // many purposes
+ SNAC 15,02
+ TLV(1)
+   WORD   bytes remaining (little endian), useless
+   UIN    my uin
+   WORD   type
+   WORD   cookie
+    type=3C00       // ask for offlines messages
+      nothing
+    type=3E00       // ack to offline messages, maybe cookie is #-of-messages*old-cookie
+      nothing
+    type=D007
+      WORD  subtype
+        subtype=9808  xml-stype in an LNTS
+          LNTS  '<key>' name of required data '</key>'
+        subtype=1F05       // simple query info
+          UIN   user to request info
+        subtype=B204       // query info about user
+          UIN   user to request info
+        subtype=D004       // query my info
+          UIN   my uin
+        subtype=1505       // wp-short-request
+          wp-short-request-info
+        subtype=3305       // wp-full-request
+          wp-full-request-info
+        subtype=EA03       // modify user info (main/home)
+          main-home-info
+        subtype=FD03       // modify user info (homepage/more)
+          homepage-more-info
+        subtype=0604       // modify user info (about)
+          LNTS    about
+        subtype=F303       // modify user info (work)
+          work-info
+        subtype=2E04       // change password
+          LNTS    new password
+        subtype=C404       // remove user (warning!)
+          UIN     uin to remove
+          LNTS    password
+
+; server sends 1,0f
+
+server sends                   // Message of the day
+ SNAC 1,13 Flag:009D
+ WORD     unknown, usually 0004
+ TLV(B)   STRING message of the day, usually 'http://www.aol.com'
+
+server sends                   // many purposes
+ SNAC 15,03 flag:000x
+ TLV(1)  used for a lot of things
+   WORD   bytes remaini ng (little-endian), useless
+   UIN    my uin
+   WORD   message-type
+   WORD   cookie
+      message-type = 4100                   // offline message
+        UIN     his uin
+        WORD    year (LE)
+        BYTE    month (1=jan)
+        BYTE    day
+        BYTE    hour (GMT time)
+        BYTE    minutes
+        BYTE    msg-subtype
+        BYTE    msg-flags
+        LNTS    msg
+        WORD    0000, present only in single messages
+      message-type = 4200                   // end of offline messages
+        BYTE  unknown, usually 0
+      message-type = D007
+        2 BYTE unknown, usually 98 08
+        WORD  length of the following NTS
+        NTS   "<key>"field-type"</key>"
+        field-type = DataFilesIP
+          6 BYTE   unk, usually 2A 02 44 25 00 31
+      message-type = DA07
+        3 BYTE   subtype
+          subtype=A2080A                //  where to get ads stuff
+             LNTS     ip address  (a web server), usually '<value>205.188.250.25</value>' that is cb.icq.com
+          subtype=A40132 or AE0132      //  empty whitepages result
+            empty
+          subtype=A4010A                //  wp-full-request result
+            wp-result-info
+          subtype=AE010A                //  wp-full-request result (the last)
+            wp-result-info
+            DWORD   lasting results (LE)
+          subtype=90010A                //  wp-short-request result
+            wp-result-info
+          subtype=9A010A                //  wp-short-request result (the last)
+            wp-result-info
+            DWORD   lasting results (LE)
+          subtype=C8000A                // query result
+            main-home-info
+            WORD    unknown
+          subtype=D2000A                // query result
+            work-info
+          subtype=E6000A                // query result
+            LNTS    about
+          subtype=F0000A                // query result
+            personal-interests-info
+          subtype=FA000A                // query result
+            past-background-info
+          subtype=FA0014                // query result: users does not exists
+            empty
+          subtype=EB000A                // query result
+            more-email-info
+          subtype=DC000A                // query result
+            homepage-more-info
+            WORD    unknown
+          subtype=0E010A                // query: additional info
+            WORD   unknown, 0000
+          subtype=64000A                // ack to modify info (main/home)
+            empty
+          subtype=78000A                // ack to modify info (homepage/more)
+            empty
+          subtype=82000A                // ack to modify info (about)
+            empty
+          subtype=6E000A                // ack to modify info (work)
+            empty
+          subtype=B4000A                // ack to remove user
+            empty
+          subtype=AA000A                // ack to change password
+            empty
+
+server sends                   // ONcoming user
+ SNAC 3,0B
+ B-UIN
+ WORD   warning level
+ WORD   user class
+ TLV(1)  class2, usually 0050
+ TLV(C)  direct-connection-info
+ TLV(A)  ip address
+ TLV(4)  unknown, usually 0000
+ TLV(6)  status
+ TLV(D)  capability-info
+ TLV(F)  unknown
+ TLV(2)  date: member since
+ TLV(3)  date: online since
+
+server sends                      // OFFgoing user
+ SNAC 3,0C
+ B-UIN
+ DWORD   unknown, usually 00000001
+ TLV(1)  unknown, usually 0000
+
+server sends                      // incoming message
+ SNAC 4,07
+ 2 DWORD  ??B, a sort of ID (it seems to be based on timestamp)
+ WORD     msg-format
+ B-UIN    sender's uin
+ WORD     warning level? garbage of OSCAR protocol
+ WORD     5 or 6, maybe it counts the following TLVs before the format-dipendent datas
+ TLV(1)   unknown, usually 0050
+ TLV(4)   unknown, usually 0000, not present in file-req
+ TLV(6)   sender's status
+ TLV(F)   a time, in seconds
+ TLV(2)   a date
+ TLV(3)   a date
+ if msg-format = 1    // message
+   TLV(2)
+     WORD    unknown, usually 0501
+     WORD    number of following bytes? usually 0001
+     BYTE    unknown, usually 01
+     WORD    unknown, usually 0101
+     WORD    msg length + 4
+     DWORD   usually 0
+     STRING  message
+ if msg-format = 4    // url or contacts or auth-req or userAddedYou
+   TLV(5)
+     UIN      sender's uin
+     BYTE     msg-subtype
+     BYTE     msg-flags
+     LNTS     msg
+     2 DWORD  unknown, usually 00000000 FFFFFF00
+ if msg-format = 2    // advanced message
+   TLV(5)
+     WORD       ??A, 0002 for file-ack, else 0000
+     2 DWORD    same as ??B
+     4 DWORD    capability1
+     if ??A=0000
+       TLV(A)     00 02 on file-reply, 00 01 else
+       TLV(5)     WORD, listening port (BE)  (present on FT)
+       TLV(3)     INT, internal ip (BE) (present on FT and file-reply)
+       TLV(F)     empty
+       TLV(2711)  
+          26 BYTE  unk, 1B 00 07 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 03 00 00
+          BYTE     unk, 04
+          WORD     ??D, seems to be a downcounter starting from FFFF
+          WORD     unk, 0E 00
+          WORD     same as ??D
+          12 BYTE  unk, 0
+          BYTE     msg-subtype
+          BYTE     msg-flags
+          WORD     number of directories?, 00 00
+          WORD     number of files?, 01 00
+          LNTS     msg
+          if file-req
+            DWORD   unk, 9F CD D3 11             
+            LNTS    filename
+            DWORD   filesize (LE)
+            DWORD   unk, 00 FD 81 01
+          if file-reply
+            WORD    ??C
+            WORD    0
+            LNTS    ''
+            DWORD   unk
+            WORD    same as ??C but inverted endian
+            WORD    0
+          if text msg
+            COLOR   foreground
+            COLOR   background
+       TLV(4)  external ip (BE) (present on file-req, file-reply)
+
+server sends            // server ack to type-2 messages
+ SNAC 4,0C
+ 5 WORD    equals to first 5 WORD of message
+ BUIN      equals to message' uin
+
+client sends            // invisible list
+ SNAC 9,07
+ UIN-LIST
+
+client sends                       // send message
+ SNAC 4,06
+  2 DWORD  ??B, a sort of ID (it seems to be based on timestamp, ack and replies to SNAC 4,07 should use same ID)
+  WORD     message-format
+  B-UIN    recipient
+    msg-format=1           // simple message
+      TLV(2)
+        WORD   unknown, usually 0501
+        WORD   number of following bytes? usually 0001
+        BYTE   unknown, usually 01
+        WORD   unknown, usually 0101
+        WORD   msg length + 4
+        DWORD  unknown, 0000
+        STRING msg
+      TLV(6)
+        empty
+    msg-format=2           // advanced message
+      TLV(5)
+        WORD       ??A    (00 01 abort, else 0000)
+        2 DWORD    same as ??B
+        4 DWORD    capability1
+        if ??A = 00 00
+          TLV(A)     00 01 
+          TLV(5)     listening port (BE)  (present on file-req)
+          TLV(3)     internal ip (BE) (present on file-req)
+          TLV(F)     empty
+          TLV(2711)  
+            26 BYTE  unk, 1B 00 07 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 03 00 00 00
+            BYTE     unk, 04
+            WORD     ??D, seems to be a downcounter starting from FFFF
+            WORD     unk, 0E 00  (it could be a LE counter of following bytes: 0E = 2+12)
+            WORD     same as ??D
+            12 BYTE  unk, 0
+            BYTE     msg-subtype
+            BYTE     msg-flags
+            DWORD    00 00 01 00 on file-req, chat-req, 00 00 00 00 on file-reply
+            LNTS     msg
+            if subtype=FT
+              WORD    unk
+              WORD    ??C
+              LNTS    filename
+              DWORD   filesize (LE)
+              WORD    unk
+              WORD    same or near to ??C (it seems to be LE)
+            if subtype=chat
+              BYTE      01
+              10 BYTE   0
+            if subtype=msg text
+              COLOR   foreground
+              COLOR   background
+          TLV(3)   //  ack request
+            empty
+    msg-format=4           // url or contacts or auth-reply or multi-send
+      TLV(5)
+        UIN    my uin
+        BYTE   msg-subtype
+        BYTE   msg-flags
+        LNTS   msg
+      TLV(6)    // ack request?
+        empty
+
+client sends               // ack to type-2 message
+  SNAC 4,0B flags:0000
+  5 WORD    equals to first 5 WORD of message
+  BUIN      equals to message' uin
+  WORD      00 03
+  47 BYTE   from offset 40 to 86 of TLV(5)
+  BYTE      override-status
+  3 BYTE    0
+  LNTS      auto-message
+  DWORD     0
+  DWORD     -1
+
+server sends               // warning: you're sending too fast
+  SNAC 1,0A flags:0000
+    WORD    unknown, usually 1, 2 or 3
+    24 BYTE unknown, usually 00 01 00 00 00 50 00 00 09 C4 00 00 07 D0 00 00 05 DC 00 00 03 20 00 00
+    WORD    unknown, maybe indicates the available buffer in the server and it's always under 2000dec
+      under 5DC (1500dec), the first word is 3
+      over it's 2
+    9 BYTE  unknown, usually 00 00 17 70 00 00 00 00 01
+
+client sends                  // add to ignore list (it seems to have no effects)
+ SNAC 3,05
+ UIN-LIST
+
+
+server sends (4)
+  00 09 00 02 00 01 00 0B 00
+  LNTS http://www.aim.aol.com/errors/USER_LOGGED_OFF_NEW_LOGIN.html
+
+
+
+----A CORRECT LOGIN SEQUENCE
+login packet (uin/password)
+get the cookie and reconnect
+send cookie
+SNAC 1/17
+SNAC 1/6
+SNAC 1/E
+SNAC 2/2
+SNAC 3/2
+SNAC 4/4
+SNAC 9/2
+the server reply 1/7 to the 1/6, and then it goes:
+SNAC 1/8
+SNAC 4/2
+SNAC 2/4
+SNAC 3/4 with the contact list
+if status = invisible SNAC 9/5 with visible list
+SNAC 1/1E with status
+SNAC 1/11
+if status <> invisible SNAC 9/7 with invisible list
+SNAC 1/2
+SNAC 15/2, to require offline messages
+
+
+---RECEIVE A FILE TRANSFER REQUEST VIA SERVER
+SNAC 4,07   (request)
+SNAC 4,06   (reply)
+SNAC 4,07   (acknowledge, with ??A=0002)
+
+
+---NEW UIN REGISTRATION
+server sends (1)
+ DWORD   1
+
+client sends (1)
+ DWORD   1
+
+client sends
+ SNAC  17,04
+ DWORD 00 01 00 3B,  00 01 00 38
+ DWORD 0
+ DWORD 28 00 03 00
+ DWORD 0
+ DWORD 0
+ DWORD 03 46 00 00,  B4 25 00 00
+ DWORD 03 46 00 00,  B4 25 00 00
+ DWORD 0
+ DWORD 0
+ DWORD 0
+ DWORD 0
+ LNTS  password
+ DWORD 03 46 00 00,  B4 25 00 00
+ DWORD 00 00 CF 01
+
+server sends
+ SNAC 17,05
+ 00 01 00 32 30 00 00 00 00 00 2D 00 03 00 00 00 06 0F 3E 62
+,00 01 00 32 30 00 00 00 00 00 2D 00 03 00 00 00 06 72 3E 62
+ E3 53 7E FF 14 18 03 46 00 00 00 00 00 00 00 00 00 00 00 00
+,CD B5 7E FF 17 08 B4 25 00 00 00 00 00 00 00 00 00 00 00 00
+ 00 00 00 00 00 00
+,00 00 00 00 00 00
+ UIN  new uin number
+ 03 46 00 00
+,B4 25 00 00
+
+
+---PEOPLE WHO CONTRIBUTED TO THIS DOC (i decide the order, that is, random)
+Jeff Hughes <valaxer@nwinet.com>
+Filippov Joe <joe@idisys.iae.nsk.su>
+Robin Fisher <robin@phase3solutions.com>

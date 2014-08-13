@@ -1,0 +1,304 @@
+/*
+ * gtkbutton.c - GTK Implementation of pwICQGUI Button system
+ */
+
+ #include <pwicqgui.h>
+ #include <stdlib.h>
+ #include <malloc.h>
+ #include <string.h>
+ #include <dlfcn.h>
+ 
+ #include <pwicqrc.h>
+
+/*---[ Structures ]----------------------------------------------------------*/
+
+ #pragma pack(1)
+
+ typedef struct _icqdialog
+ {
+    ICQFRAME_STANDARD_PREFIX
+	
+    const struct icqDialogDescriptor *ds;
+    USHORT       					 szDataBlock;
+    const DLGMGR *					 mgr;
+
+ } ICQDIALOG;
+
+ struct dlgPos
+ {
+	USHORT x;
+	USHORT y;
+	USHORT cx;
+	USHORT cy;
+ };
+ 
+ 
+ struct dlgcreate
+ {
+    GSList *radioGroup;
+ };
+
+ #pragma pack()
+ 
+/*---[ Object macros ]--------------------------------------------------------*/
+
+ #define DECLARE_WINDOW_CONSTRUCTOR(e) static hWindow dialog_##e(const char *, unsigned long, struct dlgcreate *)
+ #define WINDOW_CONSTRUCTOR(e)         { e, dialog_##e }
+ #define BEGIN_WINDOW_CONSTRUCTOR(e)   static hWindow dialog_##e(const char *title, unsigned long style, struct dlgcreate *info) {
+ #define END_WINDOW_CONSTRUCTOR(x,h)   return h; }
+ 
+/*---[ Object constructors ]--------------------------------------------------*/
+
+ DECLARE_WINDOW_CONSTRUCTOR(WC_STATIC);
+ DECLARE_WINDOW_CONSTRUCTOR(WC_BUTTON);
+ DECLARE_WINDOW_CONSTRUCTOR(WC_ENTRYFIELD);
+ 
+ #pragma pack(1)
+ 
+ static const struct wdgCreate
+ {
+	ULONG   className;
+	hWindow (*create)(const char *,unsigned long, struct dlgcreate *); 
+ }
+ wdgTable[] =
+ {
+	WINDOW_CONSTRUCTOR(WC_STATIC),
+	WINDOW_CONSTRUCTOR(WC_BUTTON),
+	WINDOW_CONSTRUCTOR(WC_ENTRYFIELD)
+ };
+ 
+ 
+ #pragma pack()
+
+/*---[ Constants ]------------------------------------------------------------*/
+ 
+ 
+/*---[ Prototipes ]-----------------------------------------------------------*/
+
+ static void convertSize(struct dlgPos *);
+ static void icqdialog_destroy( hWindow, ICQDIALOG *);
+
+/*---[ Implementation ]-------------------------------------------------------*/
+
+ void icqskin_setDialogManager(hWindow hwnd, const struct dlgmgr *mgr)
+ {
+	
+ }
+ 
+ static hWindow createObject(const struct icqDialogDescriptor *dlg, struct dlgcreate *info)
+ {
+	int f;
+	
+	for(f=0;f < (sizeof(wdgTable)/sizeof(struct wdgCreate)); f++)
+    {
+	   if(wdgTable[f].className == dlg->className)
+		  return wdgTable[f].create(dlg->title,dlg->flags, info);
+    }	   
+	
+    DBGTracex(dlg->className);
+    DBGTrace(dlg->id);
+    DBGTrace(dlg->x);
+    DBGTrace(dlg->y);
+    DBGTrace(dlg->cx);
+    DBGTrace(dlg->cy);
+
+	return 0;
+ }	
+
+ hWindow icqskin_loadDialog(HICQ icq, hWindow owner, HMODULE hMod, USHORT id, const DLGMGR *mgr)
+ {
+    int                              qtd  = 0;
+	int                              cx   = 0;
+	int                              cy   = 0;
+	
+	const struct icqDialogDescriptor *dlg = icqGetDialogDescriptor(icq,hMod,id,qtd);
+    hWindow                          hwnd = 0;	 
+    hWindow                          h;	
+	int                              f;
+	int                              tmp;
+    struct dlgPos                    pos;
+
+    ICQDIALOG	                     *cfg;
+    struct dlgcreate				 info;
+
+	memset(&info,0,sizeof(struct dlgcreate));
+	
+	if(!dlg)
+	   return 0;
+
+#ifdef DEBUG
+	
+	f   = sizeof(ICQDIALOG)+mgr->userDataSize;
+
+    cfg = (ICQDIALOG *)  icqframe_createDataBlock(icq, f, "Dialog");
+	if(!cfg)
+	   return 0;
+	
+	cfg->ds          = dlg;
+	cfg->szDataBlock = mgr->userDataSize;
+	cfg->mgr         = mgr;
+	
+	hwnd = gtk_fixed_new();
+
+    if(!hwnd)
+    {
+	   icqWriteSysLog(icq,PROJECT,"Failure creating gtk_fixed container");
+	   free(cfg);
+	   return 0;
+    }	   
+	
+    gtk_object_set_user_data(GTK_OBJECT(hwnd), (gpointer) cfg);
+    gtk_signal_connect(GTK_OBJECT(hwnd),"destroy",GTK_SIGNAL_FUNC(icqdialog_destroy), cfg);
+	
+	for(f=0;f<qtd;f++)
+	{
+       tmp =dlg[f].x + dlg[f].cx;	   
+	   if(tmp > cx)
+		  cx = tmp;
+	   
+       tmp =dlg[f].y + dlg[f].cy;	   
+	   if(tmp > cy)
+		  cy = tmp;
+	}
+	
+	DBGTrace(cx);
+	DBGTrace(cy);
+
+    pos.x  = 
+    pos.y  = 0;
+    pos.cx = cx;
+    pos.cy = cy;
+	
+    convertSize(&pos);
+	
+	cx = pos.cx;
+	cy = pos.cy;
+	
+#ifdef GTK2
+    gtk_widget_set_size_request(hwnd,cx,cy);
+#else	
+    gtk_widget_set_usize(hwnd,cx,cy);
+#endif	
+	
+    while(qtd-- > 0)	
+    {
+	   h = createObject(dlg,&info);  
+	   
+	   if(h)
+       {
+          gtk_object_set_user_data(GTK_OBJECT(h), (gpointer) cfg);
+
+          pos.x  = dlg->x;
+	      pos.y  = dlg->y;
+	      pos.cx = dlg->cx;
+	      pos.cy = dlg->cy;
+          convertSize(&pos);
+		  
+	      icqgui_setWindowID(owner,dlg->id);
+		  icqskin_setFont(h, FONT_NORMAL);
+		  
+#ifdef GTK2
+          gtk_widget_set_size_request(hwnd,pos.cx,pos.cy);
+#else	
+          gtk_widget_set_usize(hwnd,pos.cx,pos.cy);
+#endif	
+
+          gtk_fixed_put(GTK_FIXED(hwnd),h,pos.x,cy-pos.y);
+       }
+       else
+       {
+		  icqPrintLog(icq,PROJECT,"Error creating dialog element class %08lx",dlg->className);
+       }		  
+
+       dlg++;
+    }
+
+    gtk_widget_show_all(GTK_WIDGET(hwnd));	
+	
+#endif
+	
+    return hwnd;
+ }
+
+ static void convertSize(struct dlgPos *pos)
+ {
+	pos->cy += pos->cy;
+	pos->y  += (pos->y >> 1);
+	
+	pos->cx += (pos->cx >> 1);
+	pos->x  += (pos->x  >> 1);
+	
+ }
+
+ static void icqdialog_destroy( hWindow hwnd, ICQDIALOG *cfg)
+ {
+	if(!cfg->sz)
+	   return;
+
+	DBGPrint("Dialog \"%s\" destroyed",cfg->name);
+	
+
+	cfg->sz = 0;
+	free(cfg);
+ }
+
+ 
+/*---[ Window constructors ]--------------------------------------------------*/
+
+ BEGIN_WINDOW_CONSTRUCTOR(WC_STATIC)
+
+    hWindow hwnd = NULL;
+ 
+    if(style & SS_TEXT)
+    {	   
+       hwnd = gtk_label_new(title);
+    }	   
+/*	
+	else if(style & SS_GROUPBOX)
+    {
+      hwnd = gtk_label_new(title);
+    }	   
+*/	
+ 
+ END_WINDOW_CONSTRUCTOR(WC_STATIC,hwnd)
+ 
+ BEGIN_WINDOW_CONSTRUCTOR(WC_ENTRYFIELD)
+	
+    hWindow hwnd = gtk_entry_new();
+ 
+ END_WINDOW_CONSTRUCTOR(WC_ENTRYFIELD,hwnd)
+ 
+ 
+ BEGIN_WINDOW_CONSTRUCTOR(WC_BUTTON)
+	
+    hWindow hwnd   = NULL;
+	hWindow label;
+
+    if(style & (BS_CHECKBOX|BS_AUTOCHECKBOX) )
+    {	   
+       hwnd = gtk_check_button_new_with_label(title);
+    }	
+/*	
+    else if(style & (BS_RADIOBUTTON|BS_AUTORADIOBUTTON) )
+    {	   
+       hwnd = gtk_radio_button_new_with_label(info->radioGroup,title);
+	   
+	   if(!info->radioGroup)
+       {		  
+	      info->radioGroup = gtk_radio_button_get_group(GTK_RADIO_BUTTON(hwnd));
+		  DBGTracex(info->radioGroup);
+	   }
+	}	   
+ 	else
+	{
+       hwnd = gtk_button_new_with_label(title);
+	}
+*/	
+	label = gtk_bin_get_child(GTK_BIN(hwnd));
+	
+	if(label)
+       icqskin_setFont(label, FONT_NORMAL);
+	   
+	
+ END_WINDOW_CONSTRUCTOR(WC_BUTTON,hwnd)
+ 

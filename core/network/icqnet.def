@@ -1,0 +1,39 @@
+;========================================================================
+; ICQNETW.DEF - pwICQ Network support module
+;========================================================================
+
+LIBRARY      ICQNETW INITINSTANCE TERMINSTANCE
+
+PROTMODE
+
+DATA         MULTIPLE READWRITE LOADONCALL NONSHARED
+CODE         LOADONCALL
+
+EXPORTS      icqnetw_Configure          @1
+             icqnetw_Start              @2
+             icqnetw_ConfigPage         @3
+             icqOpenUDP                 @4
+             icqOpenTCP                 @5
+             icqCloseSocket             @6
+             icqConnect                 @7
+             icqGetSockError            @8
+             icqGetHostByName           @9
+             icqGetHostID               @10
+             icqSendTo                  @11
+             icqRecvFrom                @12
+             icqSend                    @13
+             icqRecv                    @14
+             icqGetPort                 @15
+             icqAcceptConnct            @16
+             icqListen                  @17
+             icqFormatIP                @18
+             icqConnectSock             @19
+             icqString2IPAddress        @20
+             icqConnectHost             @21
+             icqGetIPAdress             @22
+             icqWriteNetworkErrorLog	@23
+             icqEnableBroadcast		@24
+             icqShutdownSocket		@25
+             icqBindSocket		@26
+             icqPeekSocket		@27
+

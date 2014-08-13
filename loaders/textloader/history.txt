@@ -1,0 +1,106 @@
+grep icqCoreStartup *.h
+release
+bd
+dir
+release
+del pwicq.ini
+dir
+exit
+go
+release
+list s:\POPUPLOG.OS2
+dir
+go
+dir
+exit
+go
+go
+go
+go
+dir
+release
+exit
+release
+exit
+exit
+release
+exit
+release
+exit
+exit
+copy makefile makefile.os2
+\data\ibmcpp\sources\icq2\core\icqv7\
+list makefile
+bd
+db
+eset include
+e \data\home\ibmcpp\sets.txt
+e s:\bin\scripts\ibmcpp.cmd
+db
+icqtext.exe
+ls
+icqtext.exe
+cl
+ls
+db
+./icqtext.exe
+type go.cmd
+ls
+del PWICQ.INI
+cl
+rl
+rl
+exit
+icc
+exit
+rl
+exit
+run
+dir \Private\pwicq2
+type go.cmd
+copy ..\mainloader\go.cmd
+run
+type ..\mainloader\go.cmd
+type ..\..\core\kernel\go.cmd
+run
+dir \Private\pwicq2\icqkrnl.dll
+run
+less ..\mainloader\makefile
+less ..\..\core\kernel\makefile
+bd
+run
+dir
+cl
+dir
+dir
+exit
+rl
+exit
+less ..\..\core\kernel\os2core.def
+..\..\core\kernel\
+grep icqadd *.c
+grep icqAdd *.c
+less user.c
+exit
+less \data\ibmcpp\sources\icq2\core\kernel\user.c
+rl
+exit
+rl
+exit
+rl
+exit
+copy icqtext.c icqtext.old
+less ..\..\core\kernel\exec.c
+e icqtext.old
+run
+run
+rl
+exit
+run
+rl
+dir
+exit
+rl
+exit
+rl
+exit

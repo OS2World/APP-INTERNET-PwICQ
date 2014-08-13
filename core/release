@@ -1,0 +1,5 @@
+make --file=linux.mak PARMS="-DNDEBUG=1 -DDLL=1" release
+
+
+
+

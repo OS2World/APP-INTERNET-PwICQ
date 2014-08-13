@@ -1,0 +1,161 @@
+/*
+ * listen.c - listener thread
+ */
+
+#ifdef __OS2__
+ #pragma strings(readonly)
+ #define INCL_DOSPROCESS
+#endif
+
+ #include <stdio.h>
+ #include <string.h>
+ #include <malloc.h>
+
+ #include "peer.h"
+
+/*---[ Prototipes ]-------------------------------------------------------------------------------------------*/
+
+ static void execute(HICQ, HPEER);
+ static int  validate(HICQ,HPEER,int);
+
+/*---[ Implement ]--------------------------------------------------------------------------------------------*/
+
+ void  _System icqv8_peerThread(ICQTHREAD *thd)
+ {
+    PEERCONF *cfg = thd->parm;
+
+    DBGMessage("Listener thread started");
+    cfg->active = TRUE;
+
+    execute(thd->icq,cfg);
+
+    if(cfg->sock > 0)
+    {
+       icqCloseSocket(cfg->sock);
+       cfg->sock = 0;
+    }
+
+    cfg->active = FALSE;
+    cfg->thread = -1;
+    DBGMessage("Listener thread stopped");
+ }
+
+ static void execute(HICQ icq, HPEER cfg)
+ {
+    char        buffer[0x0100];
+    PEERSESSION *session;
+    long        ip;
+    int         port;
+    int         sock;
+
+    cfg->sock = icqOpenTCP(icqLoadValue(icq,"peer:listen",0));
+
+    DBGTrace(cfg->sock)
+
+    if(cfg->sock < 1)
+    {
+       icqWriteNetworkErrorLog(icq, PROJECT, "Error creating peer socket");
+       return;
+    }
+
+    if(icqListen(cfg->sock))
+    {
+       icqWriteNetworkErrorLog(icq, PROJECT, "Error configuring peer socket");
+       return;
+    }
+
+    icqWriteSysLog(icq,PROJECT,"Listener thread enabled");
+
+    sock = icqAcceptConnct(cfg->sock, &ip, &port);
+    DBGTrace(sock);
+
+    while(icqIsActive(icq) && cfg->active && sock > 0)
+    {
+       DBGTrace(sock);
+
+       strcpy(buffer,"Connection received from ");
+       icqIP2String(ip,buffer+strlen(buffer));
+       sprintf(buffer+strlen(buffer),":%d",port);
+       icqWriteSysLog(icq,PROJECT,buffer);
+
+       if(icqCheckBlacklist(icq, ip))
+       {
+          icqWriteSysLog(icq,PROJECT,"Blacklisted IP address, connection rejected");
+          icqCloseSocket(sock);
+       }
+       else if(validate(icq,cfg,sock))
+       {
+          icqWriteSysLog(icq,PROJECT,"Peer session rejected");
+          icqCloseSocket(sock);
+       }
+
+       sock = icqAcceptConnct(cfg->sock, &ip, &port);
+    }
+
+ }
+
+ static int validate(HICQ icq, HPEER cfg, int sock)
+ {
+    #pragma pack(1)
+
+    struct _header
+    {
+       UCHAR  cmd;	// BYTE  ff  CMD  The command: connect.
+       USHORT tcpVer;	// WORD.L 08 00 TCPVER The peer-to-peer version this packet uses.
+       USHORT sz;       // WORD.L 2b 00 LENGTH The length of the following data in bytes.
+    } h;
+
+    char	*buffer;
+    int         rc = -1;
+
+/*
+BYTE  ff  CMD  The command: connect.
+WORD.L 08 00 TCPVER The peer-to-peer version this packet uses.
+WORD.L 2b 00 LENGTH The length of the following data in bytes.
+DWORD.L xx xx xx xx DESTUIN The UIN this packet is sent to.
+WORD.L 00 00 UNKNOWN Unknown: empty.
+DWORD.L xx xx xx xx OURPORT The port the sender listens on.
+DWORD.L xx xx xx xx OURUIN The UIN of the sender.
+DWORD xx xx xx xx OURREMIP The IP of the sender as the server sees it.
+DWORD xx xx xx xx OURINTIP The local IP of the sender.
+BYTE 04 TCPFLAGS TCP connection flags.
+DWORD.L xx xx xx xx OURPORT2 The sender's "other" port.
+DWORD.L xx xx xx xx COOKIE The connection cookie the server gave for this pair of UINs.
+DWORD.L 50 00 00 00 UNKNOWN Unknown: 0x50 = 80.
+DWORD.L 03 00 00 00 UNKNOWN Unknown: 0x3 = 3.
+DWORD.L 00 00 00 00 UNKNOWN Unknown: empty.
+*/
+
+    if(!icqv8_recBlock(cfg, sock, sizeof(h), (void *) &h))
+       return -1;
+
+    if(h.cmd == 0xFF)
+    {
+       icqDumpPacket(icq, NULL, "Invalid hello packet on peer processing", sizeof(h), (unsigned char *) &h);
+       return -1;
+    }
+
+    if(h.cmd != 0x08)
+    {
+       icqDumpPacket(icq, NULL, "Invalid peer version on hello packet", sizeof(h), (unsigned char *) &h);
+       return -1;
+    }
+
+    buffer = malloc(h.sz);
+
+    if(!buffer)
+    {
+       icqWriteSysLog(icq,PROJECT,"Memory allocation error when processing peer hello");
+       return -1;
+    }
+
+    if(icqv8_recBlock(cfg, sock, h.sz, (void *) buffer))
+    {
+       icqDumpPacket(icq, NULL, "Peer hello packet", h.sz, (unsigned char *) buffer);
+    }
+
+
+    free(buffer);
+    return rc;
+ }
+

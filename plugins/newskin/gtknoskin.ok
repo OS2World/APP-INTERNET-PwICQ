@@ -1,0 +1,121 @@
+/*
+ * gtknoskin.c - Create GTK non Skinned pwICQ Window
+ */
+
+ #include <pwicqgui.h>
+ #include <string.h>
+ #include <malloc.h>
+
+
+/*---[ Prototipes ]-----------------------------------------------------------*/
+
+ static void destroy( GtkWidget *, ICQFRAME *);
+ static void resized(GtkWidget *, GtkAllocation *, ICQFRAME *);
+
+/*---[ Implementation ]-------------------------------------------------------*/
+
+ int _System icqskin_CreateStandardWindow(HICQ icq, SKINDATA *cfg)
+ {
+	char        buffer[0x0100];
+	ICQFRAME    *wnd;
+    GtkWidget   *temp;
+	int         f;
+	int         sz;
+	hWindow     *wndChilds;
+
+	sz  = sizeof(ICQFRAME) + (MAIN_WINDOW_COMPONENTS * sizeof(hWindow)); 
+	wnd = malloc(sz);
+	
+	if(!wnd)
+	   return -1;
+
+	memset(wnd,0,sz);
+	wnd->sz     = sizeof(ICQFRAME);
+	wnd->icq    = icq;
+	wnd->childs = MAIN_WINDOW_COMPONENTS;
+	
+	wndChilds   = (hWindow *) (wnd+1);
+	
+    cfg->frame      = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_object_set_user_data(GTK_OBJECT(cfg->frame), (gpointer) wnd);
+	
+    cfg->mainWindow = gtk_vbox_new(FALSE,0);
+    gtk_object_set_user_data(GTK_OBJECT(cfg->mainWindow), (gpointer) wnd);
+
+	DBGTracex(cfg->mainWindow);
+	DBGTracex(wnd);
+
+    sprintf(buffer,"ICQ#%lu",icqQueryUIN(icq));
+    icqskin_setWindowManagerName(cfg->frame,buffer);
+	
+    gtk_signal_connect( GTK_OBJECT(cfg->frame),"destroy",GTK_SIGNAL_FUNC(destroy),wnd );
+    gtk_signal_connect( GTK_OBJECT(cfg->frame),"size-allocate",GTK_SIGNAL_FUNC(resized),wnd );
+
+	icqskin_loadIcons(cfg,"icons.gif");
+	
+	/* Create listbox control */
+	icqSkin_createStandardUserList(icq,cfg->mainWindow,ID_USERLIST);
+	CHKPoint();
+
+	/* Create Buttons */
+    wndChilds[ID_SEARCH] = icqskin_createButton(cfg->mainWindow, ID_SEARCH, cfg,     11, "Search/Add", "searchbutton", (BUTTON_CALLBACK) icqskin_searchButton, cfg);
+    wndChilds[ID_SYSMSG] = icqskin_createButton(cfg->mainWindow, ID_SYSMSG, cfg,     10, "System",     "sysmsgbutton", (BUTTON_CALLBACK) icqskin_sysmsgButton, cfg);
+    wndChilds[ID_CONFIG] = icqskin_createButton(NULL,            ID_CONFIG, cfg, 0xFFFF, "pwICQ",      "sysbutton",    (BUTTON_CALLBACK) icqskin_configButton, cfg);
+    wndChilds[ID_MODE]   = icqskin_createButton(0,               ID_MODE,   cfg,      7, "Offline",    "modebutton",   (BUTTON_CALLBACK) icqskin_modeButton,   cfg);
+
+    /* Create the bottom line */
+	temp = gtk_hbox_new(FALSE,0);
+    gtk_box_pack_start(GTK_BOX(temp), wndChilds[ID_CONFIG], FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(temp), wndChilds[ID_MODE],   TRUE,  TRUE,  0);
+	
+    gtk_box_pack_start(GTK_BOX(cfg->mainWindow), temp, FALSE, FALSE, 0);
+	
+    /* Add mainWindow in the frame, show widgets */
+    DBGTracex(cfg->mainWindow);
+    gtk_widget_show_all(GTK_WIDGET(cfg->mainWindow));
+	gtk_container_add(GTK_CONTAINER(cfg->frame), cfg->mainWindow);
+
+	CHKPoint();
+
+    for(f=0;f<ICQMNU_COUNTER;f++)
+	   cfg->menu[f] = icqskin_CreateMenu(icq, f, cfg);
+
+	icqskin_restoreFrame(cfg->frame,"pos:MainWindow", 150, 375);
+
+    return 0;	
+ }
+
+ static void destroy(GtkWidget *hwnd, ICQFRAME *cfg )
+ {
+	/* Main window is beeing closed */
+	DBGMessage("Closing main window");
+	
+	if(cfg && cfg->sz == sizeof(ICQFRAME))
+	{
+	   DBGMessage("Releasing frame window");
+   	   memset(cfg,0,sizeof(ICQFRAME));
+	   free(cfg);
+	}
+#ifdef DEBUG
+	else
+	{
+	   DBGMessage("********* INVALID FRAME WINDOW");
+	}
+#endif	
+    gtk_main_quit();
+ }
+
+ static void resized(GtkWidget *widget, GtkAllocation *allocation, ICQFRAME *cfg)
+ {
+	char buffer[80];
+	
+	if(cfg && cfg->icq)
+	{
+       sprintf(buffer,"%d,%d,%d,%d",allocation->x,allocation->y,allocation->width,allocation->height);
+	   DBGMessage(buffer);
+       icqSaveString(cfg->icq,"pos:MainWindow",buffer);
+	}
+
+ }
+
+

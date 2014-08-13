@@ -1,0 +1,327 @@
+            This is Google's cache of 
+            www.people.unt.edu/~das0015/icq/icqprop.txt.
+            Google's cache is the snapshot that we took of the page as we 
+            crawled the web.
+            The page may have changed since that time. Click here for the 
+            current page without highlighting.
+
+
+            Google is not affiliated with the authors of this page nor 
+            responsible for its content.
+
+
+
+
+============================================================================
+==  ICQPROP.TXT -- version 0.05 (12/27/1999)
+==
+==  Discusses the format of ICQ 99x's user properties as contained in the
+==  database files (uin.DAT and uin.IDX, in directories NEWDB\ and DB99B\).
+==  Managed by:  Derek Soeder <das0015@unt.edu>
+==
+==  Feel free to use the information in this document as you wish, but
+==  please give credit to the appropriate contributors (listed at the end
+==  of this document).  If you choose to redistribute this document, you
+==  must do so for free, with the exception of compensation for any
+==  reasonable expenses, and this notice and the credits must remain intact.
+==
+==  The information contained in this document was gathered through
+==  observation of the uin.DAT and uin.IDX files ("database files") for
+==  ICQ 99x, and may be incorrect.  Use it at your own risk.
+==
+==  This document is in no way sponsored, supported, or condoned by
+==  ICQ Inc., Mirabilis, or AOL.  ICQ is Copyright (C) 1999, ICQ Inc.
+============================================================================
+
+
+> OVERVIEW
+
+    In an ICQ 99x user's database (uin.DAT), each contact, as well as the
+    database's owner, has an entry containing their user information as
+    applicable on the local machine.  ICQ 99a's database files (NewDB) have
+    the majority of this user information stored as sequential entries of
+    binary data, although they also use lists of named values, called
+    "properties" in this document.  These properties consist of a name
+    string, a value type identifier (specifies what type the following value
+    is), and an attached value.  ICQ 99b makes extensive use of the property
+    system, storing almost all user information as properties.
+
+
+> NOTES
+
+    For each user property documented, the property's name, typical data
+    type (reading the "data type" byte is still advised, however), and a
+    description of the property's significance are given.  If the word "me"
+    appears at the beginning of the description, the property only applies to
+    the "My Details" for the database's owner.  Conversely, "contact" is used
+    to signify that a property only applies to contacts.
+
+    Spelling errors in property names are preserved for compatibility.
+
+    For information on reading user properties, please see the ICQ database
+    documents (ICQNEWDB.TXT for ICQ 99a; ICQ 99b document to be released).
+
+    The data types used below correspond to C++ data types:  a CHAR is a
+    signed BYTE (a BYTE is considered unsigned); a SHORT is a signed WORD
+    (2-byte integer); a LONG is a signed DWORD (4-byte integer); and a STRING
+    is an ASCIIZ string preceded by a WORD which gives the length of the
+    string (including the null terminator).  For example, a STRING with a
+    zero length WORD would consist of nothing but the length WORD itself,
+    while a STRING with a length WORD of one would be followed only by a null
+    terminator character.
+
+
+> ICQ99A PROPERTIES
+
+property                            data type   description
+----------------------------------- ----------- -----------------------------
+UserHomepageDescription             STRING
+UserHomepageCategory                WORD
+iOnlineAlert                        LONG
+iAutoAway                           LONG
+iAutoChat                           LONG
+iAutoAddURL                         LONG
+iAutoReceiveFile                    LONG
+iAcccessToFileServer                LONG
+iMessagePopup                       LONG
+iAcceptInAway                       LONG
+iAcceptInDND                        LONG
+iAcceptInBusy                       LONG
+iPlaySoundAfter                     LONG
+iPlayOnlineSoundAfter               LONG
+iAcceptInOut                        LONG
+iPopupResponse                      LONG
+iOnlineFloat                        LONG
+iUserSound                          LONG
+iUserSendByServer                   LONG
+iCustomMessage                      LONG
+iEditCustomMsg                      STRING
+iPlaySoundSame                      LONG
+UserStatusToUser                    BYTE
+UserNoHistory                       BYTE
+DontUpdateGMT                       BYTE
+AlreadyRemindedBirthday             BYTE
+WindowsAutoHide                     BYTE
+ShowHistoryDate                     BYTE
+ShowRichTextOptionDlg               BYTE
+OnlineOnlyList                      BYTE
+GroupModeList                       BYTE
+UseMsgRichText                      LONG
+GlobalOnlineAlertOnAway             LONG
+Picture Auto Decline                BYTE
+Picture Update Date                 LONG
+ShowUpdateInfoWarning               BYTE
+HandlePhoneDetailsRequest           LONG
+DontPublishEmail                    DWORD
+WebSearchString0                    LONG
+ShowHideIPWarning                   BYTE
+WhitePagesSearchOnline              BYTE
+BroadcastBDay                       BYTE
+AutoOpenURLInNewBrowser             BYTE
+UseICQEmailClient                   BYTE
+ShowWebAwareWarning                 BYTE
+Dont Send ICQ Email                 BYTE
+HorizontalItemWidth                 LONG
+UseKeyboardShortcuts                BYTE
+ActiveHotKeyActivateICQ             LONG
+HotKeyActivateICQ                   LONG
+ActiveHotKeyDblClkTray              LONG
+HotKeyDblClkTray                    LONG
+ActiveHotKeyCreateNote              LONG
+HotKeyCreateNote                    LONG
+ActiveHotKeyWebSearch               LONG
+HotKeyWebSearch                     LONG
+ActiveHotKeyWebSearchBrowser        LONG
+HotKeyWebSearchBrowser              LONG
+ActiveHotKeyCheckEmail              LONG
+HotKeyCheckEmail                    LONG
+ActiveHotKeySendEmail               LONG
+HotKeySendEmail                     LONG
+ActiveHotKeyContactListSearch       LONG
+HotKeyContactListSearch             LONG
+ActiveHotKeyAdvancedFind            LONG
+HotKeyAdvancedFind                  LONG
+ActiveHotKeyBringNotesToFront       LONG
+HotKeyBringNotesToFront             LONG
+ActiveHotKeyCreateReminder          LONG
+HotKeyCreateReminder                LONG
+GroupShowSeparators                 BYTE
+OwnerFloatPosLeft                   LONG
+OwnerFloatPosTop                    LONG
+SocksResolveIP                      DWORD
+ShowContactListIcons                BYTE
+GlobalOnlineAlert                   BYTE
+GlobalOnlineSound                   BYTE
+GlobalOnlineBlink                   BYTE
+ColorsList                          BYTE
+ShowUpdateListWarning               BYTE
+Picture Location                    STRING
+SocksExternalIP                     STRING
+UseSocksExternalIP                  DWORD
+WebSearchDefaultSite                LONG
+
+
+> ICQ99B PROPERTIES
+
+property                            data type   description
+----------------------------------- ----------- -----------------------------
+99BCrypt                            BYTE        [me]  encrypt "Password"
+99BCryptIV                          LONG        [me]  password encryption key?
+AutoSavePassword                    BYTE        [me]  0:don't save password,
+                                                  1:save password
+Password                            STRING      [me]  user's password;
+                                                  encrypted if "99BCrypt"<>0
+ShowIP                              BYTE        0:hide IP, 1:show IP
+UpdateInfoStatus                    SHORT
+WebAware                            BYTE
+About                               STRING      "additional information" text
+Age                                 BYTE        user's age
+Authorize                           BYTE        0:authorization required to
+                                                  add this user, 1:not req'd
+BirthDay                            BYTE        birthdate day (1=1st, ...)
+BirthMonth                          BYTE        birth month (1=January, ...)
+BirthYear                           SHORT       birth year
+FirstName                           STRING      first name
+Gender                              BYTE        1:female, 2:male
+GroupText                           STRING
+GroupText1                          STRING
+GroupText2                          STRING
+HomeAddress                         STRING
+HomeCell                            STRING
+HomeCity                            STRING
+HomeCountry                         SHORT
+HomeFax                             STRING
+HomeHomepage                        STRING
+HomepageDescription                 STRING
+HomePhone                           STRING
+HomeState                           STRING
+HomeZipCode                         STRING
+InterestCategory                    WORD
+InterestCategory1                   WORD
+InterestText                        STRING
+InterestText1                       STRING
+InterestText2                       STRING
+InterestText3                       STRING
+Language                            BYTE
+Language2                           BYTE
+LastName                            STRING      last name
+MyDefinedHandle                     STRING      user name (handle; usually
+                                                  equals "NickName")
+NickName                            STRING      nickname
+Occupation                          BYTE        occupation value [see table]
+OldEmail                            STRING
+PastText                            STRING
+PastText1                           STRING
+PastText2                           STRING
+PrimaryEmail                        STRING      primary e-mail address
+Remarks                             STRING      [contact]  "notes" text
+SecondEmail                         STRING      secondary e-mail address
+UIN                                 DWORD       UIN
+WorkAddress                         STRING
+WorkCity                            STRING
+WorkCompany                         STRING
+WorkDepartment                      STRING
+WorkFax                             STRING
+WorkHomepage                        STRING
+WorkJobTitle                        STRING
+WorkPhone                           STRING
+WorkState                           STRING
+WorkZipCode                         STRING
+ShowActiveListExplenation           BYTE
+ShowAutoSleepWarning                BYTE
+ShowAwayWarning                     BYTE
+ShowChatWarning                     BYTE
+ShowFileTransferWarning             BYTE
+ShowHideIPWarning                   BYTE
+ShowInvisibleWarning                BYTE
+ShowLeftButtonWarning               BYTE
+ShowMoreEventsWarning               BYTE
+ShowOutWarning                      BYTE
+ShowRichTextOptionWarning           BYTE
+ShowSendLaterOfflineWarning         BYTE
+ShowUpdateInfoWarning               BYTE
+ShowWebAwareWarning                 BYTE
+FirewallFromPort                    SHORT
+FirewallToPort                      SHORT
+IP                                  LONG        current/last IP address
+SocksHost                           STRING
+SocksVersion                        BYTE
+UseSocks                            BYTE
+AllResponseJumpToMessage            BYTE
+AllResponsePlay                     BYTE
+ChatOptionShow                      BYTE
+EmailReceipientsSeparator           STRING
+ExternalOptionShow                  BYTE
+FileOptionShow                      BYTE
+GlobalPlaySoundAfter                BYTE
+GroupModeList                       BYTE
+MenuCounter                         SHORT
+MoveNewMessageToTop                 BYTE
+MoveToAway                          BYTE
+NoviceUser                          BYTE
+NoviceUserCounter                   DWORD
+OpenMenuLClick                      BYTE
+OutMessagePreset7                   STRING
+OutMessagePresetName7               STRING
+PhoneInternationalPrefix            STRING
+PhoneLDPrefix                       STRING
+PhoneLocalPrefix                    STRING
+PictureOptionShow                   BYTE
+RandomAge                           STRING
+RandomComments                      STRING
+RandomCountry                       STRING
+RandomGender                        STRING
+RandomHomePage                      STRING
+RandomLanguage                      STRING
+RandomName                          STRING
+RealAwayMessage                     STRING
+RealOutMessage                      STRING
+SecurityLevel                       BYTE
+SendClientStats                     BYTE
+SMTP                                STRING
+URLOptionAutoOpenURLInNewBrowser    BYTE
+URLOptionShow                       BYTE
+WhitePagesSearchOnline              BYTE
+
+
+> TABLES
+
+    Occupation                          // (ICQ\Defaults\Occupation.dat)
+    -----------------------------------
+        1       = Academic
+        2       = Administrative
+        3       = Art/Entertainment
+        4       = College Student
+        5       = Computers
+        6       = Community & Social
+        7       = Education
+        8       = Engineering
+        9       = Financial Services
+        10      = Government
+        11      = High School Student
+        12      = Home
+        13      = ICQ - Providing Help
+        14      = Law
+        15      = Managerial
+        16      = Manufacturing
+        17      = Medical/Health
+        else    = (empty)                   //ICQ uses 0
+
+
+> CREDITS
+
+    The following people have contributed to this document:
+
+        Derek Soeder <das0015@unt.edu>: pre-release draft (version 0.05) and
+            preliminary research; ICQNEWDB.TXT
+
+    Contributions are always welcome!  If you think you have new information
+    to add, an update to some incomplete or obsolete information, or a
+    correction to make, please contact the document's current manager (name
+    and e-mail listed in the notice at the beginning of the document).
+
+
+
+
+
+

@@ -1,0 +1,197 @@
+ static void drawTransparent(HBITMAP *img, HBITMAP *msk, USHORT id, HPS hps, USHORT x, USHORT y, USHORT cx, USHORT cy)
+ {
+    POINTL aptlPoints[4];
+
+    // Image coordinates
+    aptlPoints[0].x = x;
+    aptlPoints[0].y = y;
+    aptlPoints[1].x = x+cx;
+    aptlPoints[1].y = y+cy;
+
+    // Source - Non inclusive
+    aptlPoints[2].x = 0;
+    aptlPoints[2].y = 0;
+    aptlPoints[3].x = cx+1;
+    aptlPoints[3].y = cy+1;
+
+    GpiWCBitBlt( hps, msk[id], 4, aptlPoints, ROP_SRCAND,   BBO_IGNORE);
+    GpiWCBitBlt( hps, img[id], 4, aptlPoints, ROP_SRCPAINT, BBO_IGNORE);
+ }
+
+ HBITMAP icqskin_createFrameBackground(HBITMAP bg, short cx, short cy, HBITMAP *img, HBITMAP *msk
+ {
+    SIZEL                sizl    = { 0, 0 };
+    DEVOPENSTRUC         dop     = {0L, "DISPLAY", NULL, 0L, 0L, 0L, 0L, 0L, 0L};
+    HAB                  hab     = WinQueryAnchorBlock(hwnd);
+    HBITMAP              bg      = NO_IMAGE;
+    HPS                  hps;
+    HDC                  hdc;
+    BITMAPINFOHEADER     bmpData;
+    BITMAPINFOHEADER2    bmih;
+    RECTL                rcl;
+    int					 x;
+    int                  y;
+    int                  f;
+
+    icqskin_deleteImage(bg);
+
+    hdc = DevOpenDC(hab, OD_MEMORY, "*", 5L, (PDEVOPENDATA)&dop, NULLHANDLE);
+    hps = GpiCreatePS(hab, hdc, &sizl, PU_PELS | GPIT_MICRO | GPIA_ASSOC);
+
+    bmih.cbFix        = sizeof(bmih);
+    bmih.cx           = cx;
+    bmih.cy           = cy;
+    bmih.cPlanes      = 1;
+    bmih.cBitCount    = 24;
+    bg                = GpiCreateBitmap(hps, &bmih, 0L, NULL, NULL);
+
+    GpiSetBitmap(hps,bg);
+    GpiSetColor(hps,CLR_WHITE);
+    GpiSetBackColor(hps,CLR_BLACK);
+
+    /* Clear background */
+    rcl.xLeft   =
+    rcl.yBottom = 0;
+    rcl.xRight  = cx;
+    rcl.yTop    = cy;
+    WinFillRect(hps, &rcl, CLR_PALEGRAY);
+
+    /* Stretch images */
+    if(img[ICQFRAME_MIDSTRETCH] != NO_IMAGE)
+    {
+       if(img[ICQFRAME_MIDLEFT] == NO_IMAGE)
+       {
+          x = 0;
+       }
+       else
+       {
+          GpiQueryBitmapParameters(img[ICQFRAME_MIDLEFT], &bmpData);
+          x = bmpData.cx;
+       }
+
+       GpiQueryBitmapParameters(img[ICQFRAME_MIDSTRETCH], &bmpData);
+       for(f=x;f<cx;f+=bmpData.cx)
+          drawTransparent(img,msk, ICQFRAME_MIDSTRETCH, hps, f, 0, bmpData.cx, bmpData.cy);
+
+       for(y=0;y<cy;y += bmpData.cy)
+       {
+          for(f=x;f<cx;f+=bmpData.cx)
+             drawTransparent(img,msk, ICQFRAME_MIDSTRETCH, hps, f, y, bmpData.cx, bmpData.cy);
+       }
+    }
+
+    if(img[ICQFRAME_TITLESTRETCH] != NO_IMAGE)
+    {
+       GpiQueryBitmapParameters(img[ICQFRAME_TITLESTRETCH], &bmpData);
+       y = cy-bmpData.cy;
+       for(x=0; x<cx; x += bmpData.cx)
+          drawTransparent(img,msk, ICQFRAME_TITLESTRETCH, hps, x, y, bmpData.cx, bmpData.cy);
+    }
+
+
+    if(img[ICQFRAME_MIDLEFT] != NO_IMAGE)
+    {
+       GpiQueryBitmapParameters(img[ICQFRAME_MIDLEFT], &bmpData);
+       drawTransparent(img,msk, ICQFRAME_MIDLEFT, hps, 0, 0, bmpData.cx, bmpData.cy);
+    }
+
+    if(img[ICQFRAME_MIDRIGHT] != NO_IMAGE)
+    {
+       GpiQueryBitmapParameters(img[ICQFRAME_MIDRIGHT], &bmpData);
+       drawTransparent(img,msk, ICQFRAME_MIDRIGHT, hps, cx-bmpData.cx, 0, bmpData.cx, bmpData.cy);
+    }
+
+    y = cy;
+    if(img[ICQFRAME_TITLELEFT] != NO_IMAGE)
+    {
+       GpiQueryBitmapParameters(img[ICQFRAME_TITLELEFT], &bmpData);
+       y -= bmpData.cy;
+       drawTransparent(img,msk, ICQFRAME_TITLELEFT, hps, 0, y, bmpData.cx, bmpData.cy);
+    }
+
+    if(img[ICQFRAME_TOPLEFT] != NO_IMAGE)
+    {
+       GpiQueryBitmapParameters(img[ICQFRAME_TOPLEFT], &bmpData);
+       y -= bmpData.cy;
+       drawTransparent(img,msk, ICQFRAME_TOPLEFT, hps, 0, y, bmpData.cx, bmpData.cy);
+    }
+
+
+    if(img[ICQFRAME_MIDLEFT] != NO_IMAGE)
+    {
+       GpiQueryBitmapParameters(img[ICQFRAME_MIDLEFT], &bmpData);
+       while(y > 0)
+       {
+          y -= bmpData.cy;
+          drawTransparent(img,msk, ICQFRAME_MIDLEFT, hps, 0, y, bmpData.cx, bmpData.cy);
+       }
+    }
+
+    /* Right images */
+    y = cy;
+
+    if(img[ICQFRAME_TITLERIGHT] != NO_IMAGE)
+    {
+       GpiQueryBitmapParameters(img[ICQFRAME_TITLERIGHT], &bmpData);
+       y -= bmpData.cy;
+       drawTransparent(img,msk, ICQFRAME_TITLERIGHT, hps, cx-bmpData.cx, y, bmpData.cx, bmpData.cy);
+    }
+
+    if(img[ICQFRAME_MIDRIGHT] != NO_IMAGE)
+    {
+       GpiQueryBitmapParameters(img[ICQFRAME_MIDRIGHT], &bmpData);
+       x = cx-bmpData.cx;
+       while(y > 0)
+       {
+          y -= bmpData.cy;
+          drawTransparent(img,msk, ICQFRAME_MIDRIGHT, hps, x, y, bmpData.cx, bmpData.cy);
+       }
+    }
+
+    /* Bottom images */
+    if(img[ICQFRAME_BOTTOMSTRETCH] != NO_IMAGE)
+    {
+       GpiQueryBitmapParameters(img[ICQFRAME_BOTTOMSTRETCH], &bmpData);
+       for(x=0; x<cx; x += bmpData.cx)
+          drawTransparent(img,msk, ICQFRAME_BOTTOMSTRETCH, hps, x, 0, bmpData.cx, bmpData.cy);
+
+    }
+
+    x = 0;
+    if(img[ICQFRAME_BOTTOMLEFT] != NO_IMAGE)
+    {
+       GpiQueryBitmapParameters(img[ICQFRAME_BOTTOMLEFT], &bmpData);
+       x += bmpData.cx;
+       drawTransparent(img,msk, ICQFRAME_BOTTOMLEFT, hps, 0, 0, bmpData.cx, bmpData.cy);
+    }
+
+    if(img[ICQFRAME_BOTTOMMIDLEFT] != NO_IMAGE)
+    {
+       GpiQueryBitmapParameters(img[ICQFRAME_BOTTOMMIDLEFT], &bmpData);
+       drawTransparent(img,msk, ICQFRAME_BOTTOMMIDLEFT, hps, x, 0, bmpData.cx, bmpData.cy);
+    }
+
+    x = cx;
+    if(img[ICQFRAME_BOTTOMRIGHT] != NO_IMAGE)
+    {
+       GpiQueryBitmapParameters(img[ICQFRAME_BOTTOMRIGHT], &bmpData);
+       x -= bmpData.cx;
+       drawTransparent(img,msk, ICQFRAME_BOTTOMRIGHT, hps, x, 0, bmpData.cx, bmpData.cy);
+    }
+
+    if(img[ICQFRAME_BOTTOMMIDRIGHT] != NO_IMAGE)
+    {
+       GpiQueryBitmapParameters(img[ICQFRAME_BOTTOMMIDRIGHT], &bmpData);
+       x -= bmpData.cx;
+       drawTransparent(img,msk, ICQFRAME_BOTTOMMIDRIGHT, hps, x, 0, bmpData.cx, bmpData.cy);
+    }
+
+    /* Release image */
+    GpiSetBitmap(hps, NULLHANDLE);
+    GpiDestroyPS(hps);
+    DevCloseDC(hdc);
+
+    return bg;
+ }
+
+

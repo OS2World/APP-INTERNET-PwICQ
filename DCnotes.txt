@@ -1,0 +1,221 @@
+ICQ CLIENT TO CLIENT COMMUNICATION (v5/6)
+written up by Daniel Tan (datan@seas.upenn.edu)
+
+
+/* header */
+
+1. All packets are preceded by a two-byte header with the length of the packet to follow.
+2. All lengths, WORDs, DWORDs etc. are in LE unless otherwise stated. Thus, remember to reverse the order of the bytes.
+3. ?? means 'unknown to me'
+
+
+/* The following gives the sequence of packets initiating a DC between two users */
+
+TCP_INIT (by sender)
+BYTE		0xFF
+WORD		0x0006 /* TCP protocol used (same as the one sent by your client upon login to server */
+WORD		0x0027
+DWORD		/* UIN of receiver */
+6 BYTES		0x00 /* ?? */
+DWORD		/* UIN of sender */
+DWORD		/* sender's external IP */
+DWORD		/* sender's internal IP */
+BYTE		TCP_FLAG (1)
+DWORD		/* sender's listening port */
+DWORD		/* DC cookie */
+DWORD 		0x00000050 
+DWORD		0x00000003
+
+TCP_INIT_ACK (by receiver)
+DWORD		0x00000001
+
+TCP_INIT (by receiver)
+exactly the same except the UIN's (for sender/receiver) are swapped
+
+TCP_INIT_ACK (by sender)
+
+/* Footnote */
+
+(1) TCP_FLAG (known flags)
+0x01	Firewall
+0x02	Proxy
+0x04	TCP-enabled
+0x06	ICQ Lite
+
+
+/* The following gives the structure of a TCP_MESSAGE packet */
+
+/* The beginning part is common to all TCP_MESSAGE packets */
+
+DWORD		CHECKSUM
+WORD		TCP_COMMAND (1)
+WORD		0x000E		/* ?? */
+WORD		TCP SEQUENCE NUMBER (DEC from 0xFFFF for NORMAL messages)
+12 bytes	0x00 		/* ?? */
+WORD		TCP_MESSAGE_TYPE
+
+/* FOOTNOTE */ 
+TCP_COMMAND 
+0x07D0		CANCEL MESSAGE 	(2000)
+0x07DA		ACK MESSAGE	(2010)
+0x07EE		NORMAL MESSAGE	(2030)
+
+/* The next part of the packet depends on the TCP_MESSAGE/TCP_COMMAND */
+
+/* This section deals with CANCEL messages (TCP_COMMAND == 0x07D0) */
+
+(For CANCEL messages, 
+TCP SEQUENCE NUMBER = sequence number of NORMAL message to cancel
+TCP_MESSAGE_TYPE = TCP_MESSAGE_TYPE of NORMAL message)
+
+DWORD		0x00000000
+WORD		MESSAGE LENGTH (0x0001)
+NTS		MESSAGE (0x00)
+
+When your message is not ACK'd by the receiver, your dialog box will
+appear stuck. Pressing 'cancel' sends the CANCEL message.
+
+/* This section deals with ACK messages (TCP_COMMAND == 0x07DA) */
+
+(ACK's messages are sent on receipt of every NORMAL message.
+TCP SEQUENCE NUMBER = sequence number of NORMAL message to ACK
+TCP_MESSAGE_TYPE = TCP_MESSAGE_TYPE of NORMAL message to ACK)
+
+WORD		ACCEPT STATUS (1)
+WORD		0x0000
+WORD		MESSAGE LENGTH
+NTS		MESSAGE
+DWORD		0x00000000
+DWORD		0xFFFFFFFF
+
+If user is in any mode other than Online/Free for chat, the message 
+will have the user's Away/Occupied/DND/NA message
+
+/* FOOTNOTE */
+(1) ACCEPT STATUS
+0x0000		NORMALLY ACCEPTED (ONLINE/FREE FOR CHAT)
+0x0004		AWAY
+0x0009		OCCUPIED
+0x000A		DND 
+0x000E		NA
+0x000C		ACCEPTED TO CONTACT LIST
+
+
+
+
+
+
+/* This section deals with NORMAL messages (TCP_COMMAND == 0x07EE) */
+
+WORD		0x0000
+BYTE		0x10 	(IF INVISIBLE = 0x90)
+BYTE		ONLINE STATUS (1)
+
+/* FOOTNOTE */
+(1) ONLINE STATUS
+0x00		ONLINE/FREE FOR CHAT
+0x01		AWAY
+0x02  		OCCUPIED
+0x08		N/A
+0x10		DND
+
+
+
+/* This section gives the known valid TCP_MESSAGE_TYPEs */
+
+MESSAGE_TYPE_NORMAL 						(0x0001)		
+WORD		MESSAGE LENGTH
+NTS
+DWORD		32 BIT FONT COLOUR
+DWORD 		32 BIT BACKGROUND COLOUR 
+		(eg. 0x00000000 for black, 0x00FFFFFF for white)
+
+
+MSG_CHAT_REQ 							(0x0002)		
+WORD		MESSAGE LENGTH
+NTS		CHAT REQUEST REASON
+WORD	 	MESSAGE LENGTH (0x0001)
+NTS		?? (0x00)
+DWORD		0x00000000
+DWORD		0x00000000
+
+
+MSG_FILE_TRANSFER_REQ						(0x0003)
+WORD		MESSAGE LENGTH
+NTS		FILE DESCRIPTION
+DWORD		0x00000000 
+WORD		FILE NAME LENGTH
+NTS		FILE NAME
+DWORD		FILE SIZE
+DWORD		MESSAGE ID
+
+MSG_URL 							(0x0004)
+WORD		MESSAGE LENGTH
+NTS		DESCRIPTION 0xFE 
+		URL
+
+MSG_PLUGIN 							(0x000A)
+
+format depends on particular plugin (eg. Greeting card, Netmeeting)
+
+
+
+MSG_CONTACTS 							(0x0013)
+WORD		MESSAGE LENGTH
+NTS		ASCII NUMBER OF CONTACTS (EG. 0x32)	0xFE
+		ASCII UIN OF CONTACT			0xFE		
+
+
+
+/* Some comments  */
+
+DC settings:
+1. DC with anyone.
+This allows your IP/port to be sent to any client who has you on the contact list.
+Does not authenticate DC cookie. Therefore, DC connections can be spoofed (ie. if both
+A and B have this setting, it is possible to intercept messages between A & B by spoofing
+the TCP_INIT packets :) ). Also, it is trivial to spoof messages from a sender in the
+receiver's contact list by changing the UIN in the TCP_INIT packet.
+
+2. DC on contact list
+Your IP/port is only revealed to clients on your contact list. DC cookie is authenticated.
+
+3. DC upon authorisation
+Your IP/port is only revealed when you authorise a chat request/file transfer etc.
+All normal messages go through the server.
+
+4. Unlike earlier versions, TCP connections are dropped by either client if there are
+no messages for some time (does not appear to be fixed, around 30 min).
+
+5. Some of the status flags are dependent on the exact ICQ version. Packets were 
+dumped using ICQ 2000b v4.63. Status refers to the status that the receiver sees the
+sender as.
+
+
+About DC Cookie:
+If A & B are online and both can see each other, the DC cookie is sent to both clients when one of 
+them logs in. DC cookie is authenticated by the receiver upon receipt of the TCP_INIT packet. 
+This prevents spoofing.
+
+When establishing DC, if the sender is not on the receiver's contact list, all packets to the 
+sender from the receiver will go through the server.
+
+
+
+Credit:
+From various documents on the internet (http://www.d.kth.se/~d95-mih/icq/)
+- icq protocol documentation (http://www.algonet.se/~henisak/icq/icqv5.html)
+- source code of ickle (for the encryption/decryption algorithm) (http://ickle.sourceforge.net)
+- icq-devel list (http://vic20.blipp.com/mailman/listinfo.cgi/icq-devel)
+- icq protocol 7 documentation (http://icqv7.cjb.net)
+
+If you think I've left you out (my apologies!), please send me an email.
+This work was based on a large extent on the work of others. 
+I've done a writeup and made some additions of my own.
+
+
+
+Packets were dumped using a small client that I made.
+
+
+

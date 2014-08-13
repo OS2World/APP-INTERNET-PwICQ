@@ -1,0 +1,117 @@
+run
+rl & exit
+\Public\pwicq\skins\GreenSkin\
+open icons.gif
+dir
+exit
+rl & exit
+rl
+exit
+dir
+exit
+\Public\pwicq\
+dr
+dir
+rar t pwICQ2OS2-Preview.EXE
+bd
+rl
+exit
+rl
+exit
+exit
+dir *.def
+db
+db
+cl
+rl
+exit
+rl
+exit
+less os2core.def
+dir /od
+less os2core.def
+rl
+dir
+less s:\POPUPLOG.OS2
+less makefile
+less go.cmd
+cl
+db
+del menu.obj
+m
+db
+grep skin *.c | grep -i mgr
+less msg.c
+less ..\..\include\icqdefs.h
+rl
+dir
+exit
+dir
+exit
+exit
+less \data\ibmcpp\sources\monitor\core\log.c
+less os2core.def
+dir
+run
+less \Temp\pwicq.dbg
+less \Temp\pwicq.log
+e go.cmd
+run
+rl
+exit
+rl
+exit
+rl
+cl
+rl
+cl
+cd ..
+..\
+buildall
+dir
+\Private\pwicq2\plugins\
+dir /od
+cd ..
+dir /od
+bd
+dir \Private\pwicq2\plugins /od
+cd ..\..\plugins\pmdc
+dir
+rl
+exit
+less \logs\27241234.log
+exit
+rl
+less s:\POPUPLOG.OS2
+cd ..
+\Private\pwicq2\
+dir
+dir plugins
+del plugins
+dir
+select /od del (*)
+850
+dir
+cd -
+dir
+buildall
+cl
+cd ..
+cd ..
+alias
+e \data\home\ibmcpp\build.cmd
+dir
+exit
+rl
+exit
+rl
+..\..\plugins\
+buildall
+\private\pwicq2\plugins\
+dir
+del .
+cd -
+..\
+exit
+m
+exit

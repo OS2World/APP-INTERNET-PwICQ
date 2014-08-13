@@ -1,0 +1,37 @@
+LIBRARY      ICQWIN INITINSTANCE TERMINSTANCE
+
+PROTMODE
+
+DATA         MULTIPLE READWRITE LOADONCALL NONSHARED
+CODE         LOADONCALL
+
+
+EXPORTS         icqStartWindowTools                     @1
+                icqStopWindowTools                      @2
+                icqOpenMsgWindow                        @3
+                icqDefaultMsgPreProcessor               @4
+                icqAjustDefaultMsgDialog                @5
+                icqQueryDefaultMsgMgr                   @6
+                icqAjustFrameTitle                      @7
+                icqExecuteWindowLoop                    @8
+                icqLogonDialog                          @9
+                icqRegisterConfigurationWindow          @10
+                icqOpenDefaultConfigurationWindow       @11
+                icqValidateDefaultEditHelper            @12
+                icqOpenSearchWindow			            @13
+                icqCreatePointer                        @14
+                icqMakeBitmapTransparent                @15
+                icqAjustTaskList                        @16
+                icqProcessGuiEvent                      @17
+                icqDDEQueryServer	 				    @18
+                icqDDEData								@19
+                icqDDEInitiateAck						@20
+                icqQuerySystray                         @21
+                icqUpdateSysTray                        @22
+                icqDisableSysTray                       @23
+                icqSetBitmap                            @24
+
+
+
+
+

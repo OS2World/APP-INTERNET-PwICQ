@@ -1,0 +1,6 @@
+cd ~/pwicq2/bin
+LD_LIBRARY_PATH=.
+./pwicqt --uin=6838492 --password=oxigenio
+cd -
+
+

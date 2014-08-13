@@ -1,0 +1,217 @@
+/*
+ * EVENT.C - Lanca eventos
+ */
+
+
+ #include <icqkernel.h>
+ #include "icqcore.h"
+
+ /*---[ Implementacao ]-------------------------------------------------------------------------------*/
+
+ static void ajustModeIcon(HICQ icq)
+ {
+    if(icq->info)
+    {
+       icq->info->mode     = icq->currentMode;
+       icq->info->modeIcon = icqQueryModeIcon(icq, icq->currentMode);
+       icq->info->eventCounter++;
+    }
+ }
+
+ void EXPENTRY icqSystemEvent(HICQ icq, USHORT event)
+ {
+    HPLUGIN     p;
+    HUSER       usr;
+
+    if(icq->sz != sizeof(ICQ))
+    {
+       DBGMessage("******** CODIGO DE CONEXAO INVALIDO!!!");
+       icqWriteSysLog(NULL,PROJECT,"Invalid connection handler received on event processor (Invalid plugin?)");
+       return;
+    }
+
+    switch(event)
+    {
+    case ICQEVENT_CONTACT:
+       icq->onlineFlags |= ICQF_CONTACTED;
+       break;
+
+    case ICQEVENT_ONLINE:
+       icq->onlineFlags &= ~ICQF_CONNECTING;
+       icq->onlineFlags |= ICQF_ONLINE;
+       icq->loginRetry   = 0;
+       ajustModeIcon(icq);
+       break;
+
+    case ICQEVENT_CHANGED:
+       ajustModeIcon(icq);
+       break;
+
+    case ICQEVENT_OFFLINE:
+       icqWriteSysLog(icq,PROJECT,"System offline");
+       icq->onlineFlags    = 0;
+       icq->searchs        = 0;
+       icq->cntlFlags     &= ~(ICQFC_LOGONCOMPLETE);
+       icq->currentMode    = icqQueryOfflineMode(icq);
+
+       icqClearList(icq->pendingSearchs);
+
+       for(usr = icqQueryFirstUser(icq);usr;usr = icqQueryNextUser(icq,usr))
+       {
+          if(usr->u.mode != icq->currentMode)
+             icqUserEvent(icq, usr, ICQEVENT_SETOFFLINE);
+          usr->u.mode = icq->currentMode;
+          if(usr->u.flags & USRF_TEMPORARY)
+             usr->u.flags |= USRF_HIDEONLIST;
+          icqAjustUserIcon(icq,usr,FALSE);
+       }
+       ajustModeIcon(icq);
+       break;
+
+    case ICQEVENT_PLISTCLEAR:
+       icq->cntlFlags |= ICQFC_CLEAR;
+       break;
+
+    case ICQEVENT_LOGONCOMPLETE:
+       icqWriteSysLog(icq,PROJECT,"Logon process complete");
+/*
+       if( (icq->onlineFlags & ICQF_ONLINE) && !(icq->cntlFlags & ICQFC_SEARCHING) && icqLoadValue(icq,"UpdateUser",1))
+          icqRequestBasicUserInfoUpdate(icq, icq->uin);
+*/
+       icq->cntlFlags |= ICQFC_LOGONCOMPLETE;
+       break;
+
+/*
+    case ICQEVENT_BEGINSEARCH:
+       DBGMessage("Pesquisa iniciada");
+       icq->searchs++;
+       break;
+
+    case ICQEVENT_ENDSEARCH:
+       DBGMessage("Pesquisa terminada");
+       if(icq->searchs)
+          icq->searchs--;
+       break;
+*/
+
+    case ICQEVENT_UPDATED:
+       icq->cntlFlags |= ICQFC_SAVEUSER;
+       break;
+
+    }
+
+    for(p=icqQueryFirstElement(icq->plugins);p;p=icqQueryNextElement(icq->plugins,p))
+    {
+       if(isProcValid(p,p->SystemEvent))
+          p->SystemEvent(icq,p->dataBlock,event);
+    }
+
+    icqEvent(icq,0,'S',event,0);
+
+ }
+
+ static void blinkUser(HICQ icq, HUSER user)
+ {
+    user->blinkTimer  = icqLoadValue(icq, "UserBlinkTime", 10);
+    if(user->blinkTimer)
+       user->u.flags |= USRF_BLINK;
+ }
+
+ void EXPENTRY icqUserEvent(HICQ icq, HUSER user, USHORT event)
+ {
+    HPLUGIN     p;
+
+    if(!user)
+       return;
+
+    switch(event)
+    {
+    case ICQEVENT_UPDATED:
+       icq->cntlFlags |= ICQFC_SAVEUSER;
+       break;
+
+    case ICQEVENT_MODIFIED:
+       icqAjustUserIcon(icq, user, FALSE);
+       icq->cntlFlags |= ICQFC_SAVEUSER;
+       break;
+
+    case ICQEVENT_REJECTED:
+       user->u.flags  |= USRF_REJECTED;
+       user->u.flags  &= ~USRF_ONLIST;
+       icq->cntlFlags |= ICQFC_SAVEUSER;
+       break;
+
+    case ICQEVENT_ONLINE:
+       user->u.flags   |= USRF_ONLINE;
+       blinkUser(icq,user);
+       break;
+
+    case ICQEVENT_OFFLINE:
+       user->u.flags   &= ~USRF_ONLINE;
+       blinkUser(icq,user);
+       break;
+
+    case ICQEVENT_SETOFFLINE:
+       user->u.flags   &= ~USRF_ONLINE;
+       break;
+
+    case ICQEVENT_HIDE:
+       user->u.flags  |= USRF_HIDEONLIST;
+       icq->cntlFlags |= ICQFC_SAVEUSER;
+#ifdef EXTENDED_LOG
+       icqWriteUserLog(icq,PROJECT,user,"Hide");
+#endif
+       break;
+
+    case ICQEVENT_SHOW:
+       user->u.flags  &= ~USRF_HIDEONLIST;
+#ifdef EXTENDED_LOG
+       icqWriteUserLog(icq,PROJECT,user,"Unhide");
+#endif
+       icq->cntlFlags |= ICQFC_SAVEUSER;
+       break;
+    }
+
+    for(p=icqQueryFirstElement(icq->plugins);p;p=icqQueryNextElement(icq->plugins,p))
+    {
+       if(isProcValid(p,p->UserEvent))
+          p->UserEvent(icq,p->dataBlock,user,event);
+    }
+
+    icqEvent(icq,user->u.uin,'U',event,(ULONG)user);
+ }
+
+ void EXPENTRY icqEvent(HICQ icq, ULONG uin, char id, USHORT event, ULONG parm)
+ {
+    HPLUGIN             p;
+    HTHREAD             thd;
+    EVENTLISTENER       *listener;
+
+    if(icq->info)
+       icq->info->eventCounter++;
+
+    if(icq->skin && icq->skin->event)
+       icq->skin->event(icq,uin,id,event,parm,icq->skinData);
+
+    for(p=icqQueryFirstElement(icq->plugins);p;p=icqQueryNextElement(icq->plugins,p))
+    {
+       if(isProcValid(p,p->ProcessEvent))
+          p->ProcessEvent(icq,p->dataBlock,uin,id,event,parm);
+    }
+
+    for(thd = icqQueryFirstElement(icq->threads);thd;thd = icqQueryNextElement(icq->threads,thd))
+    {
+       if(thd->event)
+          thd->event(thd,uin,id,event,parm);
+    }
+
+    for(listener = icqQueryFirstElement(icq->listeners);listener;listener = icqQueryNextElement(icq->listeners,listener))
+    {
+       if(listener->listener)
+          listener->listener(icq,listener->parm,uin,id,event,parm);
+    }
+
+ }
+
+
+

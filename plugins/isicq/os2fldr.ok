@@ -1,0 +1,200 @@
+/*
+ * flist.c - Manage shared files list
+ */
+
+#ifdef __OS2__
+ #pragma strings(readonly)
+ #define INCL_DOSFILEMGR   /* File Manager values */
+ #define INCL_DOSERRORS    /* DOS error values */
+#endif
+
+ #include <stdio.h>
+ #include <malloc.h>
+ #include <string.h>
+
+ #include "ishared.h"
+
+/*---[ Structures ]--------------------------------------------------------------------------------------*/
+
+ #pragma pack(1)
+
+ struct fldBase
+ {
+    HDIR		hDir;
+    FILEFINDBUF3	fl;
+    ULONG		fCount;
+    APIRET		rc;
+    ISHARED_FILEDESCR	*entry;
+    char		buffer[0x0100];
+ };
+
+/*---[ Prototipes ]--------------------------------------------------------------------------------------*/
+
+ static void loadFolder(ISHARED_CONFIG *, const char *, int);
+
+
+/*---[ Implementation ]----------------------------------------------------------------------------------*/
+
+ void ICQAPI ishare_loadFolder(ISHARED_CONFIG *cfg, const char *folder)
+ {
+    /* Load the selected folder in the shared list files */
+#ifdef DEBUG
+    ISHARED_FILEDESCR	*entry;
+#endif
+
+//    DBGMessage(folder);
+    loadFolder(cfg,folder,0);
+
+#ifdef DEBUG
+//    walklist(entry,cfg->sharedFiles)
+//    {
+//       DBGTrace(entry->fileID);
+//       DBGMessage(entry->filePath+entry->offset);
+//    }
+#endif
+
+ }
+
+ static void loadFolder(ISHARED_CONFIG *cfg, const char *key, int level)
+ {
+    struct fldBase	*s = malloc(sizeof(struct fldBase));
+
+    if(!s)
+    {
+       log(cfg,"Memory allocation error when loading file list");
+       return;
+    }
+
+    strncpy(s->buffer,key,0xFF);
+    strncat(s->buffer,"\\*.*",0xFF);
+
+//    DBGTrace(level);
+//    DBGMessage(s->buffer);
+
+    s->fCount = 1;
+    s->hDir   = HDIR_CREATE;
+    s->rc     = DosFindFirst(s->buffer,&s->hDir,FILE_DIRECTORY|FILE_NORMAL,&s->fl,sizeof(FILEFINDBUF3),&s->fCount,FIL_STANDARD);
+
+//    DBGTrace(s->rc);
+
+    while(!s->rc)
+    {
+       strncpy(s->buffer,key,0xFF);
+       strncat(s->buffer,"\\",0xFF);
+       s->fCount = strlen(s->buffer);
+       strncat(s->buffer,s->fl.achName,0xFF);
+       if(s->fl.attrFile & FILE_DIRECTORY)
+       {
+          if(*s->fl.achName != '.')
+             loadFolder(cfg, s->buffer, level+1);
+       }
+       else
+       {
+//          DBGMessage(s->buffer);
+          s->entry	= malloc(sizeof(ISHARED_FILEDESCR)+strlen(s->buffer));
+          if(!s->entry)
+          {
+             log(cfg,"Memory allocation error when registering a file");
+          }
+          else
+          {
+             memset(s->entry,0,sizeof(ISHARED_FILEDESCR));
+             s->entry->fileID   = cfg->fileID++;
+             s->entry->offset   = s->fCount;
+             s->entry->fileSize = s->fl.cbFile;
+             strcpy(s->entry->filePath,s->buffer);
+             ishare_insertItem(&cfg->sharedFiles,&s->entry->l);
+          }
+       }
+
+       s->fCount = 1;
+       s->rc     = DosFindNext(s->hDir,&s->fl,sizeof(FILEFINDBUF3),&s->fCount);
+    }
+
+#ifdef PWICQ
+    if(s->rc != ERROR_NO_MORE_FILES)
+       icqWriteSysRC(cfg->icq, PROJECT, s->rc, "Error loading shared files");
+#endif
+
+    DosFindClose(s->hDir);
+
+    free(s);
+ }
+
+ int ICQAPI ishare_SetEA(const char *pszPathName, const char *attr, const char *name)
+ {
+    APIRET       rc;
+    PFEA2LIST    fpFEA2List;
+    EAOP2        InfoBuf;
+    PFEA2        at;
+    USHORT       *ptr;
+    int          ns = strlen(attr);
+    int          sz = strlen(name);
+
+    rc = DosAllocMem((PPVOID) &fpFEA2List,sizeof(FEA2LIST)+sz+ns+5,PAG_READ|PAG_WRITE|PAG_COMMIT);
+    if(rc)
+       return rc;
+
+    memset(&InfoBuf,0,sizeof(InfoBuf));
+    InfoBuf.fpFEA2List = fpFEA2List;
+
+    fpFEA2List->cbList = sizeof(FEA2LIST) + sz + ns + 4;
+    at                 = fpFEA2List->list;
+
+    at->oNextEntryOffset = 0;            /*  Offset to next entry. */
+    at->fEA              = 0;            /*  Extended attributes flag. */
+    at->cbName           = ns;           /*  Length of szName, not including NULL. */
+    at->cbValue          = sz+4;         /*  Value length. */
+
+    strcpy(at->szName,attr);
+    ptr      = (USHORT *)(at->szName+ns+1);
+    *(ptr++) = 0xFFFD;
+    *(ptr++) = sz;
+
+    strcpy((char *) ptr,name);
+
+    rc = DosSetPathInfo( (PSZ) pszPathName,
+                         FIL_QUERYEASIZE,
+                         &InfoBuf,
+                         sizeof(EAOP2),
+                         0);
+
+    DBGTracex(rc);
+
+    DosFreeMem(fpFEA2List);
+    return rc;
+
+ }
+
+
+ void ICQAPI ishare_loadMD5(ISHARED_CONFIG *cfg)
+ {
+    ISHARED_FILEDESCR	*entry;
+    char		md5[50];
+    int			f;
+
+    DosSetPriority(PRTYS_THREAD, PRTYC_IDLETIME, PRTYD_MINIMUM, 0);
+
+    walklist(entry,cfg->sharedFiles)
+    {
+       if(!cfg->active)
+          return;
+
+       DBGMessage(entry->filePath);
+       if(!ishare_MDFile(cfg, entry->filePath, entry->md5))
+       {
+          DBGMessage("MD5 calculado");
+
+          for(f=0;f<16;f++)
+             sprintf(md5+(f*2),"%02x",entry->md5[f]);
+
+          ishare_SetEA(entry->filePath, "MD5", md5);
+
+       }
+
+    }
+
+ }
+
+
+

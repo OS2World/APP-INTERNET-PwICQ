@@ -1,0 +1,99 @@
+cd ..
+dir
+cd -
+less ..\..\core\kernel\event.c
+less ..\..\include\icqkernel.h
+dir \public\pwicq2
+dir \public\pwicq2\os2\bin
+dir \public\pwicq2\os2\bin\plugins
+rl
+exit
+rl
+exit
+grep DLGMGR *.c
+rl
+exit
+rl
+exit
+rl
+\logs\27241234.log
+exit
+rl
+dir
+exit
+rl
+less makefile
+type \Private\pwicq2\builds.txt
+exit
+less ..\icqmsg\makefile
+rl
+rl
+less \Private\pwicq2\builds.txt
+dir \Private\pwicq2\plugins
+exit
+rl
+exit
+exit
+rl
+exit
+rl
+exit
+db
+cl
+db
+rl
+exit
+rl
+exit
+less ..\..\core\kernel\os2tools.c
+rl
+..\..\config\logs\
+dir
+date
+rar m bkp20021225 *
+dir
+exit
+less \logs\27241234.log
+exit
+rl
+exit
+m
+dir ..\..\config\logs
+db
+rl
+exit
+\data\browser\os2\
+Mozilla\
+"Perry Werneck"\
+dir
+vocpak7v.slt\
+less prefs.js
+dir
+exit
+exit
+..\..\core\ex
+..\..\extras\
+dir
+stealpwd\
+exit
+less \data\ibmcpp\sources\icq2\core\kernel\init.c
+del \Private\pwicq2\plugins\icqulog.dll
+rl
+cl
+m
+cl
+rl
+rl
+exit
+rl
+cd ..
+grep -r -i browser *.c
+grep -r -i browser *
+icqmsg\
+less icqmsg.c
+grep -i browser *.c
+less icqmsg.c
+rl & exit
+rl
+exit
+rl & exit

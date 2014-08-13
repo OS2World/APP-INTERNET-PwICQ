@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>
+	OSCAR Protocol: Section 1: Introduction
+    </title>
+  </head>
+
+  <body bgcolor="#FFFFFF" link="#444444" vlink="#666666">
+    <table width="1" border="0" align="center">
+      <tr>
+	<td><img src="/images/blank.gif" height="1" width="540">
+      </tr>
+      <tr>
+	<td align="right">
+	  <img src="/faim/faim.gif" border="0" width="111" height="50"><br>
+	  <A href="/pst/"><img src="/pst/pst_small.gif" border="0"></a>
+	</td>
+      </tr>
+      <tr>
+	<td align="center">
+	  <b><font size="+1">AIM/Oscar Protocol Specification: Section 1: Introduction</font></b>
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  <hr noshade>
+	  <table width="100%" border="0" align="center">
+	    <tr>
+	      <td width="1%" valign="top">
+		<img src="/images/blank.gif" width="5" height="1" border="0"><br>
+	      </td>
+	      <td width="1%" bgcolor="#BBBBBB">
+
+	      </td>
+	      <td width="1%">
+		<img src="/images/blank.gif" width="5" height="1" border="0">
+	      </td>
+	      <td width="98%">
+		<img src="/images/blank.gif" width="460" height="1" border="0"><br>
+
+
+		<font size="+1"><b>1.0 Introduction</b></font>
+		<p>
+		  This is hoped to someday become the cononical source of unencumbered information on the <a href="http://www.aim.aol.com">AIM/OSCAR</a> protocol suite.  So far, it may not live up to that goal, though at this point it is canonical for the sole point that it's the only one.  
+		</p>
+		<u>1.1 Purpose</u>
+		<p>
+		  To the lay person, this all may seem pointless.  And, really, it is.  This whole effort is really necessary for two reasons 1) legality, 2) the ego of <a href="http://www.aol.com">AOL</a>.  It really is not maximally efficient to design a protocol and not release the specification, forcing some users to attempt to reverse engineer your work.  This is not a problem that's associated with just AOL, though, so you shouldn't blame them specifically.  The morals of the AOL company were forced upon them by the rest of the industry.  Since already we've left the scope of this document, I shall not exit further by discussing that topic in detail.
+		</p>
+		<p>
+		  To everyone else, I'm sure the reason for this work is perfectly clear.  We would like to be as efficient as possible.  Using a Java client to do such simple things as this protocol is insanely stupid.  The Java version of the AIM client is notoriously buggy wastes alot of it's users' time with it's idiotic crashes and moronic error messages.  Personally, this work is to let me escape from this Client of Doom.
+		</p>
+		<p>
+		  Globally, though, this will actually <i>promote</i> the use of the AIM service.  AOL has provided very nice clients for the Windows and Macintosh platforms, but has left it's UNIX(tm) users with a horrible "solution".  Exposing this protocol will allow third-parties to develope nice, stable clients for other platforms, generally supporting the idea that "rewritten work is always better than the original".  Through repetition, we can make the world of cross-platform real-time messaging a better place.  
+		</p>
+		<p>
+		  I must note, though, that this is not the only service of it's kind.  The Mirrabilis ICQ service is in some peoples eye's superior to AIM, and is definitly more widespread usage-wise.  This protocol dissection was inspired by all the hard workers that freed the ICQ protocol from the grips of it's beholder and let the <i>user</i> decide what they wanted in a client.  
+		</p>
+		<p>
+		  Generally, the whole purpose is so that anyone can write an AIM client, and if they desire, an AIM server.
+		</p>
+		<u>1.2 Information Sources</u>
+		<p>
+		  Everything from here has so far come from interpretation of AIM/Oscar packets coming straight off the wire.  There's been <b>NO</b> dissassembly of any code.  It appears at this point, that that will never become necessary in the near future.  The critical points of the protocol have been decoded and everything appears to be working happily using the current methods.  I'm guessing that disassembly would involve far more effort than simply decoding packets, and not much more information could be obtained anyway.  Also, it's more legally acceptable to avoid disassembly.
+		</p>
+		<u>1.3 Authors</u>
+		<p>
+		  There are two authors of this document: Adam Fritzler and  Scott Werndorfer.  Scott is helping maintain the existing protocol information and adding anything else he uncovers, while Adam goes off and does other things, occasionally popping in to make a comment or two whenever he's least wanted.  Additionally, various people have discovered things and told us about them.  If you are one of those people and would like to be listed here, let us know.
+		</p>
+		<u>1.4 Disclaimer</u>
+		<p>
+		  Before you take any action on the information giving herein and throughout this document please make sure that you are aware of what you're doing.  The best way to do this is by reading the AOL-published document entitled <u>AOL Instant Messenger(tm) Registration Agreement</u>.  This will let you know where they stand on the subject of what went on to publish this specification.  Also, none of the author's of this agreement shall be held liable for any legal action taken towards you by AOL or other parties.  We'll also not be held responsible for your use of this document, either in it's intended purpose or otherwise.  You're on your own (as are we).
+		</p>
+		<u>1.5 Contacts</u>
+		<p>
+		  Adam Fritzler may be contacted at <a href="mailto:mid@auk.cx">mid@auk.cx</a>.
+		</p>
+		
+		<p>Scott Werndorfer may be reached at <a href="mailto:smw@ceruleanstudios.com">smw@ceruleanstudios.com</a></p>
+		<u>1.6 Further Information</u>
+		<p>
+		  The main source of this document if you ended up here in different manner, is <a href="http://www.auk.cx/faim/protocol/">www.auk.cx/faim/protocol/</a>.
+		</p>
+		<p>
+		  There's also two mailing lists associated with this document.  The first, <code>libfaim-aim-protocol</code>, is for discussion of client-/platform-independent discussion of protocol issues.  The second list, <code>libfaim-devel</code>, is dedicated to the discussion of <a href="http://www.auk.cx/faim/">libfaim</a>-related issues.  Instructions regarding how to subscribe to these lists are available <a href="http://sourceforge.net/mail/?group_id=920">here</a>.
+		</p>
+
+	      </td>
+
+	      <td width="1%">
+		<img src="/images/blank.gif" width="10" height="1" border="0">
+	      </td>
+	      <td width="1%" bgcolor="#BBBBBB">&nbsp;
+		
+	      </td>
+	      <td width="1%" valign="top">
+		<img src="/images/blank.gif" width="50" height="1" border="0"><br>
+		<a href="/pst/"><img src="/pst/bar_home.gif" width="50" height="15" border="0"></a><br>
+		<a href="/pst/software/"><img src="/pst/bar_software.gif" width="50" height="15" border="0"></a>
+	      </td>
+	    </tr>
+	  </table>
+	  <hr noshade>
+	  <Center>
+	    <address><a href="mailto:mid@auk.cx">Adam Fritzler</a></address>
+	    <address><a href="mailto:smw@ceruleanstudios.com">Scott Werndorfer</a></address>
+	      <!-- Created: Sat Jun 20 20:35:10 MST 1998 -->
+	    <!-- hhmts start -->
+Last modified: Sat May 27 01:49:57 UTC 2000
+<!-- hhmts end -->	
+	  </center>
+	</td>
+      </tr>
+    </table>
+  </body>
+</html>

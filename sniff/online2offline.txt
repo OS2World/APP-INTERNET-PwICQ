@@ -1,0 +1,57 @@
+Frame 1 (60 on wire, 60 captured)
+    Arrival Time: Oct 17, 2001 18:58:56.656299
+    Time delta from previous packet: 0.000000 seconds
+    Time relative to first packet: 0.000000 seconds
+    Frame Number: 1
+    Packet Length: 60 bytes
+    Capture Length: 60 bytes
+Ethernet II
+    Destination: 00:c0:49:40:9f:fe (US_40:9f:fe)
+    Source: 00:a0:c9:0a:ee:6e (Intel_0a:ee:6e)
+    Type: IP (0x0800)
+Internet Protocol, Src Addr: 172.17.31.230 (172.17.31.230), Dst Addr: 205.188.9.133 (205.188.9.133)
+    Version: 4
+    Header length: 20 bytes
+    Differentiated Services Field: 0x00 (DSCP 0x00: Default; ECN: 0x00)
+        0000 00.. = Differentiated Services Codepoint: Default (0x00)
+        .... ..0. = ECN-Capable Transport (ECT): 0
+        .... ...0 = ECN-CE: 0
+    Total Length: 46
+    Identification: 0x0f01
+    Flags: 0x04
+        .1.. = Don't fragment: Set
+        ..0. = More fragments: Not set
+    Fragment offset: 0
+    Time to live: 128
+    Protocol: TCP (0x06)
+    Header checksum: 0x4890 (correct)
+    Source: 172.17.31.230 (172.17.31.230)
+    Destination: 205.188.9.133 (205.188.9.133)
+Transmission Control Protocol, Src Port: iad2 (1031), Dst Port: aol (5190), Seq: 673887, Ack: 1961861856
+    Source port: iad2 (1031)
+    Destination port: aol (5190)
+    Sequence number: 673887
+    Next sequence number: 673893
+    Acknowledgement number: 1961861856
+    Header length: 20 bytes
+    Flags: 0x0018 (PSH, ACK)
+        0... .... = Congestion Window Reduced (CWR): Not set
+        .0.. .... = ECN-Echo: Not set
+        ..0. .... = Urgent: Not set
+        ...1 .... = Acknowledgment: Set
+        .... 1... = Push: Set
+        .... .0.. = Reset: Not set
+        .... ..0. = Syn: Not set
+        .... ...0 = Fin: Not set
+    Window size: 8321
+    Checksum: 0xe5df (correct)
+AOL Instant Messenger
+    Command Start: 0x2a
+    Channel ID: 0x04
+    Sequence Number: 25506
+    Data Field Length: 0
+
+0000  00 c0 49 40 9f fe 00 a0 c9 0a ee 6e 08 00 45 00   ..I@.......n..E.             
+0010  00 2e 0f 01 40 00 80 06 48 90 ac 11 1f e6 cd bc   ....@...H.......             
+0020  09 85 04 07 14 46 00 0a 48 5f 74 ef a2 e0 50 18   .....F..H_t...P.             
+0030  20 81 e5 df 00 00 2a 04 63 a2 00 00                .....*.c...                 

@@ -1,0 +1,276 @@
+/*
+ * gtkstatic.c - Static skinned control for GTK
+ */
+ 
+ #include <malloc.h>
+ #include <string.h>
+ #include <stdlib.h>
+
+ #include <pwicqgui.h>
+ #include <gdk-pixbuf/gdk-pixbuf.h>
+
+/*---[ Defines ]--------------------------------------------------------------*/
+
+ #define max(a,b) a > b ? a : b
+ #define min(a,b) a < b ? a : b
+
+/*---[ Structures ]-----------------------------------------------------------*/
+
+ #pragma pack(1)
+ 
+
+ #pragma pack()
+
+/*---[ Constants ]------------------------------------------------------------*/
+ 
+ 
+/*---[ Prototipes ]-----------------------------------------------------------*/
+
+#ifdef SKINNED_GUI	
+ static void     resize(  GtkWidget *, GtkAllocation  *, ICQSTATIC *);
+ static gboolean expose(  GtkWidget *, GdkEventExpose *, ICQSTATIC *);
+#endif 
+
+/*---[ Implementation ]-------------------------------------------------------*/
+
+ ICQSTATIC * EXPENTRY icqlabel_createDataBlock(hWindow owner, int sz, const char *name)
+ {
+	#pragma pack(1)
+	
+	struct _ownerinfo
+	{
+	   ICQGUI_STANDARD_PREFIX
+	} *ownerinfo = gtk_object_get_user_data(GTK_OBJECT(owner));
+	   
+    #pragma pack()	   
+
+    ICQSTATIC *cfg = malloc(sz);
+	   
+	if(!cfg)
+	   return NULL;
+
+    memset(cfg,0,sz);	
+    cfg->sz  = sz;
+
+	/* Initialize */
+	cfg->msg  = icqStaticWindow;
+	cfg->icq  = ownerinfo->icq;
+	cfg->name = name;
+	
+	return cfg;
+ }
+
+ void EXPENTRY icqlabel_setBackground(hWindow hwnd, GdkPixbuf *bg)
+ {
+#ifdef SKINNED_GUI	
+	ICQSTATIC *cfg = gtk_object_get_user_data(GTK_OBJECT(hwnd));
+	
+    cfg->baseImage = bg;
+	
+	if(bg)
+	   gtk_widget_set_size_request(hwnd,-1,gdk_pixbuf_get_height(cfg->baseImage));
+#endif	
+ }
+
+ void EXPENTRY icqlabel_setForegroundRGB(hWindow hwnd, USHORT red, USHORT green, USHORT blue)
+ {
+#ifdef GTK2	
+    GdkColor    clr  = { 0, red, green, blue };
+    gtk_widget_modify_fg(hwnd,GTK_STATE_NORMAL,&clr);
+#endif	
+ }
+ 
+ hWindow EXPENTRY icqlabel_new(hWindow owner, USHORT id, const char *name, const char *text)
+ {
+	hWindow   ret    = NULL;
+    ICQSTATIC *cfg   = icqlabel_createDataBlock(owner, sizeof(ICQSTATIC), name);
+	
+	if(!cfg)
+	   return ret;
+
+    ret = gtk_label_new(text);
+	if(!ret)
+	   return ret;
+
+    gtk_object_set_user_data(GTK_OBJECT(ret), (gpointer) cfg);
+    gtk_signal_connect( GTK_OBJECT(ret),"destroy",GTK_SIGNAL_FUNC(icqlabel_destroy), cfg );
+	
+    icqgui_setWindowID(ret, id);
+    gtk_misc_set_alignment(GTK_MISC(ret), 0, .5);
+
+#ifdef SKINNED_GUI	
+	
+    icqlabel_setBackground(ret, gdk_pixbuf_new_from_file("button.gif",NULL));
+    icqlabel_setForegroundRGB(ret, 0xFFFF, 0xFFFF, 0xFFFF);
+	
+    gtk_signal_connect( GTK_OBJECT(ret), "size-allocate", GTK_SIGNAL_FUNC(resize), cfg );
+    gtk_signal_connect(GTK_OBJECT(ret),  "expose_event",  GTK_SIGNAL_FUNC(expose), cfg);
+
+#endif	
+	
+	return ret;
+ }
+
+ void EXPENTRY icqlabel_destroy( hWindow hwnd, ICQSTATIC *cfg)
+ {
+	if(!cfg->sz)
+	   return;
+
+	DBGPrint("Widget \"%s\" destroyed",cfg->name);
+	
+	if(cfg->bg)
+	   gdk_pixbuf_unref(cfg->bg);
+	
+	if(cfg->baseImage)
+	   gdk_pixbuf_unref(cfg->baseImage);
+
+ 	cfg->sz = 0;
+	free(cfg);
+ }
+
+#ifdef SKINNED_GUI	
+
+ void EXPENTRY icqlabel_createBackground(hWindow hwnd, ICQSTATIC *cfg, int width, int height)
+ {
+	ICQFRAME  *hFrame  = (ICQFRAME *) gtk_object_get_user_data(GTK_OBJECT(gtk_widget_get_toplevel(hwnd)));
+	int       rows;
+	int       cols;
+	int       f;
+	int       sz;
+	
+	if(!cfg->baseImage)
+	{
+	   if(cfg->bg)
+	   {
+	      gdk_pixbuf_unref(cfg->bg);
+		  cfg->bg = NULL;
+	   }
+       return;		  
+	}
+
+	if(!hFrame || hFrame->sz < sizeof(ICQFRAME))
+	{
+#ifdef USEICQLIB	   
+	   icqWriteSysLog(cfg->icq,PROJECT,"Invalid frame window when creating label background");
+#endif	   
+	   DBGMessage("Invalid frame Window in icqlabel_createBackground");
+	   return;
+	}
+	
+	cfg->gc = hFrame->gc;
+	
+    if(!cfg->bg || height != gdk_pixbuf_get_height(cfg->bg) || width != gdk_pixbuf_get_width(cfg->bg))
+    {
+	   DBGPrint("Creating new background for \"%s\"",cfg->name);
+	   
+	   if(cfg->bg)
+		  gdk_pixbuf_unref(cfg->bg);
+	   
+	   CHKPoint();
+	   
+	   cfg->bg = gdk_pixbuf_new(	GDK_COLORSPACE_RGB,    
+							        TRUE,
+							        8,
+							        width,
+							        height
+					             );
+	   
+       rows = gdk_pixbuf_get_height(cfg->baseImage);
+	   cols = gdk_pixbuf_get_width(cfg->baseImage)/3;
+	   
+	   if(cols > (width/3))
+	   {
+		  CHKPoint();
+	   }
+	   else
+	   {
+		  for(f=cols;f<(width-cols);f += cols)
+		  {
+			 sz = min(cols,(width-f));
+             gdk_pixbuf_copy_area(	cfg->baseImage,
+	   							    cols,0,
+	   							    sz,height,
+	   							    cfg->bg,
+	   							    f,0 );
+		  }
+		  
+          gdk_pixbuf_copy_area(	cfg->baseImage,
+	   							0,0,
+	   							cols,height,
+	   							cfg->bg,
+	   							0,0 );
+		  
+          gdk_pixbuf_copy_area(	cfg->baseImage,
+	   							cols*2,0,
+	   							cols,height,
+	   							cfg->bg,
+	   							width-cols,0 );
+	   }
+	   
+	}	   
+	
+	DBGTracex(cfg->bg);
+	
+ }
+ 
+ static void resize(GtkWidget *hwnd, GtkAllocation *sz, ICQSTATIC *cfg)
+ {
+    icqlabel_createBackground(hwnd,cfg,sz->width,sz->height);	
+ }
+
+ static gboolean expose(GtkWidget *hwnd, GdkEventExpose *event, ICQSTATIC *cfg)
+ {
+    icqlabel_expose(hwnd, event, cfg);
+	return FALSE;
+ }
+
+ gboolean icqlabel_expose(GtkWidget *hwnd, GdkEventExpose *event, ICQSTATIC *cfg) 
+ {
+	gint x;
+	gint y;
+	
+	if(cfg->bg)
+	{
+/*	   
+	   void        gdk_draw_pixbuf                 (GdkDrawable *drawable,
+                                             GdkGC *gc,
+                                             GdkPixbuf *pixbuf,
+                                             gint src_x,
+                                             gint src_y,
+                                             gint dest_x,
+                                             gint dest_y,
+                                             gint width,
+                                             gint height,
+                                             GdkRgbDither dither,
+                                             gint x_dither,
+                                             gint y_dither);
+*/
+       gtk_widget_translate_coordinates( 	gtk_widget_get_toplevel(hwnd),
+                                           	hwnd,
+                                        	event->area.x,event->area.y,
+                                        	&x,&y );
+       
+       gdk_draw_pixbuf(	hwnd->window,
+						cfg->gc,
+						cfg->bg,
+						x,y,
+						event->area.x,event->area.y,
+						event->area.width,event->area.height,
+						GDK_RGB_DITHER_NORMAL,
+						0,0 
+					  );
+       return TRUE;						
+    }	   
+
+	return FALSE;
+ }
+
+#endif
+ 
+ MRESULT _System icqStaticWindow(HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2)
+ {
+
+        return 0;
+ }
+
+ 

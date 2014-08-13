@@ -1,0 +1,37 @@
+    * Panel plugins - If you think theres functionality missing from the panel, you can start to write your own panel plugin. Read the notes below :
+
+      Note : if you plan to write your own plugin, please use the following software : automake 1.7.5, autoconf 2.57, libtool 1.5 (1.1220 2003/04/05 19:32:58) and gettext 0.11.5, and keep the m4 up to date, get the latest .m4 files from libxfce4util.
+
+      The xfce4 component allows the compilation and installation of third party plugins. In addition a M4 macro was added to depends.m4 to do the required stuff for panel plugins.
+
+          XFCE_PANEL_PLUGIN([var], [version]) 
+
+      var is the prefix for the resulting variables. E.g. if you choose var to be XFCE4_PANEL the macro will define the following variables (and implicitly call AC_SUBST for them):
+          o XFCE4_PANEL_CFLAGS holds the flags required for the C compiler to compile the plugin.
+          o XFCE4_PANEL_LIBS has the flags required for the compile-time linker to create the plugin module. If you're using libtool you'll need in addition to the above the following flags -aviod-version -export-dynamic -module (if you don't use libtool see the documentation of your link editor for further flags, that need to be added).
+          o XFCE4_PANEL_PLUGINSDIR has the path to the panels plugin directory. You have to install your plugin to this directory.
+
+      version specifies the required xfce4-panel version. Has to be atleast 3.99.1, since prior versions do not care about third party plugins (they do not even install a pkg-config file).
+
+      For a complete example how to create a panel plugin see my sample plugin package xfce4-extras/xfce4-sample-plugin in XFce's CVS.
+      Here is a quick and dirty guide how to compile your own plugin:
+          o Install or update your xfce4 package to at least version 3.99.1.
+          o Since the location of the panel header files has changed, you'll need to use #include <panel/whatever.h> now.
+          o Compile and link your plugin with the following command:
+
+                cc `pkg-config --cflags --libs xfce4-panel` sources... 
+
+          o Install the plugin into the panels plugin directory, which can be obtained using the following command:
+
+                pkg-config --variable=pluginsdir 
+
+          o Notify the panel to reload the plugins. This can be done by sending the process the SIGUSR1 signal. For example:
+
+                pkill -USR1 xfce4-panel 
+
+            or
+
+                killall -USR1 xfce4-panel 
+
+            Note : Do not send the panel process the SIGHUP signal, since this will terminate the process instead.
+

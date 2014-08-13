@@ -1,0 +1,118 @@
+cd ..
+grep -s icqLoadString *.c
+bd
+copy ..\icqrexx\go.cmd
+cmd
+less ..\..\core\kernel\event.c
+cmd
+less ..\..\core\kernel\os2plug.c
+bd
+cmd
+rl
+exit
+dir
+cl
+rl
+dir
+exit
+cl
+rl
+exit
+less icqpipe.rc
+rl
+exit
+exit
+\data\ibmcpp\sources\icq\plugins\icqpipe\
+less icqpipe.c
+\data\ibmcpp\sources\icq2\core\kernel\
+less msg.c
+grep icqEvent *.c
+less ..\..\include\icqdefs.h
+rl
+cl
+bd
+rl
+exit
+rl
+exit
+..\..\core\os2win\
+grep -i icqquerymessage *.c
+..\kernel\
+grep icqQueryMessageTitle *.c
+less msg.c
+rl
+bd
+rl
+exit
+rl
+exit
+rl
+exit
+rl
+exit
+rl
+exit
+rl
+rl
+e makefile
+rl
+dir
+\Public\pwicq2\os2\bin\plugins\
+dir
+exit
+ls
+rl
+type \Private\pwicq2\builds.txt
+m
+less ..\icqv7\makefile
+rl
+exit
+dir
+less gnomeapplet.c
+rl
+rl
+exit
+rl
+exit
+rl
+exit
+less icqpipe.rc
+e icqpipe.rc
+rl
+exit
+c 32 -9
+rl
+rl
+exit
+rl
+db
+run
+dir go.cmd
+exit
+rl & exit
+less ..\icqconf\icqconf.c
+run
+rl
+exit
+rl
+exit
+less ..\..\include\icqdefs.h
+..\icqconf\
+grep getString *.c
+grep setString *.c
+grep readString *.c
+run
+cl
+bd
+run
+go
+dir
+less lnxpipe.c
+dir
+rl
+dir
+rl
+icc
+exit
+rl
+exit

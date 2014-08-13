@@ -1,0 +1,112 @@
+..\..\include\
+grep DLG *.h
+less icqos2.h
+bd
+rl
+exit
+grep icqmsg_getField *.c
+ls
+rl & exit
+less ..\..\core\kernel\query.c
+less url.c
+run
+rl & exit
+exit
+grep addSendTo *.c
+rl
+exit
+grep MSGDESCR *
+..\..\include\
+db
+bd
+m
+run
+rl & exit
+run
+run
+run
+run
+run
+run
+run
+rl & exit
+exit
+rl
+exit
+rl & exit
+e go.cmd
+dir 
+exit
+e go.cmd
+run
+e go.cmd
+dir /f \Public\pwicq\os2\experimental\icqgui.dll
+run
+go
+run
+less go.cmd
+run
+run
+rl
+exit
+db
+copy icqmsg.dll \Private\pwicq2\plugins
+rl
+exit
+rl & exit
+rl
+rl & exit
+dir
+rl
+cl
+db
+rl & exit
+run
+rl & exit
+rl & exit
+rl 
+\Private\pwicq2\
+attrib -a builds.txt
+dir
+\logs\27241234.log
+exit
+rl & exit
+rl
+exit
+less ..\..\include\pwicqgui.h
+rl & exit
+rl
+exit
+rl & exit
+run
+rl
+exit
+run
+m
+..\..\core\kernel\
+grep icqValidateMsgEditHelper *.
+grep icqValidateMsgEditHelper *.c
+less query.c
+bd
+rl
+exit
+exit
+less ..\..\include\pwicqgui.h
+rl
+m
+run
+..\..\core\kernel\
+grep icqValidateMsgEditHelper *.c
+less query.c
+rl
+bd
+run
+m
+rl
+exit
+rl
+exit
+run
+..\..\include\
+grep DLG_ELEMENT_ID *
+exit

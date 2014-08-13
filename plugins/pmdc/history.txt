@@ -1,0 +1,105 @@
+run
+dir icqwin
+run
+run
+run
+grep -r 2SHORT *
+run
+run
+rl
+run
+s:\os2tk45\h\
+grep DrgVerifyRMF *
+less pmstddlg.h
+grep DRM_OS2FILE *
+grep -r DRM_OS2FILE *
+bd
+run
+grep -r DRM *
+bd
+run
+dir s:\bin\PMdc
+less s:\bin\PMdc\PMD.EXE
+run
+run
+run
+..\..\include\
+grep getRadioButton *
+less icqos2.h
+cd -
+cd ..
+grep -r saveCheckBox *
+grep -r loadCheckBox *
+grep -r icqLoadValue  *
+bd
+run
+cl
+rl
+exit
+rl
+exit
+less ..\..\core\kernel\os2plug.c
+less ..\..\include\icqkernel.h
+..\..\include\
+grep icqpluginipc *
+less icqqueue.h
+cd -
+..\..\core\kernel\
+less qproc.c
+cd ..
+cd ..
+grep -r icqpluginipc *
+extras\ipc\
+dir
+less queuecmd.c
+grep -i plugin *
+less queuecmd.c
+bd
+rl
+m
+exit
+less ..\icqskmgr\drag.c
+run
+run
+rl
+exit
+rl
+exit
+rl
+exit
+rl
+exit
+rl
+exit
+rl & exit
+rl
+exit
+rl
+exit
+dh
+db
+run
+rl
+exit
+rl & exit
+run
+less s:\POPUPLOG.OS2
+run
+m
+rl & exit
+less ..\..\include\icqdefs.h
+cd ..
+grep -r readRadioButton *
+grep -r writeRadioButton *
+grep -r readCheckBox *
+less icqconf\away.c
+bd
+run
+rl
+exit
+less pmdc.rc
+exit
+less ..\newskin\edit.c
+exit
+rl
+exit

@@ -1,0 +1,184 @@
+/*
+ * ICQCONF.C - Modulo principal do plugin de configuracao
+ */
+
+#ifdef __OS2__
+ #define INCL_WIN
+#endif
+
+ #include <stdio.h>
+ #include <string.h>
+ #include <time.h>
+
+ #include "icqconf.h"
+
+/*---[ Prototipes ]------------------------------------------------------------------------------------------*/
+
+ static int  _System openSysConfig(HICQ, ULONG, USHORT, ULONG);
+ static int  _System openUserInfo(HICQ, ULONG, USHORT, ULONG);
+
+ static int  _System sysConfig(HICQ, ULONG, USHORT, HWND, HWND, const DLGINSERT *, char *);
+ static int  _System userInfo(HICQ, ULONG, USHORT, HWND, HWND, const DLGINSERT *, char *);
+
+ static int  _System aboutUser(const DLGHELPER *,HWND,HICQ,ULONG,char *);
+
+
+/*---[ Publics ]---------------------------------------------------------------------------------------------*/
+
+ HMODULE module = NULLHANDLE;
+
+ const DLGMGR usrAbout = {    sizeof(DLGMGR),
+                              NULL,
+                              aboutUser,
+                              NULL,
+                              NULL,
+                              NULL,
+                              NULL		// sysButton
+                         };
+
+
+/*---[ Implementing ]----------------------------------------------------------------------------------------*/
+
+ int EXPENTRY icqconf_Configure(HICQ icq, HMODULE hmod)
+ {
+    module = hmod;
+    return 0;
+ }
+
+ int EXPENTRY icqconf_Start(HICQ icq, void *lixo, HWND hwnd)
+ {
+    icqWriteSysLog(icq,PROJECT,"Default configuration plugin Starting");
+    return 0;
+ }
+
+ static int _System openSysConfig(HICQ icq, ULONG uin, USHORT type,ULONG dummy)
+ {
+    DBGMessage("Abrir menu de configuracao");
+    return icqOpenConfigDialog(icq, 0, 1, sysConfig);
+ }
+
+ static int _System openUserInfo(HICQ icq, ULONG uin, USHORT type,ULONG dummy)
+ {
+    DBGMessage("Abrir menu de usuario");
+    return icqOpenConfigDialog(icq, uin, 0, userInfo);
+ }
+
+ static int _System sysConfig(HICQ icq, ULONG uin, USHORT type, HWND hwnd, HWND base, const DLGINSERT *dlg, char *buffer)
+ {
+#ifdef __OS2__
+    HWND                h;
+    struct cfgdlgparm   p = { sizeof(struct cfgdlgparm), uin, icq };
+#endif
+
+    static const USHORT sysConfig[]     = { CFGWIN_NETWORK, CFGWIN_EVENTS, CFGWIN_OPTIONS, CFGWIN_USERS, CFGWIN_SECURITY, CFGWIN_ADVANCED, CFGWIN_ABOUT, 0 };
+    const USHORT        *list           = sysConfig;
+    char                nick[80];
+
+    if(dlg->sz != sizeof(DLGINSERT))
+    {
+       icqWriteSysLog(icq,PROJECT,"Invalid dialog loader");
+       return -1;
+    }
+
+    icqLoadString(icq, "NickName", "John Doe", nick, 79);
+
+    /* Insert predefined titles (It's not really necessary) */
+    while(*list)
+    {
+       dlg->insert(hwnd, module, 0, NULL, *list);
+       list++;
+    }
+
+    /* Insert OS/2 pages */
+    dlg->insert(hwnd, module, 202, &away,       CFGWIN_OPTIONS);
+    dlg->insert(hwnd, module, 100, &antiSpam,   CFGWIN_SECURITY);
+    dlg->insert(hwnd, module, 101, &request,    CFGWIN_SECURITY);
+    dlg->insert(hwnd, module, 204, &groupNames, CFGWIN_USERS);
+
+
+    /* Call plugins for pages */
+    icqInsertConfigPage(icq, uin, type, hwnd, dlg, buffer);
+
+#ifdef __OS2__
+
+    /* OS/2 version - Add codepage translation */
+
+    h = WinLoadDlg(   base,
+                      base,
+                      cfgcpg,
+                      module,
+                      203,
+                      &p );
+
+    dlg->ajust(hwnd,h);
+    WinLoadString(WinQueryAnchorBlock(hwnd), module, 203, 0xFF, buffer);
+    dlg->add(hwnd, CFGWIN_OPTIONS, h, buffer);
+
+#endif
+
+
+    sprintf(buffer,"%s's (ICQ# %d) Configuration",nick,icqQueryUIN(icq));
+    DBGMessage(buffer);
+    return 0;
+
+ }
+
+ static int _System userInfo(HICQ icq, ULONG uin, USHORT type, HWND hwnd, HWND base, const DLGINSERT *dlg, char *buffer)
+ {
+    if(dlg->sz != sizeof(DLGINSERT))
+    {
+       icqWriteSysLog(icq,PROJECT,"Invalid dialog loader");
+       return -1;
+    }
+
+    /* Insert my pages */
+    dlg->insert(hwnd, module, 200, &usrAbout,           0xFFFF);                /* Welcome */
+    dlg->insert(hwnd, module, 201, &usrBasic,           CFGWIN_INFO);           /* About user (Basic information) */
+    dlg->insert(hwnd, module, 206, &miscOptions,        CFGWIN_OPTIONS);
+    dlg->insert(hwnd, module, 205, &userGroups,         CFGWIN_OPTIONS);
+
+    /* Call plugins for pages */
+    icqInsertConfigPage(icq, uin, type, hwnd, dlg, buffer);
+
+    sprintf(buffer,"%s's (ICQ# %d) Information",icqQueryUserNick(icqQueryUserHandle(icq,uin)),uin);
+    DBGMessage(buffer);
+
+    return 0;
+ }
+
+ static int _System aboutUser(const DLGHELPER *dlg, HWND hwnd, HICQ icq, ULONG uin, char *buffer)
+ {
+    HUSER usr   = icqQueryUserHandle(icq,uin);
+    char  *ptr;
+
+    CHKPoint();
+
+    if(!usr)
+       return 0;
+
+    sprintf(buffer,"%s (ICQ#%d)",icqQueryUserNick(usr),uin);
+    dlg->setString(hwnd,103,buffer);
+
+    strncpy(buffer,icqQueryUserFirstName(usr),0xFF);
+    strncat(buffer," ",0xFF);
+    strncat(buffer,icqQueryUserLastName(usr),0xFF);
+    dlg->setString(hwnd,105,buffer);
+
+    dlg->setString(hwnd,107,icqQueryUserEmail(usr));
+
+    if(usr->flags & USRF_WAITING)
+       dlg->setString(hwnd,102,"Waiting for authorization");
+
+
+    if(usr->lastAction)
+    {
+       strcpy(buffer,"Inactive since ");
+       strncat(buffer,ctime( (const long *) &usr->lastAction),0xFF);
+       for(ptr = buffer;*ptr && *ptr != '\n';ptr++);
+       *ptr = 0;
+       dlg->setString(hwnd,104,buffer);
+    }
+
+    return 0;
+
+ }

@@ -1,0 +1,491 @@
+/*
+ * main.c - I-Search client main loop
+ */
+
+#ifdef __OS2__
+ #pragma strings(readonly)
+ #include <types.h>
+ #include <sys\socket.h>
+ #define INCL_DOSPROCESS
+#endif
+
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <malloc.h>
+ #include <string.h>
+
+ #include "ishared.h"
+
+/*---[ Structures and Macros ]---------------------------------------------------------------------------*/
+
+ #pragma pack(1)
+
+ typedef struct _packet_processor
+ {
+#ifdef WIN32
+    int		id;
+#else
+    UCHAR	id;
+#endif
+    int		(*exec)(ISHARED_CONFIG *, long, int, int, char *);
+ } PACKET_PROCESSOR;
+
+ #define DECLARE_PACKET_PROCESSOR(p,x)    static int x(ISHARED_CONFIG *, long, int, int, p *);
+ #define BEGIN_PACKET_PROCESSOR_TABLE(x)  static const PACKET_PROCESSOR x[] = {
+ #define PACKET_PROCESSOR(i,p,x)          { i, (int (*)(ISHARED_CONFIG *, long, int, int, char *)) x },
+ #define END_PACKET_PROCESSOR_TABLE()     { 0, NULL } };
+ #define BEGIN_PACKET_PROCESSOR(p,x)      static int x(ISHARED_CONFIG *cfg, long fromIP, int fromPort, int sz, p *)
+
+ #pragma pack()
+
+/*---[ Function processors ]-----------------------------------------------------------------------------*/
+
+ DECLARE_PACKET_PROCESSOR( ISHARE_HELLO,     hello       )
+ DECLARE_PACKET_PROCESSOR( ISHARE_HELLOACK,  helloAck    )
+ DECLARE_PACKET_PROCESSOR( ISHARE_SEARCH,    search      )
+ DECLARE_PACKET_PROCESSOR( ISHARE_KEEPALIVE, keepalive   )
+ DECLARE_PACKET_PROCESSOR( ISHARE_FOUND,     found       )
+
+
+ BEGIN_PACKET_PROCESSOR_TABLE(packet_processor_table)
+
+ PACKET_PROCESSOR( ISHAREUDP_HELLO, 	ISHARE_HELLO,     hello       )
+ PACKET_PROCESSOR( ISHAREUDP_HELLOACK,  ISHARE_HELLOACK,  helloAck    )
+ PACKET_PROCESSOR( ISHAREUDP_SEARCH,    ISHARE_SEARCH,    search      )
+ PACKET_PROCESSOR( ISHAREUDP_KEEPALIVE, ISHARE_KEEPALIVE, keepalive   )
+ PACKET_PROCESSOR( ISHAREUDP_FOUND,     ISHARE_FOUND,     found       )
+
+ END_PACKET_PROCESSOR_TABLE()
+
+/*---[ Prototipes ]--------------------------------------------------------------------------------------*/
+
+ static int validPkt(ISHARED_CONFIG *, ULONG, int, ISHARE_PREFIX *);
+
+#ifdef PWICQ
+  static int setUserInfo(ISHARED_CONFIG *, ULONG, long);
+#endif
+
+/*---[ Implementation ]----------------------------------------------------------------------------------*/
+
+ void ICQAPI ishare_main(ISHARED_CONFIG *cfg)
+ {
+    const PACKET_PROCESSOR	*cmd;
+    ISHARE_PREFIX		*buffer;
+    long 			fromIP;
+    int  			fromPort;
+    int  			bytes;
+    USHORT			sequence;
+
+    DBGMessage("Thread de servico iniciada");
+
+    if(cfg->sz != sizeof(ISHARED_CONFIG))
+    {
+       log(cfg,"Invalid configuration block");
+       return;
+    }
+
+    cfg->kplTimer = ISHARE_KEEPALIVE_TIMER;
+    cfg->active     = TRUE;
+    cfg->searchID   = loadValue(cfg,"sid",rand());
+    buffer 	    = malloc(ISHARE_MAX_PACKET_SIZE+1);
+
+    if(!buffer)
+    {
+       log(cfg,"Memory allocation error when creating work buffer");
+       return;
+    }
+
+    cfg->sock = ishare_OpenUDP(loadValue(cfg,"listen",ISHARE_UDP_PORT));
+
+    if(cfg->sock < 0)
+    {
+       netlog(cfg,"Can't create listener sock; will retry");
+       cfg->sock = ishare_OpenUDP(0);
+    }
+
+    DBGTrace(cfg->sock);
+	
+    if(cfg->sock < 0)
+    {
+       netlog(cfg,"Can't create listener sock");
+    }
+    else
+    {
+
+#ifdef __OS2__
+       DosSetPriority(PRTYS_THREAD, PRTYC_FOREGROUNDSERVER, 0, 0);
+#endif
+
+       cfg->myIP = ishare_GetHostID();
+
+       if(loadValue(cfg,"broadcast",1))
+       {
+          CHKPoint();
+          ishare_EnableBroadcast(cfg->sock);
+          ishare_hello(cfg,IPADDR_BROADCAST);
+       }
+
+       ishare_initialize(cfg);
+
+       bytes = ishare_RecvFrom(cfg->sock, &fromIP, &fromPort, buffer, ISHARE_MAX_PACKET_SIZE);
+       while(isActive(cfg) && bytes >= 0)
+       {
+          if(cfg->packetCounter++ > PPS_LIMIT)
+             yield();
+
+          if(bytes > 0 && validPkt(cfg,fromIP,bytes,buffer))
+          {
+             *( ((char *) buffer) + bytes) = 0; // To finish the strings (the \0 isn't sent thru the network)
+
+             if(buffer->type == ISHAREUDP_ACK)
+             {
+                DBGMessage("Ack response");
+                ishare_cacheUser(cfg, fromIP, fromPort);
+             }
+             else
+             {
+                for(cmd = packet_processor_table;cmd->exec && cmd->id != buffer->type;cmd++);
+                if(cmd->exec)
+                {
+                   sequence = buffer->sequence;
+                   cmd->exec(cfg, fromIP, fromPort, bytes, (char *) buffer);
+                   if(sequence)
+                   {
+                      DBGMessage("Enviar Ack!");
+                      memset(buffer,0,sizeof(ISHARE_PREFIX));
+                      buffer->type     = ISHAREUDP_ACK;
+                      buffer->sequence = sequence;
+                      ishare_sendTo(cfg, fromIP, fromPort, FALSE, sizeof(ISHARE_PREFIX), buffer);
+                   }
+                }
+#ifdef EXTENDED_LOG
+                else
+                {
+                   bytes = buffer->type;
+#ifdef PWICQ
+                   icqIP2String(fromIP, (char *) buffer);
+                   sprintf( ((char *) buffer) + strlen((char *) buffer),": Unknown packet %d (0x%02x) received",bytes,bytes);
+#else
+                   sprintf((char *) buffer,"Unknown packet %d (0x%02d) received",bytes,bytes);
+#endif
+                   log(cfg,(char *) buffer);
+                }
+#endif
+             }
+          }
+
+          bytes = ishare_RecvFrom(cfg->sock, &fromIP, &fromPort, buffer, ISHARE_MAX_PACKET_SIZE);
+       }
+
+       ishare_CloseSocket(cfg->sock);
+
+#ifdef __OS2__
+       DosSetPriority(PRTYS_THREAD, PRTYC_REGULAR, 0, 0);
+#endif
+    }
+
+#ifdef ADMIN
+    ishare_stopAdmin(cfg);
+    ishare_deleteList(&cfg->admUsers);
+#endif
+
+#ifdef CLIENT
+    CHKPoint();
+    ishare_deleteList(&cfg->sharedFiles);
+    CHKPoint();
+    ishare_deleteList(&cfg->mySearches);
+#endif
+
+    CHKPoint();
+    free(buffer);
+    DBGMessage("Thread de servico terminada");
+ }
+
+ static int hello(ISHARED_CONFIG *cfg, long fromIP, int fromPort, int bytes, ISHARE_HELLO *pkt)
+ {
+    char 		buffer[0x0100];
+    ISHARE_HELLOACK	*rsp			= (ISHARE_HELLOACK *) buffer;
+#ifdef PWICQ
+    HUSER		usr;
+#endif
+
+    DBGMessage("Hello!");
+    DBGTrace(pkt->uin);
+    
+    if(pkt->uin && pkt->uin == queryUIN(cfg))
+       return 0;
+
+    memset(rsp,0,sizeof(ISHARE_HELLOACK));
+    rsp->h.type = ISHAREUDP_HELLOACK;
+    rsp->uin    = queryUIN(cfg);
+
+#ifdef PWICQ
+    rsp->flags |= ISHARE_FLAG_ICQ;
+#endif
+
+    loadNickname(cfg,pkt->nickname,0xF0 - sizeof(ISHAREUDP_HELLO));
+
+    ishare_sendTo(cfg, fromIP, fromPort, 0, sizeof(ISHARE_HELLOACK)+strlen(rsp->nickname)-1, rsp);
+
+#ifdef PWICQ
+    if(cfg->icq && pkt->uin)
+    {
+       if(pkt->uin == queryUIN(cfg))
+       {
+          cfg->myIP = fromIP;
+       }
+       else
+       {
+          usr = icqQueryUserHandle(cfg->icq,pkt->uin);
+	
+          if(usr)
+          {
+             usr->idle = 0;
+             if(!(usr->flags & USRF_ONLINE))
+             {
+                log(cfg,"User is online");
+                icqUserOnline(cfg->icq, pkt->uin, 0x00000100, fromIP, fromIP, 0, 0, ISHARE_MAGICNUMBER);
+             }
+          }
+       }
+    }
+#endif
+
+    ishare_cacheUser(cfg, fromIP, fromPort);
+
+    return 0;
+ }
+
+#ifdef PWICQ
+ static int setUserInfo(ISHARED_CONFIG *cfg,  ULONG uin, long fromIP)
+ {
+    HUSER usr;
+
+    if(!(cfg->icq && uin))
+       return 0;
+
+    usr = icqQueryUserHandle(cfg->icq,uin);
+    if(usr)
+    {
+       usr->idle = 0;
+	   DBGTrace(usr->uin);
+       DBGTracex(icqQueryUserIP(cfg->icq,usr));
+       usr->idle = 0;
+       if(!(usr->flags & USRF_ONLINE))
+       {
+          log(cfg,"User is online");
+          icqUserOnline(cfg->icq, uin, 0x00000100, fromIP, fromIP, 0, 0, ISHARE_MAGICNUMBER);
+       }
+       else if(icqQueryUserIP(cfg->icq,usr) == IPADDR_LOOPBACK)
+       {
+          icqSetUserIPandPort(cfg->icq, uin, fromIP, fromIP, 0);
+       }
+    }
+    return (int) usr;
+ }
+#endif
+
+
+ static int helloAck(ISHARED_CONFIG *cfg, long fromIP, int fromPort, int bytes, ISHARE_HELLOACK *pkt)
+ {
+    DBGMessage("Hello ACK");
+    DBGMessage(pkt->nickname);
+    DBGTrace(pkt->uin);
+#ifdef PWICQ
+    if(pkt->uin && setUserInfo(cfg,pkt->uin,fromIP))
+       return 0;
+#endif
+    ishare_cacheUser(cfg, fromIP, fromPort);
+    return 0;
+ }
+
+ static int validPkt(ISHARED_CONFIG *cfg, ULONG fromIP, int sz, ISHARE_PREFIX *pkt)
+ {
+/*    
+   if(cfg->myIP && fromIP == cfg->myIP)
+      return 0;
+
+   if(fromIP == localIP(cfg) && localIP(cfg))
+      return 0;
+*/
+   if(ishare_crc16(sz-2,((const char *) pkt)+2) != pkt->crc)
+   {
+       DBGMessage("****** CRC invalido");
+       DBGTracex(ishare_crc16(sz-2,((const char *) pkt)+2));
+       DBGTracex(pkt->crc);
+       DBGTrace(pkt->type);
+       return 0;
+    }
+	
+    return 1;	
+ }
+
+ static int search(ISHARED_CONFIG *cfg, long fromIP, int fromPort, int sz, ISHARE_SEARCH *pkt)
+ {
+#ifdef CLIENT
+    /*
+     * Search received, verify the file list (Only valid in client builds)
+     */
+    ISHARE_FOUND		*rsp;
+    const ISHARED_FILEDESCR 	*fl;
+    USHORT			fCount	= 0;
+    int 			f;
+    char			buffer[0x0100];
+    ISHARED_USER		*user		= NULL;
+
+    /* If first hop let's correct the packet information */
+
+    if(pkt->userIP == IPADDR_LOOPBACK || !pkt->userIP)
+       pkt->userIP = fromIP;
+	
+    if(!pkt->userPort)
+       pkt->userPort = fromPort;
+
+    /* Check for the packet origin */
+    if(pkt->userIP == cfg->myIP)
+       return 0;
+
+    if(pkt->userIP == localIP(cfg))
+       return 0;
+
+    /* Check for circular searchs */
+    	
+    for(f = 0;f < CACHE_SEARCHS;f++)
+    {
+       if(cfg->cached[f].userIP == pkt->userIP && cfg->cached[f].userPort == pkt->userPort
+       				 	       && cfg->cached[f].id       == pkt->id )
+       {
+          DBGMessage("Cached search, ignoring-it");
+	  cfg->cached[f].idle = 0;
+          return 0;
+       }       					
+    }
+
+    /* It's ok, cache and do search */
+
+    f = cfg->cachePtr++;
+    if(cfg->cachePtr >= CACHE_SEARCHS)
+       cfg->cachePtr = 0;
+
+    (cfg->cached+f)->userIP   = pkt->userIP;	
+    (cfg->cached+f)->userPort = pkt->userPort;	
+    (cfg->cached+f)->id       = pkt->id;
+    (cfg->cached+f)->idle     = 0;
+
+    user = ishare_cacheUser(cfg, pkt->userIP, pkt->userPort);
+
+    strlwr(pkt->filename);
+
+#ifdef LOGSEARCHS
+    ishare_formatIP(pkt->userIP,buffer);
+    sprintf(buffer+strlen(buffer),":%d asking for ",pkt->userPort);
+    strncat(buffer,pkt->filename,0xFF);
+    log(cfg,buffer);
+#endif
+
+    walklist(fl,cfg->sharedFiles)
+    {
+       strncpy(buffer,(fl->filePath+fl->offset),0xFF);
+       strlwr(buffer);
+	
+       if(strstr(buffer, pkt->filename))
+       {
+          DBGMessage((fl->filePath+fl->offset));
+          fCount++;
+
+          rsp = malloc(sizeof(ISHARE_FOUND)+strlen(fl->filePath+fl->offset));
+
+          if(rsp)
+          {
+             DBGMessage("Sending search response");
+             memset(rsp,0,sizeof(ISHARE_FOUND));
+             strcpy(rsp->filename,fl->filePath+fl->offset);
+             rsp->h.type = ISHAREUDP_FOUND;
+             rsp->id     = pkt->id;	        /* Search ID					*/
+             rsp->size   = fl->fileSize;	/* File size					*/
+             rsp->uin    = queryUIN(cfg);	/* The user UIN (Can be 0)		        */
+             rsp->fileID = fl->fileID;		/* File sequence				*/
+
+//             DBGTracex(pkt->userIP);
+//             DBGTrace(pkt->userPort);
+			
+             if(ishare_sendTo(cfg, pkt->userIP, pkt->userPort, 0, sizeof(ISHARE_FOUND)+strlen(rsp->filename)-1, rsp))
+                netlog(cfg,"Unable to send response");
+				
+             INTER_PACKET_DELAY
+             free(rsp);
+          }
+       }
+    }
+
+#ifdef LOGSEARCHS
+    sprintf(buffer,"Found %d file(s)",fCount);
+    log(cfg,buffer);
+#endif	
+	DBGTrace(fCount);
+	
+    if(fCount || pkt->hops < 2)	/* File found or no more hops, stop searching */
+       return 0;
+
+    /* Redistribute search */
+    pkt->hops--;
+    ishare_distribute(cfg, sz, (ISHARE_PREFIX *) pkt, pkt->userIP, user);
+
+#else  /* CLIENT */
+
+    ISHARE_ERROR	rsp;
+
+    memset(&rsp,0,sizeof(rsp));
+    rsp.h.type = ISHAREUDP_ERROR;
+    rsp.id     = pkt->id;
+    rsp.error  = ISHARE_ERROR_CANTSEARCH;
+
+    ishare_sendTo(cfg, fromIP, fromPort, 0, sizeof(rsp), &rsp);
+
+#endif /* CLIENT */
+
+    return 0;
+ }
+
+ static int keepalive(ISHARED_CONFIG *cfg, long fromIP, int fromPort, int sz, ISHARE_KEEPALIVE *pkt)
+ {
+    DBGMessage("ISHARE_KEEPALIVE");
+#ifdef PWICQ
+    setUserInfo(cfg,pkt->uin,fromIP);
+#endif
+
+    ishare_cacheUser(cfg, fromIP, fromPort);
+
+    return 0;
+ }
+
+ static int found(ISHARED_CONFIG *cfg, long fromIP, int fromPort, int sz, ISHARE_FOUND *pkt)
+ {
+#ifdef LOGSEARCHS
+    char buffer[0x0100];
+#endif
+
+    ISHARED_SEARCHDESCR *sr;
+
+    if(cfg->myIP && fromIP == cfg->myIP)
+       return 0;
+
+    if(fromIP == localIP(cfg))
+       return 0;
+
+    sr = ishare_findSearch(cfg, pkt->id);
+
+    if(!sr)
+       return 0;
+
+#ifdef LOGSEARCHS
+    ishare_formatIP(fromIP,buffer);
+    sprintf(buffer+strlen(buffer),":%d ICQ# %ld Size: %ld ID:%d File: ",fromPort,pkt->uin,pkt->size,(int)pkt->fileID);
+    strncat(buffer,pkt->filename,0xFF);
+    log(cfg,buffer);
+#endif
+     	
+    return 0;	
+ }
+
+

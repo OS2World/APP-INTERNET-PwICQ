@@ -1,0 +1,430 @@
+
+IBM(R) Linker for OS/2(R), Version 03.06.PPK1010917.011116ilink
+Copyright (C) IBM Corporation 1988, 1998.
+Copyright (C) Microsoft Corp. 1988, 1989.
+All rights reserved.
+
+Current option settings:
+	EXEC	CODE:X	DATA:RW
+	Alignfile:0x00000002	ALIGNAddr:0x00010000	BASE:0x00010000
+	NOBRowse	NODBgpack	NODEbug:none	NODEFaultlibrarysearch
+	EXEPACK:2	NOEXTdictionary	FIxed	NOFReeformat	NOIGnorecase
+	NOLinenumbers	NOLOgo	MAP:skintest.map	OCache:0x05a53400
+	NOOLDcpp	NOOPTFunc	PACKCode:0xffffffff
+	PACKData:0xffffffff	PMTYPE:PM	SEGMENTS:256 	SEGOrder
+	STUB:lnkods30.exe	NOVERBose	VERSION:00.00
+
+
+
+ SKINTEST
+
+ Start         Length     Name                   Class
+ 0001:00000000 000008625H CODE32                 CODE 32-bit
+	at offset 00000000 00DE0H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\loader.obj (loader.c)
+	at offset 00000DE0 00E96H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\menu.obj (menu.c)
+	at offset 00001C80 017DFH bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\listbox.obj (listbox.c)
+	at offset 00003460 0056FH bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\defwinp.obj (defwinp.c)
+	at offset 000039E0 007F4H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\slider.obj (slider.c)
+	at offset 000041E0 007C7H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\skmain.obj (skmain.c)
+	at offset 000049C0 007BDH bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\bitmap.obj (bitmap.c)
+	at offset 00005180 00EE7H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\btnclass.obj (btnclass.c)
+	at offset 00006080 01230H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\load.obj (load.c)
+	at offset 000072C0 0008FH bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\register.obj (register.c)
+	at offset 00007360 0018BH bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\create.obj (create.c)
+	at offset 00007500 00903H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\sizemain.obj (sizemain.c)
+	at offset 00007E20 0022AH bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\control.obj (control.c)
+	at offset 00008060 002CEH bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\images.obj (images.c)
+	at offset 00008330 000F7H bytes from S:\os2tk45\lib\libcmi.lib (exestrti)
+	at offset 00008428 001F8H bytes from S:\os2tk45\lib\libcmi.lib (setuparg)
+	at offset 00008620 00005H bytes from S:\os2tk45\lib\libcmi.lib (wctdt)
+
+ 0002:00000000 000001386H CONST32_RO             CONST 32-bit
+	at offset 00000000 00734H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\loader.obj (loader.c)
+	at offset 00000734 00150H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\menu.obj (menu.c)
+	at offset 00000884 002A4H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\listbox.obj (listbox.c)
+	at offset 00000B28 001A0H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\defwinp.obj (defwinp.c)
+	at offset 00000CC8 000B0H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\slider.obj (slider.c)
+	at offset 00000D78 000D8H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\skmain.obj (skmain.c)
+	at offset 00000E50 00155H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\bitmap.obj (bitmap.c)
+	at offset 00000FA8 001BCH bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\btnclass.obj (btnclass.c)
+	at offset 00001164 001C0H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\load.obj (load.c)
+	at offset 00001324 00034H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\create.obj (create.c)
+	at offset 00001358 00018H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\sizemain.obj (sizemain.c)
+	at offset 00001370 0000AH bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\control.obj (control.c)
+	at offset 0000137C 0000AH bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\images.obj (images.c)
+
+ 0003:00000000 000000000H EDC1                   EDC_CLASS 32-bit
+
+ 0003:00000000 00000000CH EDC2                   EDC_CLASS 32-bit
+	at offset 00000000 0000CH bytes from S:\os2tk45\lib\libcmi.lib (setuparg)
+
+ 0003:0000000C 000000000H EDC3                   EDC_CLASS 32-bit
+
+ 0003:0000000C 000000000H CTOR_DTOR1             DATA 32-bit
+
+ 0003:0000000C 000000000H CTOR_DTOR2             DATA 32-bit
+
+ 0003:0000000C 000000000H CTOR_DTOR3             DATA 32-bit
+
+ 0003:00000010 000008000H STACK32                STACK 32-bit
+	at offset 00000000 08000H bytes from S:\os2tk45\lib\libcmi.lib (exeentry)
+
+ 0004:00000000 000000054H DATA32                 DATA 32-bit
+	at offset 00000000 00024H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\loader.obj (loader.c)
+	at offset 00000024 00004H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\menu.obj (menu.c)
+	at offset 00000028 00004H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\listbox.obj (listbox.c)
+	at offset 0000002C 00004H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\slider.obj (slider.c)
+	at offset 00000030 00004H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\btnclass.obj (btnclass.c)
+	at offset 00000034 00004H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\load.obj (load.c)
+	at offset 00000038 00004H bytes from S:\os2tk45\lib\libcmi.lib (exeentry)
+	at offset 0000003C 00018H bytes from S:\os2tk45\lib\libcmi.lib (setuparg)
+
+ 0004:00000054 000000238H BSS32                  BSS 32-bit
+	at offset 00000000 00234H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\loader.obj (loader.c)
+	at offset 00000234 00004H bytes from W:\DATA\IBMCPP\SOURCES\ICQ2\CORE\SKINTLKT\create.obj (create.c)
+
+ 0004:00000290 000000004H c_common               BSS 32-bit
+	at offset 00000000 00004H bytes from S:\os2tk45\lib\libcmi.lib (exestrti)
+
+
+ Origin   Group
+ 0000:0   FLAT
+ 0004:0   DGROUP
+
+
+ Address         Publics by Name
+ 0001:0000216C       ajustPresParam
+ 0001:000057D3       btnProcedure
+ 0004:00000030       buttonWindowName
+ 0001:000081EC       createBaseImage
+ 0001:00007E20       createControlBackground
+ 0001:00007360       CreatePopupMenu
+ 0001:000045EF       destroyImages
+ 0000:00000000  Imp  DevCloseDC           (PMGPI.604)
+ 0000:00000000  Imp  DevOpenDC            (PMGPI.610)
+ 0000:00000000  Imp  DosAllocMem          (DOSCALLS.299)
+ 0000:00000000  Imp  DosBeep              (DOSCALLS.286)
+ 0000:00000000  Imp  DosExitList          (DOSCALLS.296)
+ 0000:00000000  Imp  DosFindClose         (DOSCALLS.263)
+ 0000:00000000  Imp  DosFindFirst         (DOSCALLS.264)
+ 0000:00000000  Imp  DosFindNext          (DOSCALLS.265)
+ 0000:00000000  Imp  DosFreeMem           (DOSCALLS.304)
+ 0001:00004A91       drawIcon
+ 0001:000049C7       drawTransparent
+ 0000:00000000  Imp  DrgAccessDraginfo    (PMDRAG.32)
+ 0000:00000000  Imp  DrgFreeDraginfo      (PMDRAG.39)
+ 0000:00000000  Imp  DrgQueryDragitemCount (PMDRAG.45)
+ 0000:00000000  Imp  DrgQueryDragitemPtr  (PMDRAG.46)
+ 0000:00000000  Imp  DrgQueryStrName      (PMDRAG.49)
+ 0000:00000000  Imp  exit                 (LIBCM.42)
+ 0000:00000000  Imp  fclose               (LIBCM.221)
+ 0000:00000000  Imp  feof                 (LIBCM.225)
+ 0000:00000000  Imp  fflush               (LIBCM.227)
+ 0000:00000000  Imp  fgets                (LIBCM.231)
+ 0000:00000000  Imp  fopen                (LIBCM.240)
+ 0000:00000000  Imp  free                 (LIBCM.50)
+ 0000:00000000  Imp  freopen              (LIBCM.253)
+ 0000:00000000  Imp  GpiBox               (PMGPI.356)
+ 0000:00000000  Imp  GpiCreateBitmap      (PMGPI.598)
+ 0000:00000000  Imp  GpiCreateLogColorTable (PMGPI.592)
+ 0000:00000000  Imp  GpiCreatePS          (PMGPI.369)
+ 0000:00000000  Imp  GpiDeleteBitmap      (PMGPI.371)
+ 0000:00000000  Imp  GpiDestroyPS         (PMGPI.379)
+ 0000:00000000  Imp  GpiErase             (PMGPI.389)
+ 0000:00000000  Imp  GpiMove              (PMGPI.404)
+ 0000:00000000  Imp  GpiQueryBitmapParameters (PMGPI.573)
+ 0000:00000000  Imp  GpiQueryLogColorTable (PMGPI.593)
+ 0000:00000000  Imp  GpiQueryTextBox      (PMGPI.489)
+ 0000:00000000  Imp  GpiSetBackColor      (PMGPI.504)
+ 0000:00000000  Imp  GpiSetBitmap         (PMGPI.506)
+ 0000:00000000  Imp  GpiSetBitmapBits     (PMGPI.602)
+ 0000:00000000  Imp  GpiSetColor          (PMGPI.517)
+ 0000:00000000  Imp  GpiWCBitBlt          (PMGPI.557)
+ 0000:00000000  Imp  isdigit              (LIBCM.297)
+ 0000:00000000  Imp  isspace              (LIBCM.302)
+ 0001:0000261E       lbsProcedure
+ 0004:00000028       listboxWindowName
+ 0001:00004C0C       LoadBitmap
+ 0001:00004FAB       loadTransparent
+ 0001:00000020       main
+ 0000:00000000  Imp  malloc               (LIBCM.70)
+ 0004:00000024       menuWindowName
+ 0000:00000000  Imp  mmioClose            (MMIO.32)
+ 0000:00000000  Imp  mmioGetHeader        (MMIO.77)
+ 0000:00000000  Imp  mmioIdentifyFile     (MMIO.79)
+ 0000:00000000  Imp  mmioOpen             (MMIO.27)
+ 0000:00000000  Imp  mmioQueryHeaderLength (MMIO.76)
+ 0000:00000000  Imp  mmioRead             (MMIO.28)
+ 0001:0000163B       mnuProcedure
+ 0004:00000288       module
+ 0001:000041F5       notifyClients
+ 0001:00007835       paintMainBackGround
+ 0001:00008060       paintWindow
+ 0001:00001C80       queryItemSize
+ 0000:00000000  Imp  realloc              (LIBCM.92)
+ 0004:0000002C       scbarWindowName
+ 0001:00003C0E       scbProcedure
+ 0001:00004240       sknConnectListBox
+ 0001:00004742       sknCreate
+ 0001:0000742B       sknCreateWindow
+ 0001:0000430F       sknDefaultButtons
+ 0001:00003460       sknDefWindowProc
+ 0001:000046A5       sknDestroy
+ 0001:000044C5       sknDoTimer
+ 0001:00004B54       sknDrawIcon
+ 0001:000072E4       sknInitialize
+ 0001:00006391       sknLoad
+ 0001:00004B69       sknLoadBitmap
+ 0001:000046E4       sknPaint
+ 0001:00000821       sknProcedure
+ 0001:00004A75       sknQueryIconSize
+ 0001:000072C0       sknRegisterClass
+ 0001:000041E0       sknReloadSkin
+ 0001:00007564       sknResize
+ 0001:00006319       sknSearchElement
+ 0001:000043D1       sknSetDrag
+ 0000:00000000  Imp  stderr               (LIBCM.403)
+ 0000:00000000  Imp  stdout               (LIBCM.405)
+ 0000:00000000  Imp  strdup               (LIBCM.110)
+ 0000:00000000  Imp  stricmp              (LIBCM.413)
+ 0000:00000000  Imp  strnicmp             (LIBCM.415)
+ 0001:000049C0       validXBitmap
+ 0000:00000000  Imp  WinBeginPaint        (PMWIN.703)
+ 0000:00000000  Imp  WinCreateMsgQueue    (PMWIN.716)
+ 0000:00000000  Imp  WinCreateStdWindow   (PMWIN.908)
+ 0000:00000000  Imp  WinCreateWindow      (PMWIN.909)
+ 0000:00000000  Imp  WinDefWindowProc     (PMWIN.911)
+ 0000:00000000  Imp  WinDestroyMsgQueue   (PMWIN.726)
+ 0000:00000000  Imp  WinDispatchMsg       (PMWIN.912)
+ 0000:00000000  Imp  WinDrawBitmap        (PMWIN.730)
+ 0000:00000000  Imp  WinDrawText          (PMWIN.913)
+ 0000:00000000  Imp  WinEnableWindowUpdate (PMWIN.736)
+ 0000:00000000  Imp  WinEndPaint          (PMWIN.738)
+ 0000:00000000  Imp  WinFillRect          (PMWIN.743)
+ 0000:00000000  Imp  WinGetMsg            (PMWIN.915)
+ 0000:00000000  Imp  WinGetPS             (PMWIN.757)
+ 0000:00000000  Imp  WinInitialize        (PMWIN.763)
+ 0000:00000000  Imp  WinInvalidateRect    (PMWIN.765)
+ 0000:00000000  Imp  WinMapWindowPoints   (PMWIN.788)
+ 0000:00000000  Imp  WinMessageBox        (PMWIN.789)
+ 0000:00000000  Imp  WinPostMsg           (PMWIN.919)
+ 0000:00000000  Imp  WinQueryAnchorBlock  (PMWIN.800)
+ 0000:00000000  Imp  WinQueryPointer      (PMWIN.821)
+ 0000:00000000  Imp  WinQueryPointerPos   (PMWIN.823)
+ 0000:00000000  Imp  WinQueryPresParam    (PMWIN.939)
+ 0000:00000000  Imp  WinQuerySysPointer   (PMWIN.828)
+ 0000:00000000  Imp  WinQueryWindow       (PMWIN.834)
+ 0000:00000000  Imp  WinQueryWindowPos    (PMWIN.837)
+ 0000:00000000  Imp  WinQueryWindowPtr    (PMWIN.839)
+ 0000:00000000  Imp  WinQueryWindowRect   (PMWIN.840)
+ 0000:00000000  Imp  WinQueryWindowULong  (PMWIN.843)
+ 0000:00000000  Imp  WinQueryWindowUShort (PMWIN.844)
+ 0000:00000000  Imp  WinRegisterClass     (PMWIN.926)
+ 0000:00000000  Imp  WinReleasePS         (PMWIN.848)
+ 0000:00000000  Imp  WinSendDlgItemMsg    (PMWIN.903)
+ 0000:00000000  Imp  WinSendMsg           (PMWIN.920)
+ 0000:00000000  Imp  WinSetCapture        (PMWIN.852)
+ 0000:00000000  Imp  WinSetDlgItemText    (PMWIN.859)
+ 0000:00000000  Imp  WinSetFocus          (PMWIN.860)
+ 0000:00000000  Imp  WinSetPointer        (PMWIN.866)
+ 0000:00000000  Imp  WinSetPresParam      (PMWIN.938)
+ 0000:00000000  Imp  WinSetWindowPos      (PMWIN.875)
+ 0000:00000000  Imp  WinSetWindowPtr      (PMWIN.876)
+ 0000:00000000  Imp  WinShowWindow        (PMWIN.883)
+ 0000:00000000  Imp  WinStartTimer        (PMWIN.884)
+ 0000:00000000  Imp  WinStopTimer         (PMWIN.885)
+ 0000:00000000  Imp  WinTerminate         (PMWIN.888)
+ 0000:00000000  Imp  WinWindowFromID      (PMWIN.899)
+ 0000:00000000  Imp  _access              (LIBCM.4)
+ 0004:0000004C       _argc
+ 0004:00000050       _argv
+ 0000:00000000  Imp  _callback_opt_sys    (LIBCM.11)
+ 0000:00000000  Imp  _CRT_init            (LIBCM.180)
+ 0000:00000000  Imp  _CRT_term            (LIBCM.181)
+ 0004:00000054       _edata
+ 0004:00000294       _end
+ 0000:00000000  Imp  _environ             (LIBCM.198)
+ 0000:00000000  Imp  _exception_procinit  (LIBCM.204)
+ 0004:00000038       _exeentry
+ 0001:00008378       _exestart
+ 0000:00000000  Imp  _EXE_Exception       (LIBCM.217)
+ 0000:00000000  Imp  _fpninit             (LIBCM.46)
+ 0000:00000000  Imp  _fpreset             (LIBCM.49)
+ 0000:00000000  Imp  _fprintfieee         (LIBCM.244)
+ 0000:00000000  Imp  _matherr             (LIBCM.333)
+ 0004:00000290       _matherr_ptr
+ 0000:00000000  Imp  _PGLOBAL_PTR         (LIBCM.355)
+ 0000:00000000  Imp  _PrintErrMsg         (LIBCM.357)
+ 0001:00008428       _setuparg
+ 0000:00000000  Imp  _terminate           (LIBCM.125)
+ 0001:00008620       __wctordtorInitTerm
+
+
+ Address         Publics by Value
+ 0000:00000000  Imp  WinQueryPointer      (PMWIN.821)
+ 0000:00000000  Imp  WinRegisterClass     (PMWIN.926)
+ 0000:00000000  Imp  realloc              (LIBCM.92)
+ 0000:00000000  Imp  DrgAccessDraginfo    (PMDRAG.32)
+ 0000:00000000  Imp  GpiQueryTextBox      (PMGPI.489)
+ 0000:00000000  Imp  WinSetWindowPos      (PMWIN.875)
+ 0000:00000000  Imp  WinPostMsg           (PMWIN.919)
+ 0000:00000000  Imp  WinSetWindowPtr      (PMWIN.876)
+ 0000:00000000  Imp  WinInvalidateRect    (PMWIN.765)
+ 0000:00000000  Imp  WinSendDlgItemMsg    (PMWIN.903)
+ 0000:00000000  Imp  WinCreateMsgQueue    (PMWIN.716)
+ 0000:00000000  Imp  WinSetDlgItemText    (PMWIN.859)
+ 0000:00000000  Imp  _callback_opt_sys    (LIBCM.11)
+ 0000:00000000  Imp  WinQueryPresParam    (PMWIN.939)
+ 0000:00000000  Imp  WinQueryWindowPos    (PMWIN.837)
+ 0000:00000000  Imp  GpiCreateBitmap      (PMGPI.598)
+ 0000:00000000  Imp  WinQueryWindowPtr    (PMWIN.839)
+ 0000:00000000  Imp  DrgFreeDraginfo      (PMDRAG.39)
+ 0000:00000000  Imp  GpiDeleteBitmap      (PMGPI.371)
+ 0000:00000000  Imp  GpiSetBackColor      (PMGPI.504)
+ 0000:00000000  Imp  malloc               (LIBCM.70)
+ 0000:00000000  Imp  fclose               (LIBCM.221)
+ 0000:00000000  Imp  mmioIdentifyFile     (MMIO.79)
+ 0000:00000000  Imp  WinWindowFromID      (PMWIN.899)
+ 0000:00000000  Imp  fflush               (LIBCM.227)
+ 0000:00000000  Imp  WinSetPresParam      (PMWIN.938)
+ 0000:00000000  Imp  stderr               (LIBCM.403)
+ 0000:00000000  Imp  GpiSetBitmapBits     (PMGPI.602)
+ 0000:00000000  Imp  GpiBox               (PMGPI.356)
+ 0000:00000000  Imp  WinCreateWindow      (PMWIN.909)
+ 0000:00000000  Imp  stdout               (LIBCM.405)
+ 0000:00000000  Imp  DrgQueryStrName      (PMDRAG.49)
+ 0000:00000000  Imp  strdup               (LIBCM.110)
+ 0000:00000000  Imp  WinDefWindowProc     (PMWIN.911)
+ 0000:00000000  Imp  WinQuerySysPointer   (PMWIN.828)
+ 0000:00000000  Imp  WinDestroyMsgQueue   (PMWIN.726)
+ 0000:00000000  Imp  strnicmp             (LIBCM.415)
+ 0000:00000000  Imp  WinGetPS             (PMWIN.757)
+ 0000:00000000  Imp  DevCloseDC           (PMGPI.604)
+ 0000:00000000  Imp  mmioClose            (MMIO.32)
+ 0000:00000000  Imp  DevOpenDC            (PMGPI.610)
+ 0000:00000000  Imp  WinGetMsg            (PMWIN.915)
+ 0000:00000000  Imp  _environ             (LIBCM.198)
+ 0000:00000000  Imp  _CRT_term            (LIBCM.181)
+ 0000:00000000  Imp  _CRT_init            (LIBCM.180)
+ 0000:00000000  Imp  WinQueryAnchorBlock  (PMWIN.800)
+ 0000:00000000  Imp  WinSendMsg           (PMWIN.920)
+ 0000:00000000  Imp  DosFreeMem           (DOSCALLS.304)
+ 0000:00000000  Imp  _terminate           (LIBCM.125)
+ 0000:00000000  Imp  DrgQueryDragitemPtr  (PMDRAG.46)
+ 0000:00000000  Imp  WinQueryWindowRect   (PMWIN.840)
+ 0000:00000000  Imp  isspace              (LIBCM.302)
+ 0000:00000000  Imp  WinCreateStdWindow   (PMWIN.908)
+ 0000:00000000  Imp  GpiMove              (PMGPI.404)
+ 0000:00000000  Imp  _fpninit             (LIBCM.46)
+ 0000:00000000  Imp  _access              (LIBCM.4)
+ 0000:00000000  Imp  isdigit              (LIBCM.297)
+ 0000:00000000  Imp  DosBeep              (DOSCALLS.286)
+ 0000:00000000  Imp  mmioOpen             (MMIO.27)
+ 0000:00000000  Imp  mmioRead             (MMIO.28)
+ 0000:00000000  Imp  WinQueryPointerPos   (PMWIN.823)
+ 0000:00000000  Imp  WinMapWindowPoints   (PMWIN.788)
+ 0000:00000000  Imp  _matherr             (LIBCM.333)
+ 0000:00000000  Imp  GpiErase             (PMGPI.389)
+ 0000:00000000  Imp  stricmp              (LIBCM.413)
+ 0000:00000000  Imp  freopen              (LIBCM.253)
+ 0000:00000000  Imp  _fpreset             (LIBCM.49)
+ 0000:00000000  Imp  GpiSetBitmap         (PMGPI.506)
+ 0000:00000000  Imp  DosFindNext          (DOSCALLS.265)
+ 0000:00000000  Imp  WinInitialize        (PMWIN.763)
+ 0000:00000000  Imp  WinDrawText          (PMWIN.913)
+ 0000:00000000  Imp  WinSetFocus          (PMWIN.860)
+ 0000:00000000  Imp  WinSetPointer        (PMWIN.866)
+ 0000:00000000  Imp  WinSetCapture        (PMWIN.852)
+ 0000:00000000  Imp  WinEndPaint          (PMWIN.738)
+ 0000:00000000  Imp  WinStartTimer        (PMWIN.884)
+ 0000:00000000  Imp  WinDrawBitmap        (PMWIN.730)
+ 0000:00000000  Imp  DosAllocMem          (DOSCALLS.299)
+ 0000:00000000  Imp  WinShowWindow        (PMWIN.883)
+ 0000:00000000  Imp  _PGLOBAL_PTR         (LIBCM.355)
+ 0000:00000000  Imp  DosFindFirst         (DOSCALLS.264)
+ 0000:00000000  Imp  WinReleasePS         (PMWIN.848)
+ 0000:00000000  Imp  mmioGetHeader        (MMIO.77)
+ 0000:00000000  Imp  WinBeginPaint        (PMWIN.703)
+ 0000:00000000  Imp  _PrintErrMsg         (LIBCM.357)
+ 0000:00000000  Imp  WinStopTimer         (PMWIN.885)
+ 0000:00000000  Imp  GpiDestroyPS         (PMGPI.379)
+ 0000:00000000  Imp  DosFindClose         (DOSCALLS.263)
+ 0000:00000000  Imp  DosExitList          (DOSCALLS.296)
+ 0000:00000000  Imp  _fprintfieee         (LIBCM.244)
+ 0000:00000000  Imp  WinMessageBox        (PMWIN.789)
+ 0000:00000000  Imp  GpiCreatePS          (PMGPI.369)
+ 0000:00000000  Imp  exit                 (LIBCM.42)
+ 0000:00000000  Imp  GpiWCBitBlt          (PMGPI.557)
+ 0000:00000000  Imp  WinTerminate         (PMWIN.888)
+ 0000:00000000  Imp  GpiCreateLogColorTable (PMGPI.592)
+ 0000:00000000  Imp  GpiQueryBitmapParameters (PMGPI.573)
+ 0000:00000000  Imp  WinQueryWindowUShort (PMWIN.844)
+ 0000:00000000  Imp  _EXE_Exception       (LIBCM.217)
+ 0000:00000000  Imp  _exception_procinit  (LIBCM.204)
+ 0000:00000000  Imp  mmioQueryHeaderLength (MMIO.76)
+ 0000:00000000  Imp  DrgQueryDragitemCount (PMDRAG.45)
+ 0000:00000000  Imp  fgets                (LIBCM.231)
+ 0000:00000000  Imp  WinFillRect          (PMWIN.743)
+ 0000:00000000  Imp  fopen                (LIBCM.240)
+ 0000:00000000  Imp  GpiQueryLogColorTable (PMGPI.593)
+ 0000:00000000  Imp  GpiSetColor          (PMGPI.517)
+ 0000:00000000  Imp  WinQueryWindowULong  (PMWIN.843)
+ 0000:00000000  Imp  free                 (LIBCM.50)
+ 0000:00000000  Imp  WinEnableWindowUpdate (PMWIN.736)
+ 0000:00000000  Imp  feof                 (LIBCM.225)
+ 0000:00000000  Imp  WinQueryWindow       (PMWIN.834)
+ 0000:00000000  Imp  WinDispatchMsg       (PMWIN.912)
+ 0001:00000020       main
+ 0001:00000821       sknProcedure
+ 0001:0000163B       mnuProcedure
+ 0001:00001C80       queryItemSize
+ 0001:0000216C       ajustPresParam
+ 0001:0000261E       lbsProcedure
+ 0001:00003460       sknDefWindowProc
+ 0001:00003C0E       scbProcedure
+ 0001:000041E0       sknReloadSkin
+ 0001:000041F5       notifyClients
+ 0001:00004240       sknConnectListBox
+ 0001:0000430F       sknDefaultButtons
+ 0001:000043D1       sknSetDrag
+ 0001:000044C5       sknDoTimer
+ 0001:000045EF       destroyImages
+ 0001:000046A5       sknDestroy
+ 0001:000046E4       sknPaint
+ 0001:00004742       sknCreate
+ 0001:000049C0       validXBitmap
+ 0001:000049C7       drawTransparent
+ 0001:00004A75       sknQueryIconSize
+ 0001:00004A91       drawIcon
+ 0001:00004B54       sknDrawIcon
+ 0001:00004B69       sknLoadBitmap
+ 0001:00004C0C       LoadBitmap
+ 0001:00004FAB       loadTransparent
+ 0001:000057D3       btnProcedure
+ 0001:00006319       sknSearchElement
+ 0001:00006391       sknLoad
+ 0001:000072C0       sknRegisterClass
+ 0001:000072E4       sknInitialize
+ 0001:00007360       CreatePopupMenu
+ 0001:0000742B       sknCreateWindow
+ 0001:00007564       sknResize
+ 0001:00007835       paintMainBackGround
+ 0001:00007E20       createControlBackground
+ 0001:00008060       paintWindow
+ 0001:000081EC       createBaseImage
+ 0001:00008378       _exestart
+ 0001:00008428       _setuparg
+ 0001:00008620       __wctordtorInitTerm
+ 0004:00000024       menuWindowName
+ 0004:00000028       listboxWindowName
+ 0004:0000002C       scbarWindowName
+ 0004:00000030       buttonWindowName
+ 0004:00000038       _exeentry
+ 0004:0000004C       _argc
+ 0004:00000050       _argv
+ 0004:00000054       _edata
+ 0004:00000288       module
+ 0004:00000290       _matherr_ptr
+ 0004:00000294       _end
+
+Program entry point at 0001:00008378

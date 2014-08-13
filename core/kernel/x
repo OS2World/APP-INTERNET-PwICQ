@@ -1,0 +1,144 @@
+lnxloader.c(68):	main		(Jul  4 2003 10:46:13)
+cmdline.c(35):	icqChkCmdLine		(Jul  4 2003 11:24:20)
+cmdline.c(102):	chkParms		(Jul  4 2003 11:24:20)
+cmdline.c(40):	icqChkCmdLine		(Jul  4 2003 11:24:20)
+cmdline.c(45):	icqChkCmdLine		(Jul  4 2003 11:24:20)
+cmdline.c(49):	icqChkCmdLine		(Jul  4 2003 11:24:20)
+lnxstart.c(75):	memKey = 1728647765
+lnxstart.c(106):	Connected to the shared memory block
+list.c(27):	ret = 08065c78
+list.c(27):	ret = 08065c88
+list.c(27):	ret = 08065c98
+list.c(27):	ret = 08065ca8
+list.c(27):	ret = 08065cb8
+list.c(27):	ret = 08065cc8
+list.c(27):	ret = 08065cd8
+list.c(27):	ret = 08065ce8
+list.c(27):	ret = 08065cf8
+init.c(511):	127.0.0.1
+lnxloader.c(178):	sts = 1
+init.c(809):	6838492
+lnxconf.c(57):	chdir(buffer) = 0
+list.c(27):	ret = 08065d08
+lnxconf.c(92):	/home/perry/.pwicq/pwicq.conf
+lnxconf.c(93):	arq = 08065eb8
+list.c(27):	ret = 08066040
+list.c(27):	ret = 08066090
+list.c(27):	ret = 080672c8
+list.c(27):	ret = 08067c48
+list.c(27):	ret = 08067cd0
+lnxconf.c(159):	icq->uin = 6838492
+lnxloader.c(178):	sts = 2
+init.c(520):	icq->uin = 6838492
+init.c(522):	icqQueryLogonStatus(icq) = 0
+07/04/2003 11:36:33 pwicq      -------------------------------------------------------------------------------------------
+07/04/2003 11:36:33 pwicq      pwICQ core (Debug Version Jul  4 2003 11:26:10)
+07/04/2003 11:36:33 pwicq      *** Extensive logging enabled
+lnxquery.c(144):	/home/perry/.pwicq/%ld.key
+init.c(99):	/home/perry/.pwicq/6838492.key
+init.c(114):	seed = b5f541ad
+init.c(131):	crc = 00000014
+init.c(134):	key[pos] ^ buffer[pos] = 00000014
+init.c(146):	oxigenio
+07/04/2003 11:36:33 pwicq      Key file loaded
+init.c(559):	Core iniciado
+init.c(567):	4.3.2.1
+07/04/2003 11:36:33 pwicq      Shared memory area enabled
+lnxloader.c(178):	sts = 3
+tfile.c(44):	/usr/share/pwicq/badword.dat
+tfile.c(59):	sz = 356
+tfile.c(74):	sz = 356
+07/04/2003 11:36:33 pwicq      /usr/share/pwicq/badword.dat loaded
+blacklist.c(38):	/usr/share/pwicq/blacklist.dat
+blacklist.c(56):	qtd = 3
+blacklist.c(93):	qtd = 2
+blacklist.c(103):	*icq->blacklist = 2
+07/04/2003 11:36:33 pwicq      2 IPs/Networks in the blacklist file
+blacklist.c(126):	/usr/share/pwicq/ignore.dat
+07/04/2003 11:36:33 pwicq      Reading ignore list
+blacklist.c(143):	qtd = 33
+blacklist.c(174):	qtd = 32
+blacklist.c(184):	*icq->ignore = 32
+07/04/2003 11:36:33 pwicq      32 UINs in the ignore list file
+07/04/2003 11:36:33 pwicq      Loading plugins
+lnxloader.c(178):	sts = 4
+lnxloader.c(178):	sts = 5
+lnxloader.c(103):	skin = 00000000
+lnxloader.c(105):	pwICQ Loader Build 20030704 by perry@perry
+init.c(299):	/tmp/pwicq.queue
+init.c(309):	icq->queue = 98304
+init.c(315):	icq->shareBlock = 40014000
+init.c(321):	f = 00000005
+init.c(322):	icq->uin = 6838492
+init.c(323):	(icq->shareBlock->i+f)->uin = 0
+07/04/2003 11:36:33 pwicq      Searching for a free instance block
+init.c(343):	info = 4001400a
+07/04/2003 11:36:33 pwicq      Public instance block enabled
+lnxloader.c(178):	sts = 9
+07/04/2003 11:36:33 pwicq      Starting plugins
+lnxloader.c(178):	sts = 10
+07/04/2003 11:36:33 pwicq      Startup sequence completed
+init.c(384):	icqInitialize		(Jul  4 2003 11:26:10)
+init.c(387):	icqInitialize		(Jul  4 2003 11:26:10)
+lnxloader.c(178):	sts = 11
+init.c(390):	icqInitialize		(Jul  4 2003 11:26:10)
+init.c(416):	Entrou na thread de inicializacao secundaria
+svlist.c(189):	/home/perry/.pwicq/6838492.sav
+svlist.c(193):	arq = 0806a180
+init.c(420):	thd->icq->modeCaps & ICQMF_EXTENDEDMENU = 00000000
+badword.c(59):	namorados.net
+tfile.c(127):	www
+tfile.c(127):	http:
+tfile.c(127):	icqmultipager
+tfile.c(127):	callback.websitegalaxy.com
+tfile.c(127):	.da.ru
+tfile.c(127):	webcam101
+tfile.c(127):	h.t.t.p.
+tfile.c(127):	W.W.W.
+tfile.c(127):	easyfreesex
+tfile.c(127):	SexDynasty
+tfile.c(127):	sexyfree
+tfile.c(127):	rg3.net
+tfile.c(127):	VEMK.NET
+tfile.c(127):	LuvEmma
+tfile.c(127):	LuvTammy
+tfile.c(127):	Justclickonmypage
+tfile.c(127):	zipmidia.com.br
+tfile.c(127):	mundobrasil.com
+tfile.c(127):	hpg.com.br
+tfile.c(127):	kit.net
+tfile.c(127):	Choose-Me.c@m
+tfile.c(127):	.com
+tfile.c(127):	.COM
+tfile.c(127):	.net
+init.c(458):	icqCheckBadWord(thd->icq, "namorados  .  net") = 1
+lnxloader.c(202):	textMode		(Jul  4 2003 10:46:13)
+lnxloader.c(204):	textMode		(Jul  4 2003 10:46:13)
+lnxloader.c(143):	exec		(Jul  4 2003 10:46:13)
+07/04/2003 11:36:34 pwicq      pwICQ core stopping
+init.c(608):	icq->info = 4001400a
+init.c(612):	icq->info->uin = 6838492
+init.c(613):	icq->info->pid = 10685
+init.c(614):	icq->myPID = 10685
+07/04/2003 11:36:34 pwicq      Disconnected from shared memory block
+init.c(657):	Aguardando queda das threads
+init.c(668):	f = 0
+lnxquery.c(144):	/home/perry/.pwicq/%ld.key
+init.c(165):	/home/perry/.pwicq/6838492.key
+init.c(171):	seed = c0a95516
+init.c(180):	sz = 8
+init.c(191):	crc = 00000014
+init.c(720):	terminate		(Jul  4 2003 11:26:10)
+07/04/2003 11:36:34 pwicq      Unloading plugins
+init.c(767):	terminate		(Jul  4 2003 11:26:10)
+init.c(776):	terminate		(Jul  4 2003 11:26:10)
+07/04/2003 11:36:34 pwicq      Saving config file
+lnxconf.c(421):	/home/perry/.pwicq/pwicq.conf
+07/04/2003 11:36:34 pwicq      Saving configuration
+init.c(791):	terminate		(Jul  4 2003 11:26:10)
+07/04/2003 11:36:34 pwicq      Releasing instance indicator
+lnxstart.c(217):	instances = 4
+07/04/2003 11:36:34 pwicq      pwICQ core stopped
+lnxloader.c(145):	exec		(Jul  4 2003 10:46:13)
+lnxloader.c(149):	Terminado
+lnxloader.c(83):	rc = 0

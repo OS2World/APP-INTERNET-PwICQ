@@ -1,0 +1,444 @@
+/*
+ * ICQTEXT.C - Loader modo texto para o pwICQ
+ */
+
+#ifdef __OS2__
+   #define INCL_DOSMODULEMGR
+   #define INCL_DOSPROCESS
+   #include <os2.h>
+   #define sleep(x) DosSleep(x*1000)
+#endif
+
+#ifdef linux
+   #include <unistd.h>
+   #include <signal.h>
+   #include <sys/time.h>
+   #include <sys/types.h>
+#endif
+
+   #include <stdio.h>
+   #include <stdlib.h>
+   #include <string.h>
+   #include <icqtlkt.h>
+   #include <icqreserved.h>
+   #include <ctype.h>
+
+/*---[ Definicoes ]--------------------------------------------------------------*/
+
+ #pragma pack(1)
+ struct cmd
+ {
+    const char  *keyword;
+    void        (* _System exec)(HICQ, char *);
+    const char  *help;
+ };
+
+/*---[ Prototipos ]--------------------------------------------------------------*/
+
+ static void execCMD(HICQ,char *);
+
+ static void _System    bye(HICQ, char *);
+ static void _System    message(HICQ, char *);
+ static void _System    mode(HICQ, char *);
+ static void _System    setStatus(int);
+ static void _System    unload(HICQ, char *);
+ static void _System    load(HICQ, char *);
+ static void _System    reload(HICQ, char *);
+ static void _System    pluginPath(HICQ,char *);
+ static void _System    basicInfo(HICQ,char *);
+ static void _System    fullInfo(HICQ,char *);
+ static void _System    help(HICQ,char *);
+ static void _System    url(HICQ,char *);
+ static void _System    ask(HICQ,char *);
+ static void _System    add(HICQ,char *);
+ static void _System    del(HICQ,char *);
+
+/*---[ Constantes ]--------------------------------------------------------------*/
+
+ const struct cmd cmdList[] = {       { "bye",          bye,            "End program" },
+                                      { "msg",          message,        "msg UIN text" },
+                                      { "ask",          ask,            "ask UIN text" },
+                                      { "remove",       del,            "remove UIN" },
+                                      { "del",          del,            "del UIN" },
+                                      { "add",          add,            "add UIN" },
+                                      { "url",          url,            "msg UIN URL, text" },
+                                      { "mode",         mode,           "mode value" },
+                                      { "update",       basicInfo,      "Request basic information update" },
+                                      { "info",         fullInfo,       "Request full user information" },
+                                      { "help",         help,           NULL },
+
+                                      { "unload",       unload,         "" },
+                                      { "load",         load,           "" },
+                                      { "reload",       reload,         "" },
+                                      { "setpath",      pluginPath,     "" },
+
+                                      { NULL,           NULL,           NULL }
+                   };
+
+/*---[ Statics ]-----------------------------------------------------------------*/
+
+ BOOL           ready           = TRUE;
+ static HICQ    icq                               = 0;
+ static char    ppath[0x0100];
+
+/*---[ Implementacao ]-----------------------------------------------------------*/
+
+#ifdef linux
+
+ void onTimer(void)
+ {
+         if(icqIsActive(icq))
+       icqkrnl_Timer(icq);
+ }
+
+ static void startTimer(void)
+ {
+    struct itimerval    timer,
+                        otimer;
+
+
+    timer.it_interval.tv_sec  =
+    timer.it_value.tv_sec     = 0;
+
+    timer.it_interval.tv_usec =
+    timer.it_value.tv_usec    = 100000L;
+
+    signal(SIGALRM,(void *) onTimer);
+    setitimer(ITIMER_REAL,&timer,&otimer);
+
+ }
+
+
+#endif
+
+ int main(int numpar, char *param[])
+ {
+    char         cmdLine[0x0100];
+
+    CHKPoint();
+
+    icq = icqCoreStartup(numpar,param,setStatus);
+
+    if(icq)
+    {
+       if(!icqInitialize(icq,setStatus))
+       {
+          icqLoadString(icq, "ppath", ".\\", ppath, 0xFF);
+#ifdef linux
+          startTimer();
+#endif
+          while(icqIsActive(icq) && ready)
+          {
+             memset(cmdLine,0,0x0100);
+             fgets(cmdLine,0xFF,stdin);
+             execCMD(icq,cmdLine);
+          }
+
+          icqTerminate(icq);
+       }
+       icqCoreTerminate(icq);
+    }
+
+    return 0;
+ }
+
+ static void execCMD(HICQ icq, char *lin)
+ {
+    const struct cmd    *c;
+    char                *ptr;
+
+    for(ptr=lin;*ptr && *ptr >= ' ';ptr++);
+    *ptr = 0;
+
+    for(ptr=lin;*ptr && !isspace(*ptr);ptr++);
+    *(ptr++) = 0;
+
+    for(c=cmdList;c->keyword && strcmp(lin,c->keyword);c++);
+
+    if(!c->keyword)
+    {
+       printf("\n**** Unknown command\n\n");
+       return;
+    }
+
+    printf("\n---[%s]---------------------------------------------------------------\n",c->keyword);
+    c->exec(icq,ptr);
+
+    printf("\n\n");
+
+ }
+
+ static void _System setStatus(int x)
+ {
+
+ }
+
+ static void bye(HICQ icq, char *parm)
+ {
+    ready = FALSE;
+ }
+
+ static void _System message(HICQ icq, char *parm)
+ {
+    char        *ptr;
+    ULONG       uin;
+    int         rc;
+
+    for(ptr = parm;*ptr && !isspace(*ptr);ptr++);
+    *(ptr++) = 0;
+
+    while(*ptr && isspace(*ptr))
+       ptr++;
+
+    uin = atol(parm);
+
+    if(!(uin && ptr))
+    {
+       printf("Use msg UIN text\n");
+       return;
+    }
+
+    printf("Sending message to %ld\n",uin);
+
+    rc = icqSendMessage(icq, uin, MSG_NORMAL, ptr);
+
+    printf("rc=%d\n",rc);
+
+ }
+
+ static void _System ask(HICQ icq, char *parm)
+ {
+    char        *ptr;
+    ULONG       uin;
+    int         rc;
+
+    for(ptr = parm;*ptr && !isspace(*ptr);ptr++);
+    *(ptr++) = 0;
+
+    while(*ptr && isspace(*ptr))
+       ptr++;
+
+    uin = atol(parm);
+
+    if(!(uin && ptr))
+    {
+       printf("Use msg UIN text\n");
+       return;
+    }
+
+    printf("Sending authorization request to %ld\n",uin);
+
+    rc = icqSendMessage(icq, uin, MSG_REQUEST, ptr);
+
+    printf("rc=%d\n",rc);
+
+ }
+
+ static void _System mode(HICQ icq, char *mode)
+ {
+    DBGMessage(mode);
+    icqSetModeByName(icq,mode);
+ }
+
+ static void _System pluginPath(HICQ icq, char *path)
+ {
+    strncpy(ppath,path,0xFF);
+ }
+
+ static void _System unload(HICQ icq, char *plugin)
+ {
+    HPLUGIN p   = icqQueryPlugin(icq,plugin);
+
+    if(p)
+       icqUnloadPlugin(icq, p);
+    else
+       printf("%s isn't loaded\n",plugin);
+ }
+
+ static void _System load(HICQ icq, char *filename)
+ {
+    HPLUGIN     p;
+    char        buffer[0x01000];
+
+    strncpy(buffer,filename,0x0A);
+    strncat(buffer,".dll",0xFF);
+
+    p = icqLoadPlugin(icq, ppath, buffer);
+
+    if(p)
+       icqStartPlugin(icq,p);
+ }
+
+ static void _System reload(HICQ icq, char *filename)
+ {
+    HPLUGIN p   = icqQueryPlugin(icq,filename);
+
+    if(p)
+    {
+       icqUnloadPlugin(icq, p);
+    }
+    else
+    {
+       printf("%s isn't loaded\n",filename);
+       return;
+    }
+    sleep(2);
+    load(icq, filename);
+
+ }
+
+ static void _System basicInfo(HICQ icq, char *base)
+ {
+    ULONG uin = atol(base);
+
+    DBGTrace(uin);
+
+    if(uin)
+       icqRequestUserUpdate(icq, uin);
+ }
+
+ static void _System fullInfo(HICQ icq, char *base)
+ {
+    ULONG uin = atol(base);
+
+    DBGTrace(uin);
+
+    if(uin)
+       icqRequestUserInfo(icq, uin);
+ }
+
+ static void _System help(HICQ icq,char *txt)
+ {
+   const struct cmd    *c;
+
+   for(c=cmdList;c->help;c++)
+      printf("%-20s\t%s\n",c->keyword,c->help);
+
+ }
+
+ static void _System url(HICQ icq, char *txt)
+ {
+    ULONG uin;
+    char        *url;
+    char        *msg;
+    char        *pkt;
+
+    CHKPoint();
+
+    uin = atol(txt);
+
+    DBGTrace(uin);
+
+    if(!uin)
+    {
+       printf("Invalid format\n");
+       return;
+    }
+
+    for(url = txt;*url && !isspace(*url);url++);
+
+    if(!*url)
+    {
+       printf("Invalid format\n");
+       return;
+    }
+
+    url++;
+
+    for(msg = url;*msg && !isspace(*msg);msg++);
+
+    if(!*msg)
+    {
+       printf("Invalid format\n");
+       return;
+    }
+    *(msg++) = 0;
+
+    DBGTrace(uin);
+    DBGMessage(url);
+    DBGMessage(msg);
+
+    pkt = malloc(strlen(url)+strlen(msg)+5);
+
+    if(!pkt)
+    {
+       printf("Memory allocation error\n");
+       return;
+    }
+
+    sprintf(pkt,"%s\x01%s",msg,url);
+
+    DBGMessage(pkt);
+
+    icqSendMessage(icq, uin, MSG_URL, pkt);
+
+    free(pkt);
+
+ }
+
+ static void _System add(HICQ icq, char *parm)
+ {
+    char        *ptr;
+    ULONG       uin;
+    int         rc;
+
+    for(ptr = parm;*ptr && !isspace(*ptr);ptr++);
+    *(ptr++) = 0;
+
+    while(*ptr && isspace(*ptr))
+       ptr++;
+
+    uin = atol(parm);
+
+    if(!(uin && ptr))
+    {
+       printf("Use add UIN\n");
+       return;
+    }
+
+    printf("Adding user %ld\n",uin);
+
+    rc = icqAddUserInContactList(icq, uin);
+
+    printf("rc=%d\n",rc);
+
+ }
+
+ static void _System del(HICQ icq, char *parm)
+ {
+    char        *ptr;
+    ULONG       uin;
+    int         rc;
+    HUSER       usr;
+
+    for(ptr = parm;*ptr && !isspace(*ptr);ptr++);
+    *(ptr++) = 0;
+
+    while(*ptr && isspace(*ptr))
+       ptr++;
+
+    uin = atol(parm);
+
+    if(!(uin && ptr))
+    {
+       printf("Use remove UIN\n");
+       return;
+    }
+
+    usr = icqQueryUserHandle(icq,uin);
+
+    if(!usr)
+    {
+       printf("User isn't in the contact-list\n");
+       return;
+    }
+
+    rc = icqRemoveUser(icq, usr);
+
+    printf("rc=%d\n",rc);
+
+
+ }
+
+
+

@@ -1,0 +1,30 @@
+m
+dir ..
+db
+db
+cl
+db
+copy \data\ibmcpp\sources\twinh\twinh.def icqcmd.def
+db
+dir
+cl
+less ..\ipc\makefile
+dir w:\public\pwicq\os2\lib
+db
+dir ..
+dir ..\..\plugins\newskin\makefile
+less ..\..\plugins\newskin\makefile
+db
+db
+icqcmd.exe
+cl
+run
+icqcmd.exe add 6838492
+rl
+exit
+m
+less queuecmd.c
+icqcmd.exe url http://www.os2brasil.com.br
+rl
+dir
+exit

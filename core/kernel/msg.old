@@ -1,0 +1,956 @@
+/*
+ * MSG.C - Administracao da lista de mensagems
+ */
+
+#ifdef __IBMC__
+ #pragma strings(readonly)
+#endif
+
+ #include <icqkernel.h>
+ #include <stdio.h>
+ #include <string.h>
+ #include <malloc.h>
+ #include <time.h>
+ #include <ctype.h>
+
+ #include "icqcore.h"
+
+/*---[ Definicoes ]------------------------------------------------------------------------------------------*/
+
+ #define FILTER_NONE		0
+ #define FILTER_TYPE		1
+ #define FILTER_URL		2
+ #define FILTER_BADWORD 	3
+ #define FILTER_BLACKLIST	4
+
+
+/*---[ Prototipos ]------------------------------------------------------------------------------------------*/
+
+ static void logMessage(HICQ, HUSER, ULONG, BOOL, ICQMSG *);
+ static void messageTitle(HICQ, HUSER, ULONG, BOOL, ICQMSG *, char *, int);
+ static int  dispatchMsg(HICQ, MQUEUE *, char *);
+ static void icqSendAutoRefuse(HICQ, ULONG);
+
+/*---[ Constantes ]------------------------------------------------------------------------------------------*/
+
+ static const USHORT msgAddUser[] = {  MSG_NORMAL, MSG_CHAT, MSG_FILE, MSG_URL, MSG_AUTHORIZED, 0 };
+
+/*---[ Implementacao ]---------------------------------------------------------------------------------------*/
+
+ BOOL EXPENTRY icqInsertMessage(HICQ icq, ULONG uin, USHORT type, time_t tm, ULONG flags, int sz, const char *txt)
+ {
+    /* Anexa uma mensagem na fila correta */
+#ifdef EXTENDED_LOG
+    char                extLog[80];
+#endif
+
+    HMSG                m        = NULL;
+    const USHORT        *tbl;
+    const char          *ignore  = NULL;
+    HUSER               usr      = NULL;
+    ULONG               filter   = FILTER_NONE;
+    BOOL                tempUser = TRUE;
+
+    DBGTrace(uin);
+
+    if(sz < 0)
+       sz = strlen(txt)+1;
+
+    DBGTrace(sz);
+    DBGTrace(strlen(txt));
+    DBGTrace(uin);
+    DBGMessage(txt);
+
+    if(uin)
+    {
+       usr = icqQueryUserHandle(icq,uin);
+
+       if(icqCheckIgnoreList(icq, uin))
+       {
+          filter = FILTER_BLACKLIST;
+       }
+       else if(usr)
+       {
+          /* Usuario ja consta na contact-list */
+#ifdef EXTENDED_LOG
+          sprintf(extLog,"User Flags: %08lx (Hide: %08lx Temporary: %08lx)",usr->u.flags,usr->u.flags & USRF_HIDEONLIST, usr->u.flags & USRF_TEMPORARY);
+          icqWriteSysLog(icq,PROJECT,extLog);
+#endif
+          tempUser = FALSE;
+          filter   = icqLoadValue(icq,"Filter.K",0);
+          if(icqLoadValue(icq,"badWord.K",0) && searchTextFile( txt, icq->badWords))
+          {
+             /* Badword detectada */
+             filter = FILTER_BADWORD;
+          }
+       }
+       else
+       {
+          /* Usuario nao existe, verifica Filtros especiais */
+
+          filter = icqLoadValue(icq,"Filter.U",0);
+
+          if(type == MSG_URL && icqLoadValue(icq,"ignoreURL",0))
+          {
+             /* URL de usuario desconhecido, ignora */
+             filter = FILTER_URL;
+          }
+          else if(icqLoadValue(icq,"badWord.U",0) && searchTextFile( txt, icq->badWords))
+          {
+             /* Badword detectada */
+             filter = FILTER_BADWORD;
+          }
+          else if(filter == FILTER_NONE || (filter == FILTER_TYPE && type == MSG_NORMAL))
+          {
+             /* Anexar usuario temporario */
+             for(tbl = msgAddUser; !usr && *tbl; tbl++)
+             {
+                if(type == *tbl)
+                   usr = icqInsertTemporaryUser(icq, uin);
+             }
+          }
+       }
+    }
+
+    m = addInputMessage(icq,uin,usr,type,tm,sz,txt);
+
+    DBGTracex(m);
+
+    if(!m)
+       return FALSE;
+
+    m->msgFlags |= flags;
+    DBGTracex(m->msgFlags);
+
+    ignore = searchMessageManager(icq,usr,uin,m,TRUE);
+
+    CHKPoint();
+
+    /* Se tenho um conversor instalado, transfiro o texto para ele */
+    if(icq->convertCpg )
+       icqConvertCodePage(icq, TRUE, (UCHAR *) (m+1), sz);
+
+    if( !ignore )
+    {
+       /*
+        * Verifica se a mensagem e para ser ignorada
+        */
+       if(isEmpty((const char *) (m+1)))
+          m->msgFlags |= MSGF_EMPTY;
+
+       if( (m->msgFlags & MSGF_EMPTY) && icqLoadValue(icq,"ignoreEmpty",0))
+          ignore = "Message without text ignored by SPAM protection configuration";
+
+       if(filter == FILTER_BADWORD)
+          ignore = "Badword detected";
+
+       if(filter == FILTER_BLACKLIST)
+          ignore = "Blacklisted UIN detected";
+
+       if(filter == FILTER_URL)
+          ignore = "Message ignored by SPAM protection configuration";
+
+       if(filter == FILTER_TYPE && type != MSG_NORMAL)
+          ignore = "Message ignored by SPAM protection configuration (only normal messages accepted)";
+
+       if(m->msgFlags & MSGF_BLACKLIST)
+          ignore = "Message Blacklisted by plugin request";
+
+       if(type == MSG_PAGER && icqLoadValue(icq,"IgnorePager",0))
+          ignore = "ICQPager Ignored by configuration";
+
+       if(type == MSG_MAIL && icqLoadValue(icq,"IgnoreMail",0))
+          ignore = "ICQMail Ignored by configuration";
+
+/*
+       if(icqCheckIgnoreList(icq, uin))
+          ignore = "Blacklisted UIN detected";
+*/
+       if(usr && (usr->u.flags & USRF_IGNORE))
+          ignore = "Ignored user";
+
+    }
+
+    if(ignore || (m->msgFlags & MSGF_IGNORE) )
+    {
+       logMessage(icq,usr,uin,FALSE,m);
+       icqEvent(icq, uin, 'U', ICQEVENT_IGNORED, (ULONG) (m+1));
+
+       icqRemoveMessage(icq, uin, m);
+
+       if(ignore)
+          icqWriteSysLog(icq,PROJECT,ignore);
+
+       if(type == MSG_REQUEST)
+       {
+          icqSendAutoRefuse(icq, uin);
+          return TRUE;
+       }
+
+       return FALSE;
+    }
+
+    /* Mensagem foi aceita */
+
+    if(type == MSG_REQUEST)
+    {
+       if(!tempUser && icqLoadValue(icq,"AutoAccept",0))
+       {
+          m->msgFlags |= MSGF_ACCEPTED;
+          icqWriteSysLog(icq,PROJECT,"Sending Auto-accept");
+          icqSendMessage(icq, uin, MSG_AUTHORIZED, "");
+       }
+
+       if(tempUser && icqLoadValue(icq,"AutoRefuse",0))
+       {
+          icqWriteSysLog(icq,PROJECT,"Sending Auto-refuse");
+          icqSendAutoRefuse(icq, uin);
+       }
+
+    }
+
+    /* Atualiza dados do usuario */
+    if(usr)
+       ajustUserIcon(icq,usr,TRUE);
+
+    /* Emite um evento com a mensagem */
+
+    CHKPoint();
+
+    icqEvent(icq, uin, 'M', m->type, (ULONG) m );
+
+    /* Emite um evento avisando que a fila de mensagems foi mudada */
+    if(usr)
+       icqUserEvent(icq,usr,ICQEVENT_MESSAGECHANGED);
+    else
+       icqSystemEvent(icq, ICQEVENT_MESSAGECHANGED);
+
+    /* Grava o log da mensagem */
+
+    logMessage(icq,usr,uin,FALSE,m);
+
+    /* Verifica se pode abrir direto */
+
+#ifdef EXTENDED_LOG
+    if(usr)
+    {
+       sprintf(extLog,
+                "ModeFlag: %08lx  User Flag: %08lx  Open Windows: %d (%lu/%lu)",
+                icqQueryModeFlags(icq),
+                usr->u.flags,
+                usr->u.wndCounter,
+                icqQueryModeFlags(icq) & ICQMF_AUTOOPEN,
+                usr->u.flags & USRF_AUTOOPEN
+              );
+       icqWriteSysLog(icq,PROJECT,extLog);
+    }
+#endif
+
+    if(m->msgFlags & MSGF_OPEN)
+    {
+#ifdef EXTENDED_LOG
+       icqWriteSysLog(icq,PROJECT,"Open message by request");
+#endif
+       icqOpenMessage(icq, uin, m);
+
+    }
+    else if(usr && (icqQueryModeFlags(icq) & ICQMF_AUTOOPEN) && (usr->u.flags & USRF_AUTOOPEN) && !usr->u.wndCounter)
+    {
+#ifdef EXTENDED_LOG
+       icqWriteSysLog(icq,PROJECT,"Auto-open message");
+#endif
+       openUserMessageWindow(icq, usr, FALSE);
+    }
+
+    icq->cntlFlags |= ICQFC_SAVEQUEUES;
+
+    return TRUE;
+
+ }
+
+ BOOL isEmpty(const char *txt)
+ {
+    if(!txt)
+       return TRUE;
+
+    while(*txt)
+    {
+       if(!isspace(*txt))
+          return FALSE;
+       txt++;
+    }
+/*
+    while(*txt && isspace(*txt))
+       txt++;
+    return !*txt;
+*/
+    return TRUE;
+ }
+
+ HMSG EXPENTRY icqQueryUserMessage(HICQ icq, ULONG uin)
+ {
+    HUSER usr = icqQueryUserHandle(icq,uin);
+
+    if(usr)
+       return icqQueryFirstElement(usr->msg);
+
+    return NULL;
+ }
+
+
+ BOOL EXPENTRY icqRemoveMessage(HICQ icq, ULONG uin, HMSG msg)
+ {
+    /* Pesquisa pela mensagem nas filas do usu rio (Se for v lido) e do sistema, se achar remove */
+    HUSER       usr     = NULL;
+    HMSG        m       = NULL;
+    SYSMSG      *s      = NULL;
+
+    if(uin)
+       usr = icqQueryUserHandle(icq,uin);
+
+    DBGTracex(usr);
+
+    if(usr)
+    {
+       /* Pesquisar mensagem na fila do usuario */
+       for(m = icqQueryFirstElement(usr->msg); m && m != msg; m = icqQueryNextElement(usr->msg,m));
+
+       if(m)
+       {
+          if(m->mgr && m->mgr->icon[1])
+             usr->u.offlineIcon = m->mgr->icon[1];
+
+          usr->u.idle = 0;
+          icqRemoveElement(usr->msg,m);
+          ajustUserIcon(icq, usr, TRUE);
+          icqUserEvent(icq,usr,ICQEVENT_MESSAGECHANGED);
+          icq->cntlFlags |= ICQFC_SAVEQUEUES;
+          return TRUE;
+       }
+    }
+
+    /* Pesquisar mensagem na fila do sistema */
+
+    for(s = icqQueryFirstElement(icq->msg); s && &s->m != msg; s = icqQueryNextElement(icq->msg,s));
+
+    DBGTracex(s);
+
+    if(s)
+    {
+       icqRemoveElement(icq->msg,s);
+       icqSystemEvent(icq, ICQEVENT_MESSAGECHANGED);
+       icq->cntlFlags |= ICQFC_SAVEQUEUES;
+       return TRUE;
+    }
+
+    return FALSE;
+ }
+
+ char * EXPENTRY icqQueryMessageTitle(HICQ icq, ULONG uin, BOOL out, ICQMSG *m, char *buffer, int sz)
+ {
+    messageTitle(icq, icqQueryUserHandle(icq,uin),uin,out,m,buffer,sz);
+    return buffer;
+ }
+
+ static void messageTitle(HICQ icq, HUSER usr, ULONG uin, BOOL out, ICQMSG *m, char *buffer, int sz)
+ {
+    *buffer = 0;
+    if(m)
+    {
+       DBGTracex(m->mgr);
+
+       if(m->mgr && m->mgr->title)
+       {
+          CHKPoint();
+          strncpy(buffer,m->mgr->title(icq,usr,uin,out,m,buffer,sz),sz);
+       }
+       else
+       {
+          sprintf(buffer,"Message %04x ",m->type);
+          strncat(buffer,out ? "to " : "from ",0x80);
+
+          if(usr)
+             strncat(buffer,(char *)(usr+1),0x80);
+          else
+             strncat(buffer,"User",0x80);
+          CHKPoint();
+       }
+    }
+    DBGMessage(buffer);
+ }
+
+ static void logMessage(HICQ icq, HUSER usr, ULONG uin, BOOL out, ICQMSG *m)
+ {
+    char *buffer = malloc(MAX_MSG_SIZE+2);
+
+    if(!buffer)
+    {
+       icqWriteSysLog(icq,PROJECT,"Memory allocation error when writing message log");
+       return;
+    }
+
+    CHKPoint();
+
+    *buffer = 0;
+    messageTitle(icq,usr,uin,out,m,buffer,0xFF);
+
+    CHKPoint();
+
+    icqWriteSysLog(icq,PROJECT,buffer);
+
+    *buffer = 0;
+
+    if(m->mgr && m->mgr->formatLog)
+       m->mgr->formatLog(icq,out,m,buffer,MAX_MSG_SIZE);
+    else
+       strncpy(buffer,(char *)(m+1),MAX_MSG_SIZE);
+
+    printf("%s\n",buffer);
+    fflush(stdout);
+
+    free(buffer);
+
+ }
+
+ int EXPENTRY icqSendMessage(HICQ icq, ULONG uin, USHORT type, UCHAR *txt)
+ {
+    return sendMessage(icq, uin, type, txt, TRUE);
+ }
+
+ static void logSentMessage(HICQ icq, ULONG uin, USHORT type, UCHAR *txt, int sz)
+ {
+    ICQMSG      *m   = malloc(sizeof(ICQMSG)+sz+5);
+    const char  *src;
+    char        *dst;
+    int         f;
+
+    if(!m)
+    {
+       icqWriteSysLog(icq,PROJECT,"Unable to allocate memory for message buffer");
+       return;
+    }
+
+    m->sz       = sizeof(ICQMSG);
+    m->type     = type;
+    m->msgTime  = time(NULL);
+    m->msgSize  = sz;
+    m->mgr      = icqQueryMessageManager(icq, type);
+
+    src         = txt;
+    dst         = (char *) (m+1);
+
+    for(f=0;f<sz;f++)
+       *(dst++) = *(src++);
+    *dst = 0;
+
+    logMessage(icq, icqQueryUserHandle(icq,uin), uin, TRUE, m);
+
+    icqEvent(icq, uin, 'm', m->type, (ULONG) m );
+
+    free(m);
+ }
+
+
+ int sendMessage(HICQ icq, ULONG uin, USHORT type, UCHAR *txt, BOOL log)
+ {
+    /* Registro a mensagem na fila de sa¡da */
+    int         sz = strlen(txt);
+    MQUEUE      *msg;
+    HUSER          usr;
+
+    if(log)
+       logSentMessage(icq,uin,type,txt,sz);
+
+    msg         = icqAddElement(icq->msgQueue,sz + sizeof(MQUEUE) +5 );
+    msg->uin    = uin;
+    msg->type   = type;
+    msg->id     = 0;
+
+    strcpy((char *)(msg+1),txt);
+
+    if(!(icq->onlineFlags & ICQF_ONLINE))
+    {
+       icq->cntlFlags |= ICQFC_SAVEQUEUES;
+       if(log)
+          icqWriteSysLog(icq,PROJECT,"Can't send when offline, message queued");
+       return 98;
+    }
+
+    if(msg->type == MSG_REQUEST)
+    {
+       usr = icqQueryUserHandle(icq,uin);
+       if(usr)
+       {
+          usr->u.flags &= ~USRF_TEMPORARY;
+          usr->u.flags |= USRF_WAITING;
+          ajustUserIcon(icq,usr,TRUE);
+       }
+    }
+
+    return dispatchMsg(icq, msg, txt);
+ }
+
+ static int dispatchMsg(HICQ icq, MQUEUE *msg, char *txt)
+ {
+    int      rc    = 99;
+
+    if(icq->convertCpg)
+       icqConvertCodePage(icq, FALSE, txt, -1);
+
+    if(icq->c2s->sendMessage)
+    {
+       msg->mode = 1;
+       icq->cntlFlags &= ~ICQFC_CLEAR;
+
+       rc = icq->c2s->sendMessage(icq, msg->uin, msg->type, txt, &msg->id );
+
+       if(!(rc||msg->id))
+       {
+          icq->cntlFlags &= ~ICQFC_CLEAR;
+          icqRemoveElement(icq->msgQueue,msg);
+       }
+
+    }
+
+    return rc;
+ }
+
+ void EXPENTRY icqProcessServerConfirmation(HICQ icq, ULONG uin, ULONG id)
+ {
+    MQUEUE      *msg;
+    char        *txt;
+
+//    icqEvent(icq, uin,'m', ICQEVENT_CONFIRMED, id); <--- tipo 'm'  e para mensagem enviada
+
+    for(msg = icqQueryFirstElement(icq->msgQueue);msg && !(msg->id == id && msg->mode == 1); msg = icqQueryNextElement(icq->msgQueue,msg));
+
+    if(!msg)
+       return;
+
+//    icqWriteSysLog(icq,PROJECT,"Message confirmed from server");
+    icqRemoveElement(icq->msgQueue,msg);
+
+    /* Verifico se tem outra mensagem para enviar */
+
+    for(msg = icqQueryFirstElement(icq->msgQueue);msg && !msg->id; msg = icqQueryNextElement(icq->msgQueue,msg));
+
+    if(!msg)
+       return;
+
+    DBGMessage("Enviando a proxima mensagem da fila");
+
+    txt = strdup((char *)(msg+1));
+
+    if(!txt)
+    {
+       icqWriteSysLog(icq,PROJECT,"Memory allocation in message sent procedure");
+       return;
+    }
+
+    dispatchMsg(icq, msg, txt);
+
+    free(txt);
+ }
+
+ BOOL EXPENTRY icqOpenUserMessage(HICQ icq, ULONG uin)
+ {
+    HUSER       usr = icqQueryUserHandle(icq, uin);
+    HMSG        m   = NULL;
+
+    if(usr)
+       m = icqQueryFirstElement(usr->msg);
+
+    DBGTracex(m);
+
+    if(m)
+       icqOpenMessage(icq, uin, m);
+
+    return m != NULL;
+
+ }
+
+ BOOL EXPENTRY icqOpenSystemMessage(HICQ icq)
+ {
+    SYSMSG *s = icqQueryFirstElement(icq->msg);
+    if(s)
+       icqOpenMessage(icq, s->uin, &s->m);
+
+    return s != NULL;
+ }
+
+ void EXPENTRY icqOpenMessage(HICQ icq, ULONG uin, HMSG m)
+ {
+    if(m->mgr && m->mgr->edit )
+       m->mgr->edit(icq, uin, FALSE, m);
+    else if(icq->skin && icq->skin->view)
+       icq->skin->view(icq, uin, m);
+    else
+       icqWriteSysLog(icq,PROJECT,"Can't determine a valid message viewer");
+
+ }
+
+/*
+ MSGFORMATTER * EXPENTRY icqQueryMessageFormatter(HICQ icq, USHORT type)
+ {
+    char        buffer[sizeof(ICQMSG) + 5];
+    HMSG        m       = (HMSG) buffer;
+    HPLUGIN     p;
+
+    memset(buffer,0,sizeof(ICQMSG) + 4);
+
+    m->type = type;
+
+    for(p=icqQueryFirstElement(icq->plugins);p && !m->mgr;p=icqQueryNextElement(icq->plugins,p))
+    {
+       if(isProcValid(p->PreProcessMessage))
+          p->PreProcessMessage(icq,NULL,0,m);
+    }
+
+    if(m->mgr)
+       return m->mgr->formatWindow;
+
+    if(icq->skin)
+    {
+       icq->skin->preProcess(icq, NULL, 0, m);
+
+       if(!m->mgr)
+          m->mgr = icq->skin->msgMgr;
+    }
+
+    return m->mgr->formatWindow;
+
+ }
+ */
+
+ const MSGMGR * EXPENTRY icqQueryMessageManager(HICQ icq, USHORT type)
+ {
+    char        buffer[sizeof(ICQMSG) + 5];
+    HMSG        m       = (HMSG) buffer;
+    HPLUGIN     p;
+
+    memset(m,0,sizeof(ICQMSG) + 4);
+
+    m->type = type;
+
+    for(p=icqQueryFirstElement(icq->plugins);p && !m->mgr;p=icqQueryNextElement(icq->plugins,p))
+    {
+       if(isProcValid(p,p->PreProcessMessage))
+          p->PreProcessMessage(icq,p->dataBlock,NULL,0,m,FALSE);
+    }
+
+    DBGTracex(m->mgr);
+
+    if(m->mgr && m->mgr->sz != sizeof(MSGMGR))
+    {
+       m->mgr = NULL;
+       icqWriteSysLog(icq,PROJECT,"Invalid message manager detected");
+    }
+
+    if(m->mgr)
+       return m->mgr;
+
+/*
+    if(icq->skin && icq->skin->preProcess)
+       icq->skin->preProcess(icq, NULL, 0, m, FALSE);
+*/
+    if(icq->defMsgProcessor)
+       icq->defMsgProcessor(icq, NULL, 0, m, FALSE);
+
+/*
+    if(!m->mgr && icq->skin)
+       m->mgr = icq->skin->msgMgr;
+*/
+    return m->mgr;
+
+ }
+
+ HMSG EXPENTRY icqQueryMessage(HICQ icq, ULONG uin)
+ {
+    HUSER       usr = uin ? icqQueryUserHandle(icq, uin) : NULL;
+    SYSMSG      *s;
+
+    if(usr)
+       return icqQueryFirstElement(usr->msg);
+
+    s = icqQueryFirstElement(icq->msg);
+
+    if(s)
+       return &s->m;
+
+    return NULL;
+ }
+
+/*
+ SYSMSG * EXPENTRY icqQuerySystemMessage(HICQ icq)
+ {
+    return icqQueryFirstElement(icq->msg);
+ }
+*/
+
+ int EXPENTRY icqQueryFirstMessage(HICQ icq, ULONG *uin, HMSG *msg)
+ {
+    HUSER       usr;
+    HMSG        uMsg    = NULL;
+    HMSG        ufMsg   = NULL;
+    SYSMSG      *sMsg;
+
+    if(uin)
+       *uin = 0;
+
+    if(msg)
+       *msg = NULL;
+
+    CHKPoint();
+
+    for(usr = icqQueryFirstElement(icq->users);usr;usr = icqQueryNextElement(icq->users,usr))
+    {
+       uMsg = icqQueryFirstElement(usr->msg);
+       if(uMsg)
+       {
+         if(!ufMsg)
+         {
+            ufMsg = uMsg;
+            if(uin)
+               *uin = usr->u.uin;
+         }
+         else if(uMsg->msgTime < ufMsg->msgTime)
+         {
+            ufMsg = uMsg;
+            if(uin)
+               *uin = usr->u.uin;
+         }
+       }
+    }
+
+    DBGTracex(ufMsg);
+
+    if(ufMsg)
+    {
+       if(msg)
+          *msg = ufMsg;
+       return 0;
+    }
+
+    sMsg = icqQueryFirstElement(icq->msg);
+
+    DBGTracex(sMsg);
+
+    if(sMsg)
+    {
+       if(uin)
+          *uin = sMsg->uin;
+       if(sMsg)
+          *msg = &sMsg->m;
+       return 0;
+    }
+
+    return -1;
+ }
+
+ UCHAR * EXPENTRY icqConvertCodePage(HICQ icq, BOOL in, UCHAR *ptr, int sz)
+ {
+#ifdef __OS2__
+    ULONG  cpIn;
+    ULONG  cpOut;
+
+    if(in)      /* Mensagem entrando */
+    {
+       cpIn  = icq->cpgOut;
+       cpOut = icq->cpgIn;
+    }
+    else        /* Mensagem saindo */
+    {
+       cpIn  = icq->cpgIn;
+       cpOut = icq->cpgOut;
+    }
+
+    if(ptr && icq->convertCpg)
+       icq->convertCpg(icq,cpIn,cpOut,ptr,sz);
+#endif
+    return ptr;
+ }
+
+ void EXPENTRY icqSendConfirmation(HICQ icq, ULONG uin, USHORT type, BOOL log, char *text)
+ {
+    static const char   *txt[]  = { "NickName", "FirstName", "LastName", "EMail", NULL };
+    int                 sz      =  icqQueryMaxMessageLength(icq, NULL);
+    char                *ptr;
+    int                 f;
+    char                *buffer;
+
+    buffer = malloc(sz+10);
+
+    if(!buffer)
+    {
+       icqWriteSysLog(icq,PROJECT,"Memory allocation error when sending confirmation message");
+    }
+    else
+    {
+
+       ptr = buffer;
+
+       for(f=0;txt[f] != NULL && sz > 5;f++)
+       {
+          icqLoadString(icq, txt[f], "-", ptr, sz);
+          sz  -= strlen(ptr);
+          ptr += strlen(ptr);
+          *(ptr++) = ICQ_FIELD_SEPARATOR;
+          sz--;
+       }
+
+       *(ptr++) = icqLoadValue(icq,"Authorize",1) ? '0' : '1';
+       *ptr     = 0;
+
+       if(text)
+       {
+          *(ptr++) = ICQ_FIELD_SEPARATOR;
+          strncpy(ptr,text,sz-4);
+       }
+
+       sendMessage(icq, uin, type, buffer, log);
+
+       free(buffer);
+    }
+
+
+ }
+
+
+ HMSG addInputMessage(HICQ icq, ULONG uin, HUSER usr, USHORT type, time_t tm, int sz, const char *txt)
+ {
+    SYSMSG      *s      = NULL;
+    HMSG        m;
+    const char  *src;
+    char        *dst;
+    int         f;
+
+    if(usr)
+    {
+       /* O usu rio existe, anexa mensagem na fila dele */
+       DBGMessage("Anexar mensagem na fila do usuario");
+       DBGTracex(usr);
+
+       usr->u.idle              = 0;
+
+       usr->u.lastAction        =
+       usr->u.lastMessage       = time(NULL);
+
+       if(usr->u.flags & USRF_HIDEONLIST)
+          icqUserEvent(icq, usr, ICQEVENT_SHOW);
+
+       usr->u.flags            |= USRF_ONLIST;
+
+       DBGTracex(usr->msg);
+       m = icqAddElement(usr->msg, sz + sizeof(ICQMSG) +5 );
+
+       DBGTracex(m);
+
+       if(!m)
+          return m;
+
+       /* Ajusta flags do usu rio de acordo com o tipo da mensagem */
+       switch(type)
+       {
+       case MSG_REFUSED:
+          icqUpdateUserFlag(icq, usr, TRUE,  USRF_TEMPORARY);
+          break;
+
+       case MSG_AUTHORIZED:
+          icqUpdateUserFlag(icq, usr, FALSE, USRF_WAITING);
+          break;
+       }
+
+    }
+    else
+    {
+       /* Usuario nao existe, anexa mensagem na fila do sistema */
+       DBGMessage("Anexar mensagem na fila do sistema");
+       s = icqAddElement(icq->msg,sz + sizeof(SYSMSG) +5 );
+       DBGTracex(s);
+
+       if(!s)
+          return NULL;
+       s->uin = uin;
+       m      = &s->m;
+
+    }
+
+    m->sz   = sizeof(ICQMSG);
+    m->type = type;
+
+    if(tm)
+       m->msgTime = tm;
+    else
+       m->msgTime = time(NULL);
+
+    m->msgSize  = sz;
+    src         = txt;
+    dst         = (char *) (m+1);
+
+    for(f=0;f<sz;f++)
+       *(dst++) = *(src++);
+    *dst = 0;
+
+    DBGTracex(m);
+
+    return m;
+ }
+
+ const char * searchMessageManager(HICQ icq, HUSER usr, ULONG uin, HMSG m, BOOL convert)
+ {
+    /*
+     * Procura por um plugin que queira assumir a mensagem; quem assumir:
+     *
+     * 1. Se registra em m->mgr
+     * 2. Ajusta separadores de campo nos lugares corretos
+     * 3. Seta flags de ignore se necessario
+     *
+     */
+    HPLUGIN     p;
+    const char  *ret    = NULL;
+
+    for(p=icqQueryFirstElement(icq->plugins);p && !m->mgr;p=icqQueryNextElement(icq->plugins,p))
+    {
+       if(isProcValid(p,p->PreProcessMessage))
+          p->PreProcessMessage(icq,p->dataBlock,usr,uin,m,convert);
+    }
+
+    /* Se nenhum plugin assumiu uso o pre-processador default */
+/*
+    if(!m->mgr && icq->skin && icq->skin->preProcess)
+       icq->skin->preProcess(icq,usr,uin,m,convert);
+*/
+
+    if(!m->mgr && icq->defMsgProcessor)
+       icq->defMsgProcessor(icq,usr,uin,m,convert);
+
+    if(!m->mgr)
+    {
+       /* Mensagem de tipo desconhecido, verifica se ‚ para ignorar */
+       if(icqLoadValue(icq,"IgnoreUnknown",0))
+          ret = "Unknown messages ignored by configuration";
+    }
+
+/*
+    if(!m->mgr && icq->skin)
+    {
+       // NÆo tenho administrador de mensagems, uso o default e verifico se ‚ para ignorar
+
+       m->mgr = icq->skin->msgMgr;
+       if(icqLoadValue(icq,"IgnoreUnknown",0))
+          ret = "Unknown messages ignored by configuration";
+    }
+*/
+    return ret;
+ }
+
+ static void icqSendAutoRefuse(HICQ icq, ULONG uin)
+ {
+    char buffer[0x0100];
+
+    icqLoadString(icq, "AutoRefuseMsg", "", buffer, 0xFF);
+    icqWriteSysLog(icq,PROJECT,"Sending Auto-refuse");
+    icqSendMessage(icq, uin, MSG_REFUSED, buffer);
+
+ }
+

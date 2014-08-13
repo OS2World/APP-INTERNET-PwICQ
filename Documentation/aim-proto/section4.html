@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>
+	OSCAR Protocol: Section 4: Errors
+    </title>
+  </head>
+
+  <body bgcolor="#FFFFFF" link="#444444" vlink="#666666">
+    <table width="1" border="0" align="center">
+      <tr>
+	<td><img src="/images/blank.gif" height="1" width="540">
+      </tr>
+      <tr>
+	<td align="right">
+	  <img src="/faim/faim.gif" border="0" width="111" height="50"><br>
+	  <A href="/pst/"><img src="/pst/pst_small.gif" border="0"></a>
+	</td>
+      </tr>
+      <tr>
+	<td align="center">
+	  <b><font size="+1">AIM/Oscar Protocol Specification: Section 4: Errors</font></b>
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  <hr noshade>
+	  <table width="100%" border="0" align="center">
+	    <tr>
+	      <td width="1%" valign="top">
+		<img src="/images/blank.gif" width="5" height="1" border="0"><br>
+	      </td>
+	      <td width="1%" bgcolor="#BBBBBB">
+
+	      </td>
+	      <td width="1%">
+		<img src="/images/blank.gif" width="5" height="1" border="0">
+	      </td>
+	      <td width="98%">
+		<img src="/images/blank.gif" width="460" height="1" border="0"><br>
+
+		<font size="+1"><b>4.0 Errors</b></font>
+		<p>
+		  This information has been moved to Section 3.0, since all that was here were login errors anyway.  Soon, they'll be real errors here that aren't tightly associated with any of the other Sections.  If I can't find any, this section will be removed and we'll have one less file to worry about.
+		</p>
+<!--
+		<p>
+		  Errors almost always come in a generalized form.  They DO NOT contain the text of an error message.  Rather, they contain the URL of an error message and a non-human readable error code.  The AIM client doesn't take you to the URL in the command unless you hit the "More Info" button -- the client can give an unspecific error that at least comes close to the problem (for example, the client can tell that one of either the screen name or password is bad, but it can't definitly say one or the other -- but the URL in the packet can).
+		</p>
+		<p>
+		  Some errors though, particularly in the early stages of login, are not in the general error form.  One major example of this is the "Reservation Error" that sometimes occurs in response to sending you're inital authentication command.  This is only detectable by 1) an unusally short authentication response and 2) a specific error code embedded in the SNAC of the command.  At this point, this is the only error identified solely by an error code.  (The Reservation Error is, btw, Oscar's attempt to limit the rate of logins by a certain account.  It often begins to occur after you've tested your client many times in a row.  It's a very frustrating and unwelcomed "feature".)
+		</p>
+		<b>4.1 Known Error SNACs</b>
+		<p>
+		  Below are the known error SNACs.  The FLAP portions are not listed, but the Command Family parameter is specified for each.  All of these are sent from the server to the client.
+		</p>
+		<u>4.1.1 Standard Format Login Errors during Phase 1</u>
+		<p>
+		  These occur in response to the initial Phase 1 login command sent from the client.  All Standard Format login errors follow this format.  This error command is always in the Command Family 0x04.  All variable-length strings are assumed to be 1 byte long when doing position numbers.
+		</p>
+		<table align="center" border="2">
+		  <tr><td>Position</td><td>Data Size</td><td>Data</td></tr>
+		  <tr><td>1</td><td>Word</td><td>0x0001</td></tr>
+		  <tr><td>3</td><td>Word</td><td>Screen Name Length (not including null)</td></tr>
+		  <tr><td>5</td><td>ASCIIZ String</td><td>Screen Name that failed (null-terminated)</td></tr>
+		  <tr><td>6</td><td>Byte</td><td>0x04</td></tr>
+		  <tr><Td>7</td><td>Word</tD><td>Error Message URL Length (not including null)</td></tr>
+		  <tr><td>9</tD><td>ASCIIZ String</td><td>Error Message URL (null-terminated)</td></tr>
+		  <tr><td>10</tD><td>Byte</tD><td>0x08</td></tr>
+		  <tr><td>11</td><td>Byte</tD><td>0x00</td></tr>
+		  <tr><td>12</tD><td>Byte</td><td>0x02</tD></tr>
+		  <tr><Td>13</td><td>Word</tD><td>Specific Error Code</tD></tr>
+		</table>
+		<p>
+		  The current list of known "Specific Error Code"s:
+		</p>
+		<table border="2" align="centeR">
+		  <tr><td>Specific Error Code</td><td>Error Msg URL</td><td>Meaning</td></tr>
+		  <tr><td>0x0001</td><td><a href="http://www.aim.aol.com/errors/UNREGISTERED_SCREENNAME.html">http://www.aim.aol.com/errors/UNREGISTERED_SCREENNAME.html</a></td><td>Invalid Screen Name</td></tR>
+		  <tr><td>0x0005</td><td><A href="http://www.aim.aol.com/errors/MISMATCH_PASSWD.html">http://www.aim.aol.com/errors/MISMATCH_PASSWD.html</a></td><td>SN/Pasword Mismatch (Invalid Password)</td></tr>
+		</table>
+		<p>
+		  More of these will be added once found.
+		</p>
+		<u>4.1.2 Non Standard Format Login Errors during Phase 1</u>
+		<p>
+		  These are errors that come at the same place as Standard Format Login Phase 1 Errors above, but they don't meet the generalized form of Standard Errors.  Currently, there is no good way of detecting these errors, mainly because they're undocumented.  The best way I've found is to detect an abnormally small Login Response command.  Under almost all circumstances, a valid login response (Phase 1, Packet C) will be greater than 0x00FF, so you may detect these errors by checking the FLAP Data Field Length in the first byte of the word (it must be 0x01 or more in order to be valid, 0x00 is an error).
+		</p>
+		<p>
+		  The only known Non-Standard phase 1 login error is the reservation error.  Checking the FLAP Data Field Length word is the only way to detect this error.
+		</p>
+
+-->
+
+	      </td>
+
+	      <td width="1%">
+		<img src="/images/blank.gif" width="10" height="1" border="0">
+	      </td>
+	      <td width="1%" bgcolor="#BBBBBB">
+		&nbsp;
+	      </td>
+	      <td width="1%" valign="top">
+		<img src="/images/blank.gif" width="50" height="1" border="0"><br>
+		<a href="/pst/"><img src="/pst/bar_home.gif" width="50" height="15" border="0"></a><br>
+		<a href="/pst/software/"><img src="/pst/bar_software.gif" width="50" height="15" border="0"></a>
+	      </td>
+	    </tr>
+	  </table>
+	  <hr noshade>
+	  <Center>
+	    <address><a href="mailto:afritz@iname.com">Adam Fritzler</a></address>
+	      <!-- Created: Sat Jun 20 20:35:10 MST 1998 -->
+	    <!-- hhmts start -->
+Last modified: Fri Jul 24 21:26:54 MST 1998
+<!-- hhmts end -->	
+	  </center>
+	</td>
+      </tr>
+    </table>
+  </body>
+</html>

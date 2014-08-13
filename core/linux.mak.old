@@ -1,0 +1,33 @@
+
+PROJECT = pwicq
+
+CORE = kernel/init.c kernel/list.c kernel/log.c kernel/timer.c kernel/user.c \
+       kernel/lnxstart.c kernel/lnxthread.c kernel/lnxplug.c \
+       kernel/lnxconf.c kernel/config.c kernel/register.c kernel/modes.c \
+       kernel/event.c kernel/plugin.c kernel/msg.c
+
+NETWORK = network/lnxnet.c
+
+PROTOCOL = icqv5/icqv5.c icqv5/ulisten.c icqv5/encript.c icqv5/packets.c \
+           icqv5/exec.c icqv5/mode.c icqv5/timer.c icqv5/login.c \
+           icqv5/decode.c icqv5/user.c icqv5/msg.c
+
+LOADER  = textloader/icqtext.c
+
+SOURCES = $(PROTOCOL) $(CORE) $(NETWORK) $(LOADER)
+
+#----[ Daqui em diante, em principio, nao altera ]---------------------------------#
+
+CFLAGS = -DDEBUG=1 -I ../include -I /data/ibmcpp/sources/include
+OBJECT = $(SOURCES:.c=.o)
+BACKUP = $(SOURCES:.c=.c~)
+
+debug: $(OBJECT)
+	cc -Wl,-l,pthread -o $(PROJECT) $(OBJECT) -ldl
+
+
+clean:
+	rm $(OBJECT)
+	rm $(PROJECT)
+
+

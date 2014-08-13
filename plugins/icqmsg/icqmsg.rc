@@ -1,0 +1,17 @@
+#define __OS2__
+
+#include <msgdlg.h>
+
+
+#define INCL_WIN
+#define INCL_NLS
+#include "os2.h"
+
+ icon 200       msg.ico
+ icon 202       url.ico
+ icon 208       request.ico
+ icon 229       add.ico
+ icon 247       file.ico
+
+
+

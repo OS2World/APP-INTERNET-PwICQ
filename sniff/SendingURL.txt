@@ -1,0 +1,134 @@
+Frame 136 (250 on wire, 250 captured)
+    Arrival Time: Nov  4, 2001 22:08:41.614039
+    Time delta from previous packet: 0.000000 seconds
+    Time relative to first packet: 13.469282 seconds
+    Frame Number: 136
+    Packet Length: 250 bytes
+    Capture Length: 250 bytes
+Ethernet II
+    Destination: 00:c0:49:40:9f:fe (US_40:9f:fe)
+    Source: 00:a0:c9:0a:ee:6e (Intel_0a:ee:6e)
+    Type: IP (0x0800)
+Internet Protocol, Src Addr: 172.17.31.230 (172.17.31.230), Dst Addr: 64.12.26.67 (64.12.26.67)
+    Version: 4
+    Header length: 20 bytes
+    Differentiated Services Field: 0x00 (DSCP 0x00: Default; ECN: 0x00)
+        0000 00.. = Differentiated Services Codepoint: Default (0x00)
+        .... ..0. = ECN-Capable Transport (ECT): 0
+        .... ...0 = ECN-CE: 0
+    Total Length: 236
+    Identification: 0x0d21
+    Flags: 0x04
+        .1.. = Don't fragment: Set
+        ..0. = More fragments: Not set
+    Fragment offset: 0
+    Time to live: 128
+    Protocol: TCP (0x06)
+    Header checksum: 0xc6a4 (correct)
+    Source: 172.17.31.230 (172.17.31.230)
+    Destination: 64.12.26.67 (64.12.26.67)
+Transmission Control Protocol, Src Port: cplscrambler-in (1087), Dst Port: aol (5190), Seq: 241287, Ack: 297284386
+    Source port: cplscrambler-in (1087)
+    Destination port: aol (5190)
+    Sequence number: 241287
+    Next sequence number: 241483
+    Acknowledgement number: 297284386
+    Header length: 20 bytes
+    Flags: 0x0018 (PSH, ACK)
+        0... .... = Congestion Window Reduced (CWR): Not set
+        .0.. .... = ECN-Echo: Not set
+        ..0. .... = Urgent: Not set
+        ...1 .... = Acknowledgment: Set
+        .... 1... = Push: Set
+        .... .0.. = Reset: Not set
+        .... ..0. = Syn: Not set
+        .... ...0 = Fin: Not set
+    Window size: 8106
+    Checksum: 0xd90a (correct)
+AOL Instant Messenger
+    Command Start: 0x2a
+    Channel ID: 0x02
+    Sequence Number: 10202
+    Data Field Length: 190
+    FNAC
+        FNAC Family ID: 0x0004
+        FNAC Subtype ID: 0x0006
+        Screen Name: 27241234
+
+0000  00 c0 49 40 9f fe 00 a0 c9 0a ee 6e 08 00 45 00   ..I@.......n..E.
+0010  00 ec 0d 21 40 00 80 06 c6 a4 ac 11 1f e6 40 0c   ...!@.........@.
+0020  1a 43 04 3f 14 46 00 03 ae 87 11 b8 33 22 50 18   .C.?.F......3"P.
+0030  1f aa d9 0a 00 00 2a 02 27 da 00 be 00 04 00 06   ......*.'.......
+0040  00 00 00 12 00 06 f6 18 e2 00 17 33 00 00 00 04   ...........3....
+0050  08 32 37 32 34 31 32 33 34 00 05 00 99 88 df 53   .27241234......S
+0060  00 04 00 91 00 47 6f 6f 67 6c 65 20 53 65 61 72   .....Google Sear
+0070  63 68 3a 20 61 6c 67 6f 72 69 74 68 6d 20 63 6f   ch: algorithm co
+0080  6d 70 6c 65 78 69 74 79 20 61 6e 61 6c 79 73 69   mplexity analysi
+0090  73 20 5c fe 68 74 74 70 3a 2f 2f 77 77 77 2e 67   s \.http://www.g
+00a0  6f 6f 67 6c 65 2e 63 6f 6d 2f 73 65 61 72 63 68   oogle.com/search
+00b0  3f 73 6f 75 72 63 65 69 64 3d 6e 61 76 63 6c 69   ?sourceid=navcli
+00c0  65 6e 74 26 71 3d 61 6c 67 6f 72 69 74 68 6d 2b   ent&q=algorithm+
+00d0  63 6f 6d 70 6c 65 78 69 74 79 2b 61 6e 61 6c 79   complexity+analy
+00e0  73 69 73 2b 2b 25 32 32 77 6f 72 73 74 2b 63 61   sis++%22worst+ca
+00f0  73 65 25 32 32 00 00 06 00 00                     se%22.....
+
+
+                2a
+                02
+                27 da
+                00 be
+
+                00 04
+                00 06
+                00 00
+                00 12 00 06
+
+                f6 18 e2 00
+                17 33 00 00     ??B, a sort of ID (it seems to be based on timestamp, ACKs should use same ID)
+
+                00 04           message-format
+
+                08              B-UIN    recipient
+                32 37 32 34
+                31 32 33 34
+
+    msg-format=4           // url or contacts or auth-reply or multi-send
+      TLV(5)
+        UIN    my uin
+        BYTE   msg-subtype
+        BYTE   msg-flags
+        LNTS   msg
+        if contacts-req
+          2 BYTE    39 00, it seems to be the number of the following bytes
+          18 BYTE   unk, 2A 0E 7D 46 76 76 D4 11 BC E6 00 04 AC 96 1E A6 02 00
+          DTS       Request For Contacts
+          15 BYTE   00 00 00 00 00 01 00 00 00 00 00 00 00 00 00
+          2 BYTE    11 00, it seems to be the number of the following bytes
+          2 BYTE    0
+          DTS       request message
+      TLV(6)  empty  // ack request?
+
+                00 05           TLV-5
+                00 99           0x99 bytes
+
+                88 df 53 00
+                04
+                00
+
+                91 00
+
+                47 6f 6f 67 6c 65 20 53 65 61 72               	--> TEXTO DA URL
+                63 68 3a 20 61 6c 67 6f 72 69 74 68 6d 20 63 6f	
+                6d 70 6c 65 78 69 74 79 20 61 6e 61 6c 79 73 69
+                73 20 5c fe 68 74 74 70 3a 2f 2f 77 77 77 2e 67
+                6f 6f 67 6c 65 2e 63 6f 6d 2f 73 65 61 72 63 68
+                3f 73 6f 75 72 63 65 69 64 3d 6e 61 76 63 6c 69
+                65 6e 74 26 71 3d 61 6c 67 6f 72 69 74 68 6d 2b
+                63 6f 6d 70 6c 65 78 69 74 79 2b 61 6e 61 6c 79
+                73 69 73 2b 2b 25 32 32 77 6f 72 73 74 2b 63 61
+                73 65 25 32 32 00
+
+                00 06
+                00 00
+
+

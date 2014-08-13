@@ -1,0 +1,668 @@
+/*
+ * Processamento do dialogo de mensagem
+ */
+
+ #include <stdio.h>
+ #include <string.h>
+ #include <malloc.h>
+
+ #include <msgdlg.h>
+ 
+ #include "icqgtk.h"
+
+/*---[ Defines ]--------------------------------------------------------------------------------------------*/
+
+ #pragma pack(1)
+ struct cfg
+ {
+    USHORT   	sz;
+    HICQ	     icq;
+    ULONG		uin;
+    HUSER	    usr;
+    USHORT   	type;
+
+    GtkWidget    *main;
+    GtkWidget	*cntl[ICQMSGC_WIDGETS];
+
+    BOOL		 out;
+    BOOL		 sysMsg;
+    
+    const MSGMGR *mgr;
+    
+ };
+
+ #ifdef MSGEDITWINDOW
+    #undef MSGEDITWINDOW
+ #endif
+ 
+ #define MSGEDITWINDOW struct cfg *
+ 
+ #define SETTEXT(c,i,t) gtk_entry_set_text(GTK_ENTRY(wnd->cntl[i]),t)
+
+/*---[ Constants ]------------------------------------------------------------------------------------------*/
+
+ static const char *stringtable[] = { "Close",
+    							      "ICQ#:",
+    							      "",
+     							     "Nick:",
+    							      "",
+    							      "Name:",
+    							      "",
+    						          "E-Mail:",
+    							      "",
+    							      "",
+    							      "",
+    							      "",
+    							      "",
+    							      "Accept",
+    							      "Reject",
+    							      "Refuse",
+    							      "Reply",
+    							      "Add user",
+    							      "",
+    							      "Browse",
+    							      "Subject:",
+    							      "",
+    							      "Next",
+    							      "Send",
+    							      "Date:"
+ 							   };
+ 							   
+ static const USHORT labels[]    = { ICQMSGC_STATICUIN,
+                                     ICQMSGC_STATICNICK,
+                                     ICQMSGC_STATICNAME,
+                                     ICQMSGC_STATICEMAIL,
+                                     ICQMSGC_STATICSUBJ,
+                                     0
+                                   };
+
+ static const USHORT textBoxes[] = { ICQMSGC_UIN, 
+ 							        ICQMSGC_NICKNAME, 
+ 							        ICQMSGC_NAME, 
+ 							        ICQMSGC_EMAIL, 
+ 							        ICQMSGC_SUBJECT, 
+ 							        ICQMSGC_ENTRY,
+ 							        0 
+ 							      };
+    
+ static const USHORT buttons[]   = { ICQMSGC_NEXT,
+ 									ICQMSGC_ACCEPT,
+ 									ICQMSGC_REJECT,
+ 									ICQMSGC_REFUSE,
+ 									ICQMSGC_REPLY,
+ 									ICQMSGC_ADD,
+ 									ICQMSGC_SEND,
+ 									ICQMSGC_BROWSE,
+ 									0
+ 								   };
+ 									
+/*---[ Used by plugins ]---------------------------------------------------------------------------------*/
+
+ static int   _System loadUserFields(MSGEDITWINDOW);
+ static int   _System setMessage(MSGEDITWINDOW, USHORT, BOOL, HMSG);
+ static int   _System setTitle(MSGEDITWINDOW,const char *);
+ static int   _System setVisible(MSGEDITWINDOW, USHORT, BOOL);
+ static int   _System setEnabled(MSGEDITWINDOW, USHORT, BOOL);
+ static int   _System setString(MSGEDITWINDOW,USHORT,const char *);
+ static int   _System getString(MSGEDITWINDOW,USHORT,int,char *);
+ static int   _System setCheckBox(MSGEDITWINDOW,USHORT,BOOL);
+ static int   _System getCheckBox(MSGEDITWINDOW,USHORT);
+ static void  _System loadString(MSGEDITWINDOW, USHORT, USHORT);
+ static void  _System setReply(MSGEDITWINDOW, USHORT);
+ static void  _System showTime(MSGEDITWINDOW, USHORT, time_t);
+
+ static const MSGEDITHELPER msgHelper = {	
+		sizeof(MSGEDITHELPER),
+                  
+		(int (* _System)(void *,const char *))		   setTitle,
+		(int (* _System)(void *, USHORT, BOOL, HMSG))	setMessage,
+
+		(int (*  _System)(void *, USHORT, BOOL))         setVisible,
+		(int (*  _System)(void *, USHORT, BOOL))         setEnabled,
+
+		(int (* _System)(void *,USHORT,const char *))    setString,
+		(int (* _System)(void *,USHORT,int,char *))      getString,
+
+		(int (* _System)(void *,USHORT, BOOL))           setCheckBox,
+		(int (* _System)(void *,USHORT))                 getCheckBox,
+
+		(int (* _System)(void *))                        loadUserFields,
+ 		        
+		(void (* _System)(void *, USHORT, USHORT))       loadString,
+
+		(void (* _System)(void *, USHORT))               setReply,
+		(void (* _System)(void *, USHORT, time_t))       showTime
+ 
+ 								 };
+
+/*---[ Prototipes ]-----------------------------------------------------------------------------------------*/
+
+ static void destroy( GtkWidget *, struct cfg *);
+// static void size(GtkWidget *widget, GtkAllocation *, struct cfg *);
+ static void closeButton(GtkWidget *, struct cfg *);
+ static void sendButton(GtkWidget *, struct cfg *);
+ static void replyButton(GtkWidget *, struct cfg *);
+ static void ajustUser(struct cfg *, HMSG);
+ static void actButton(GtkWidget *, struct cfg *);
+ static BOOL readNext(struct cfg *wnd);
+
+/*---[ Implement ]------------------------------------------------------------------------------------------*/
+
+ int icqgtk_openMessageWindow(HICQ icq, ULONG uin, USHORT type, BOOL out, HMSG msg)
+ {
+    struct cfg     *wnd;
+    GtkWidget      *temp;
+    GtkWidget      *box;
+    GtkWidget	  *vbox;
+    GtkRequisition size;
+    GtkStyle	   *style;
+    const USHORT   *itn;
+    
+    if(!uin)
+       return -1;
+
+    wnd = malloc(sizeof(struct cfg));
+    
+    if(!wnd)
+    {
+       icqWriteSysLog(icq,PROJECT,"Memory allocation error when opening message window");
+       icqAbend(icq,ICQMSG_MEMORYERROR);
+       return -1;
+    }
+    
+    DBGTracex(out);
+    
+    memset(wnd,0,sizeof(struct cfg));
+    wnd->sz   = sizeof(struct cfg);
+    wnd->uin  = uin;
+    wnd->icq  = icq;
+           
+    DBGMessage("Abrir caixa de mensagem");
+
+//    wnd->main = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    wnd->main = gtk_window_new(GTK_WINDOW_DIALOG);
+
+    box       = gtk_vbox_new(FALSE,2);
+
+    gtk_signal_connect(GTK_OBJECT(wnd->main), "destroy", GTK_SIGNAL_FUNC(destroy), wnd);
+
+    /* Constroi campos estaticos */
+    for(itn = labels; *itn;itn++)
+    {
+       wnd->cntl[*itn]   = gtk_label_new(stringtable[*itn]);
+       gtk_misc_set_alignment(GTK_MISC(wnd->cntl[*itn]), 0, .5);
+    }
+    
+    /* Constroi campos de dados */
+
+    for(itn = textBoxes;*itn;itn++)
+    {
+       temp = wnd->cntl[*itn] = gtk_entry_new();
+       gtk_entry_set_editable(GTK_ENTRY(temp),FALSE);
+       gtk_widget_size_request(temp,&size);
+       gtk_widget_set_usize(temp,10,size.height);
+    }
+
+    /* Constroi botoes */
+    wnd->cntl[ICQMSGC_CLOSE]  = gtk_button_new_with_label("Close");
+    for(itn = buttons;*itn;itn++)
+       wnd->cntl[*itn] = gtk_button_new_with_label(stringtable[*itn]);
+
+    /* Constroi a caixa de edicao */
+    temp = wnd->cntl[ICQMSGC_TEXT] = gtk_text_new(NULL,NULL);
+    gtk_text_set_editable(GTK_TEXT(temp),FALSE);
+    gtk_text_set_word_wrap(GTK_TEXT(temp),TRUE);
+
+    style = gtk_style_copy(gtk_widget_get_default_style());
+    gtk_widget_set_style(temp,style);
+    gtk_style_unref(style);
+
+    gtk_widget_set_usize(temp,10,size.height);
+
+    
+    /* Constroi a parte superior da janela */
+    wnd->cntl[ICQMSGC_TOFROM] = gtk_frame_new(out ? "To" : "From");
+    temp  = gtk_table_new(2,4,FALSE);
+
+    gtk_table_attach(GTK_TABLE(temp), wnd->cntl[ICQMSGC_STATICUIN], 0, 1, 0, 1, 0, 0, 2, 2);
+    gtk_table_attach(GTK_TABLE(temp), wnd->cntl[ICQMSGC_UIN], 1, 2, 0, 1,GTK_EXPAND|GTK_SHRINK|GTK_FILL,0, 2, 2);
+
+    gtk_table_attach(GTK_TABLE(temp), wnd->cntl[ICQMSGC_STATICNAME], 2, 3, 0, 1, 0, 0, 2, 2);
+    gtk_table_attach(GTK_TABLE(temp), wnd->cntl[ICQMSGC_NAME], 3, 4, 0, 1,GTK_EXPAND|GTK_SHRINK|GTK_FILL,0, 2, 2);
+    
+    gtk_table_attach(GTK_TABLE(temp), wnd->cntl[ICQMSGC_STATICNICK], 0, 1, 1, 2, 0, 0, 2, 2);
+    gtk_table_attach(GTK_TABLE(temp), wnd->cntl[ICQMSGC_NICKNAME], 1, 2, 1, 2,GTK_EXPAND|GTK_SHRINK|GTK_FILL,0, 2, 2);
+
+    gtk_table_attach(GTK_TABLE(temp), wnd->cntl[ICQMSGC_STATICEMAIL], 2, 3, 1, 2, 0, 0, 2, 2);
+    gtk_table_attach(GTK_TABLE(temp), wnd->cntl[ICQMSGC_EMAIL], 3, 4, 1, 2,GTK_EXPAND|GTK_SHRINK|GTK_FILL,0, 2, 2);
+
+    gtk_container_add (GTK_CONTAINER(wnd->cntl[ICQMSGC_TOFROM]), temp);
+    gtk_box_pack_start(GTK_BOX(box), wnd->cntl[ICQMSGC_TOFROM],FALSE,FALSE,0);
+
+    /* Parte do meio */
+    wnd->cntl[ICQMSGC_TEXTBOX] = gtk_frame_new(NULL);
+    vbox = gtk_vbox_new(FALSE,0);
+
+    /* Caixa de subject/User name */
+    temp = gtk_hbox_new(FALSE,2);
+    gtk_box_pack_start(GTK_BOX(temp), wnd->cntl[ICQMSGC_STATICSUBJ],FALSE,FALSE,0);
+    gtk_box_pack_end(GTK_BOX(temp), wnd->cntl[ICQMSGC_SUBJECT],TRUE,TRUE,0);
+    gtk_box_pack_start(GTK_BOX(vbox),temp,FALSE,FALSE,0);
+
+    /* Caixa de texto */    
+    
+    temp = gtk_hbox_new(FALSE,0);
+    gtk_box_pack_start(GTK_BOX(temp), wnd->cntl[ICQMSGC_TEXT],TRUE,TRUE,0);
+    gtk_box_pack_start(GTK_BOX(temp),gtk_vscrollbar_new(GTK_TEXT(wnd->cntl[ICQMSGC_TEXT])->vadj),FALSE,FALSE,0);
+    gtk_box_pack_start(GTK_BOX(vbox),temp,TRUE,TRUE,0);
+
+//    gtk_box_pack_start(GTK_BOX(vbox),wnd->cntl[ICQMSGC_TEXT],TRUE,TRUE,0);
+
+    /* Area de URL/Nome de arquivo */
+    temp = gtk_hbox_new(FALSE,2);
+
+    gtk_box_pack_start(GTK_BOX(temp), wnd->cntl[ICQMSGC_ENTRY],TRUE,TRUE,0);
+    gtk_box_pack_end(GTK_BOX(temp), wnd->cntl[ICQMSGC_BROWSE],FALSE,FALSE,0);
+
+    gtk_box_pack_start(GTK_BOX(vbox),temp,FALSE,FALSE,0);
+    gtk_container_add (GTK_CONTAINER(wnd->cntl[ICQMSGC_TEXTBOX]),vbox);
+    gtk_box_pack_start(GTK_BOX(box),wnd->cntl[ICQMSGC_TEXTBOX],TRUE,TRUE,0);
+
+    /* Parte de baixo */
+    temp = gtk_hbox_new(FALSE,0);
+
+    wnd->cntl[ICQMSGC_CHECKBOX] = gtk_check_button_new_with_label( out ? "Urgent" : "Auto-Open");
+    gtk_box_pack_start(GTK_BOX(temp), wnd->cntl[ICQMSGC_CHECKBOX],FALSE,FALSE,0);
+
+    gtk_box_pack_end(GTK_BOX(temp), wnd->cntl[ICQMSGC_CLOSE],FALSE,FALSE,0);
+    gtk_box_pack_end(GTK_BOX(temp), wnd->cntl[ICQMSGC_SEND],FALSE,FALSE,0);
+    gtk_box_pack_end(GTK_BOX(temp), wnd->cntl[ICQMSGC_NEXT],FALSE,FALSE,0);
+    gtk_box_pack_end(GTK_BOX(temp), wnd->cntl[ICQMSGC_ACCEPT],FALSE,FALSE,0);
+    gtk_box_pack_end(GTK_BOX(temp), wnd->cntl[ICQMSGC_REJECT],FALSE,FALSE,0);
+    gtk_box_pack_end(GTK_BOX(temp), wnd->cntl[ICQMSGC_REFUSE],FALSE,FALSE,0);
+    gtk_box_pack_end(GTK_BOX(temp), wnd->cntl[ICQMSGC_REPLY],FALSE,FALSE,0);
+    gtk_box_pack_end(GTK_BOX(temp), wnd->cntl[ICQMSGC_ADD],FALSE,FALSE,0);
+
+    gtk_box_pack_start(GTK_BOX(box),temp,FALSE,FALSE,0);
+    
+    /* Finaliza */        
+    gtk_container_set_border_width(GTK_CONTAINER(box),4);
+    gtk_widget_show_all(box);
+    gtk_container_add (GTK_CONTAINER(wnd->main), box);
+    
+    /* Conecta eventos */
+    gtk_signal_connect(GTK_OBJECT(wnd->cntl[ICQMSGC_CLOSE]),  "clicked",    GTK_SIGNAL_FUNC(closeButton), wnd);
+    gtk_signal_connect(GTK_OBJECT(wnd->cntl[ICQMSGC_SEND]),   "clicked",    GTK_SIGNAL_FUNC(sendButton),  wnd);
+    gtk_signal_connect(GTK_OBJECT(wnd->cntl[ICQMSGC_REPLY]),  "clicked",    GTK_SIGNAL_FUNC(replyButton), wnd);
+
+    gtk_signal_connect(GTK_OBJECT(wnd->cntl[ICQMSGC_NEXT]),   "clicked",    GTK_SIGNAL_FUNC(actButton),   wnd);
+    gtk_signal_connect(GTK_OBJECT(wnd->cntl[ICQMSGC_ACCEPT]), "clicked",    GTK_SIGNAL_FUNC(actButton),   wnd);
+    gtk_signal_connect(GTK_OBJECT(wnd->cntl[ICQMSGC_REJECT]), "clicked",    GTK_SIGNAL_FUNC(actButton),   wnd);
+    gtk_signal_connect(GTK_OBJECT(wnd->cntl[ICQMSGC_REFUSE]), "clicked",    GTK_SIGNAL_FUNC(actButton),   wnd);
+    gtk_signal_connect(GTK_OBJECT(wnd->cntl[ICQMSGC_ADD]),    "clicked",    GTK_SIGNAL_FUNC(actButton),   wnd);
+    gtk_signal_connect(GTK_OBJECT(wnd->cntl[ICQMSGC_BROWSE]), "clicked",    GTK_SIGNAL_FUNC(actButton),   wnd);
+
+    /* Deixa o plugin responsavel fazer seus ajustes */
+    setMessage(wnd, type, out, msg);
+    
+    /* Mostra e sai */    
+    icqgtk_RestoreWindow(wnd->main,wnd->icq,0,"msgWindowPos",404,247);
+    gtk_widget_show(wnd->main);
+
+    return 0;
+ }
+
+ static void destroy( GtkWidget *widget, struct cfg *wnd)
+ {
+    DBGMessage("Janela de mensagems destruida");
+    
+    if(wnd->sz != sizeof(struct cfg))
+       return;
+
+    memset(wnd,0,sizeof(struct cfg));    
+    free(wnd);
+    DBGMessage("Clean-up da janela de mensagems completo");
+ }
+
+ static int _System loadUserFields(struct cfg *wnd)
+ {
+    HUSER usr;
+    char  buffer[0x0100];
+
+    if(!wnd || wnd->sz != sizeof(struct cfg))
+       return -1;
+       
+    usr = icqQueryUserHandle(wnd->icq,wnd->uin);
+
+    sprintf(buffer,"%lu",wnd->uin);
+    SETTEXT(c,ICQMSGC_UIN,buffer);
+    
+    strncpy(buffer,icqQueryUserFirstName(usr),0xFF);    
+    strncat(buffer," ",0xFF);
+    strncat(buffer,icqQueryUserLastName(usr),0xFF);
+    SETTEXT(c,ICQMSGC_NAME,buffer);
+    
+    SETTEXT(c,ICQMSGC_NICKNAME,icqQueryUserNick(usr));
+    SETTEXT(c,ICQMSGC_EMAIL,icqQueryUserEmail(usr));
+    
+    return 0;
+ }
+
+ static void closeButton(GtkWidget *widGet, struct cfg *wnd)
+ {
+    icqgtk_StoreWindow(wnd->main, wnd->icq, wnd->uin, "msgWindowPos");
+    gtk_widget_destroy(wnd->main);
+ }
+
+ static void sendButton(GtkWidget *widGet, struct cfg *wnd)
+ {
+    DBGMessage("Enviar...");
+    
+    if(!(wnd->mgr && wnd->mgr->send))
+       return;
+
+    if(wnd->mgr->send(&msgHelper,wnd,wnd->icq,wnd->uin))
+       return;
+       
+    if(icqLoadValue(wnd->icq,"NextOnSend",1))
+    {
+       if(!readNext(wnd))
+          return;
+    }
+       
+    icqgtk_StoreWindow(wnd->main, wnd->icq, wnd->uin, "msgWindowPos");
+    gtk_widget_destroy(wnd->main);
+ }
+
+ static void replyButton(GtkWidget *widGet, struct cfg *cfg)
+ {
+    if(cfg->mgr)
+       setReply(cfg,cfg->mgr->reply);
+    else
+       setReply(cfg,MSG_NORMAL);
+ }
+
+ static int _System setMessage(struct cfg *wnd, USHORT type, BOOL out, HMSG msg)
+ {
+    MSGFORMATTER	*formatter	= NULL;
+
+    if(wnd->mgr && wnd->mgr->exit)
+       wnd->mgr->exit(&msgHelper, wnd, wnd->icq, wnd->uin, wnd->type, type);
+    
+    wnd->type = type;
+    wnd->out  = out;
+
+    if(msg && msg->mgr)
+       wnd->mgr = msg->mgr;
+    else
+       wnd->mgr = icqQueryMessageManager(wnd->icq,wnd->type);
+ 
+    if(wnd->mgr)
+       formatter =wnd->mgr->formatWindow;
+
+    if(!formatter)
+       formatter = &icqgtk_unknownMsgFormatter;
+
+    ajustUser(wnd,msg);
+    setVisible(wnd, ICQMSGC_ADD, !wnd->usr || (wnd->usr->flags & USRF_TEMPORARY));
+
+    /* Ajusta a caixa de edicao */
+    gtk_text_set_editable(GTK_TEXT(wnd->cntl[ICQMSGC_TEXT]),msg==NULL);
+
+    /* Pede ao plugin para formatar a janela */
+    formatter(&msgHelper,wnd,wnd->icq,wnd->uin,type,out,msg);
+
+    if(msg)
+       icqRemoveMessage(wnd->icq,wnd->uin,msg);
+
+    setEnabled(wnd,ICQMSGC_NEXT,icqQueryMessage(wnd->icq,wnd->sysMsg ? 0 : wnd->uin) != NULL);
+    
+    if(out)
+       gtk_window_set_focus(GTK_WINDOW(wnd->main),wnd->cntl[ICQMSGC_TEXT]);
+
+    return 0;
+ }
+
+ static int _System setTitle(struct cfg *wnd,const char *txt)
+ {
+    gtk_window_set_title(GTK_WINDOW(wnd->main),txt);
+    return 0;
+ }
+ 
+ static int _System setVisible(struct cfg *wnd, USHORT id, BOOL modo)
+ {
+    if(modo)
+       gtk_widget_show(wnd->cntl[id]);
+    else
+       gtk_widget_hide(wnd->cntl[id]);
+    return 0;
+ }
+ 
+ static int _System setEnabled(struct cfg *wnd, USHORT id, BOOL modo)
+ {
+    DBGTracex(modo);
+    gtk_widget_set_sensitive(wnd->cntl[id],modo);
+    return 0;
+ }
+
+ static void ajustUser(struct cfg *cfg, HMSG msg)
+ {
+    char buffer[0x0100];
+    
+    cfg->usr    = icqQueryUserHandle(cfg->icq,cfg->uin);
+    cfg->sysMsg = (cfg->usr == NULL);
+    
+    *buffer = 0;
+    if(cfg->mgr && cfg->mgr->title)
+    {
+       cfg->mgr->title(cfg->icq,cfg->usr,cfg->uin,cfg->out,msg,buffer,0xFF);
+    }
+    else
+    {
+       sprintf(buffer,"Message %04x %s %s (ICQ#%lu)",
+       					cfg->type,
+       					cfg->out ? "to" : "from",
+       					icqQueryUserNick(cfg->usr),
+       					cfg->uin );
+    } 
+    
+    setEnabled(cfg,ICQMSGC_CHECKBOX,FALSE);
+    
+    if(*buffer)
+       setTitle(cfg,buffer);
+       
+    if(cfg->mgr && cfg->mgr->flags & ICQMSGMF_LOADUSERFIELDS)
+       loadUserFields(cfg);
+ }
+
+ static int _System setString(MSGEDITWINDOW cfg, USHORT id,const char *txt)
+ {
+    const USHORT *tbl;
+    GtkWidget	*temp	= cfg->cntl[id];
+
+    if(!txt)
+       txt = stringtable[id];
+
+    if(id == ICQMSGC_TEXT)
+    {
+       gtk_editable_delete_text(GTK_EDITABLE(temp),0,-1);
+       gtk_text_insert(GTK_TEXT(temp), NULL, NULL, NULL, txt, -1);
+       return 0;
+    }
+  
+    for(tbl = textBoxes; *tbl; tbl++)  
+    {
+       if(*tbl == id)
+       {
+          gtk_entry_set_text(GTK_ENTRY(cfg->cntl[id]),txt);
+          return 0;
+       }
+    }
+    
+    for(tbl = labels; *tbl; tbl++)  
+    {
+       if(*tbl == id)
+       {
+          gtk_label_set_text(GTK_LABEL(cfg->cntl[id]),txt);
+          return 0;
+       }
+    }
+    
+    for(tbl = buttons; *tbl; tbl++)  
+    {
+       if(*tbl == id)
+       {
+          icqWriteSysLog(cfg->icq,PROJECT,"Set Button label isn't implemented");
+          return -2;
+       }
+    }
+
+    DBGPrint("Atualizacao para tipo desconhecido: %d",id);
+    
+    return -1;
+ }
+
+ static int _System getString(MSGEDITWINDOW cfg, USHORT id, int sz, char *buffer)
+ {
+    const USHORT  *tbl;
+    gpointer	  ptr;
+    
+    if(id == ICQMSGC_TEXT)
+    {
+       ptr = gtk_editable_get_chars(GTK_EDITABLE(cfg->cntl[id]),0,-1);
+       strncpy(buffer,ptr,sz);
+       g_free(ptr);
+       return strlen(buffer);
+    }
+  
+    for(tbl = textBoxes; *tbl; tbl++)  
+    {
+       if(*tbl == id)
+       {
+          ptr = gtk_editable_get_chars(GTK_EDITABLE(cfg->cntl[id]),0,-1);
+          strncpy(buffer,ptr,sz);
+          g_free(ptr);
+          return strlen(buffer);
+       }
+    }
+    
+    for(tbl = labels; *tbl; tbl++)  
+    {
+       if(*tbl == id)
+       {
+          gtk_label_get(GTK_LABEL(cfg->cntl[id]),(gchar **) &ptr);
+          if(!ptr)
+          {
+             *buffer = 0;
+             return 0;
+          }
+          strncpy(buffer,ptr,sz);
+          return strlen(buffer);
+       }
+    }
+    return -1;
+ }
+
+ static int _System setCheckBox(MSGEDITWINDOW cfg, USHORT id, BOOL modo)
+ {
+    return 0;
+ }
+ 
+ int _System getCheckBox(MSGEDITWINDOW cfg, USHORT id)
+ {
+    return 0;
+ }
+
+ static void _System loadString(MSGEDITWINDOW cfg, USHORT id, USHORT str)
+ {
+    DBGTrace(id);
+    DBGTrace(str);
+    setString(cfg,id,stringtable[str]);
+ }
+
+ static void _System setReply(MSGEDITWINDOW cfg, USHORT type)
+ {
+    if(type == 0xFFFF)
+       return;
+    setMessage(cfg, type, TRUE, NULL);
+ }
+ 
+ static void _System showTime(MSGEDITWINDOW cfg, USHORT id, time_t tm)
+ {
+    char buffer[80];
+    strftime(buffer,79,"%a %m/%d/%Y %T",localtime(&tm));
+    setString(cfg,id,buffer);
+ }
+
+ static BOOL readNext(struct cfg *wnd)
+ {
+    HMSG msg = icqQueryMessage(wnd->icq,wnd->sysMsg ? 0 : wnd->uin);
+
+    if(msg)
+    {    
+       setMessage(wnd, msg->type, FALSE, msg);
+       return FALSE;
+    }
+    setEnabled(wnd,ICQMSGC_NEXT,FALSE);
+    return TRUE;
+ }
+
+ static void actButton(GtkWidget *widGet, struct cfg *wnd)
+ {
+    const USHORT *tbl;
+    
+    DBGMessage("Acao de botao");
+
+    for(tbl = buttons; *tbl && widGet != wnd->cntl[*tbl]; tbl++);
+    
+    if(!*tbl)
+    {
+       icqWriteSysLog(wnd->icq,PROJECT,"Unexpected button action");
+       return;
+    }
+    
+    DBGTrace(*tbl);
+ 
+    if(wnd->mgr && wnd->mgr->action)
+    {
+       if(wnd->mgr->action(&msgHelper,wnd,wnd->icq,wnd->uin,*tbl))
+          return;
+    }
+    
+    switch(*tbl)
+    {
+    case ICQMSGC_ACCEPT:
+       setReply(wnd,MSG_AUTHORIZED);
+       break;
+       
+    case ICQMSGC_REFUSE:
+       setReply(wnd,MSG_REFUSED);
+       break;
+
+    case ICQMSGC_NEXT:
+       readNext(wnd);
+       break;
+              
+    case ICQMSGC_REJECT:
+       break;
+     
+    case ICQMSGC_ADD:
+       break;
+       
+#ifdef DEBUG
+    default:
+       DBGPrint("Botao desconhecido: id=%d",(int) *tbl);
+#endif          
+    }
+ 
+ }
+
+/*
+ static void size(GtkWidget *widget, GtkAllocation *pos, struct cfg *wnd)
+ {
+    char buffer[80];
+    sprintf(buffer,"%d,%d,%d,%d",pos->x,pos->y,pos->width,pos->height);
+    icqSaveString(wnd->icq,"msgWindowPos",buffer);
+ }
+*/
+

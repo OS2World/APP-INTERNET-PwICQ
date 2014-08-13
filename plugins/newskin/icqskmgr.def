@@ -1,0 +1,14 @@
+;========================================================================
+; ICQSKMGR.DEF - pwICQ for OS2 Skin Manager entry points
+;========================================================================
+
+LIBRARY      ICQSKMGR INITINSTANCE TERMINSTANCE
+
+PROTMODE
+
+DATA         MULTIPLE READWRITE LOADONCALL NONSHARED
+CODE         LOADONCALL
+
+EXPORTS      icqskmgr_Configure
+
+

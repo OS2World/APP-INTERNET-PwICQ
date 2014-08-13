@@ -1,0 +1,81 @@
+# nos docs diz que sao flags independentes de plataforma (nem todos...),
+# mas o que j  me ajudou aqui foi:
+# -O2 -ffast-math -funroll-loops -fthread-jumps -mpentium -march=pentium
+# se eu ponho -mpentium-pro ele reclama de instrucoes faltando.
+
+CORE =    kernel/init.c kernel/list.c kernel/log.c kernel/timer.c kernel/user.c \
+          kernel/lnxstart.c kernel/lnxthread.c kernel/lnxplug.c \
+          kernel/lnxconf.c kernel/config.c kernel/register.c kernel/modes.c \
+          kernel/event.c kernel/plugin.c kernel/msg.c kernel/tfile.c \
+          kernel/query.c kernel/setvals.c kernel/uquery.c kernel/blacklist.c
+
+NETWORK = network/lnxnet.c
+
+ICQV5   = icqv5/icqv5.c icqv5/ulisten.c icqv5/encript.c icqv5/packets.c \
+          icqv5/exec.c icqv5/mode.c icqv5/timer.c icqv5/login.c \
+          icqv5/decode.c icqv5/user.c icqv5/msg.c
+
+ICQV7   = icqv7/main.c icqv7/timer.c icqv7/mode.c icqv7/login.c icqv7/network.c \
+          icqv7/snac.c icqv7/contact.c icqv7/msg.c
+
+LOADER  = textloader/icqtext.c
+
+MAINLIB = $(CORE) $(NETWORK)
+SOURCES = $(PROTOCOL) $(MAINLIB) $(LOADER)
+
+EXEPATH = /home/perry/pwicq2/bin
+LIBPATH = /home/perry/pwicq2/lib
+
+#---[ Sequencia de montagem ]--------------------------------------------------------------#
+
+CC     = gcc
+CFLAGS = $(PARMS) -O2 -mpentium -funroll-loops -fthread-jumps -march=pentium -I /home/perry/icq2/include -I /home/perry/include -fPIC -g
+
+#---[ Modulos principais ]----------------------------------------------------------------#
+
+$(EXEPATH)/icqnetw.so: $(NETWORK:.c=.o) 
+	gcc -shared -Wl,-soname,icqnetw.so -o $(EXEPATH)/icqnetw.so $(NETWORK:.c=.o)
+
+$(EXEPATH)/pwicq.so: $(MAINLIB:.c=.o) 
+	rm -f $(LIBPATH)/libpwicq.so
+	gcc -shared -Wl,-soname,pwicq.so -o $(EXEPATH)/pwicq.so $(MAINLIB:.c=.o) -lpthread -ldl
+	ln -s -f $(EXEPATH)/pwicq.so $(LIBPATH)/libpwicq.so 
+	
+$(EXEPATH)/pwicqt: $(LOADER:.c=.o) $(EXEPATH)/pwicq.so
+	gcc -o $(EXEPATH)/pwicqt $(LOADER:.c=.o) -L$(LIBPATH) -lpwicq -ldl -lpthread
+
+#---[ Plugins basicos ]-------------------------------------------------------------------#
+
+$(EXEPATH)/plugins/icqv5.so: $(ICQV5:.c=.o)
+	gcc -g -shared -Wl,-soname,icqv5.so \
+	  -o $(EXEPATH)/plugins/icqv5.so $(ICQV5:.c=.o) -lc -L$(LIBPATH) -lpwicq
+
+$(EXEPATH)/plugins/icqv7.so: $(ICQV7:.c=.o)
+	gcc -g -shared -Wl,-soname,icqv7.so -o $(EXEPATH)/plugins/icqv7.so $(ICQV7:.c=.o) -lc -L$(LIBPATH) -lpwicq
+	
+#---[ Pacote completo ]-------------------------------------------------------------------#
+
+network: $(EXEPATH)/icqnetw.so 
+core:	 $(EXEPATH)/pwicq.so
+loader:  $(EXEPATH)/pwicqt
+icqv5:   $(EXEPATH)/plugins/icqv5.so
+icqv7:   $(EXEPATH)/plugins/icqv7.so
+
+all: core loader network icqv7
+
+#---[ Debug - Monta todo o codigo num bloco so ]------------------------------------------#
+
+#debug: $(OBJECT)
+#       cc -Wl,-l,pthread -o $(PROJECT) $(OBJECT) -ldl
+
+clean:
+	rm -f $(MAINLIB:.c=.o)
+	rm -f $(LOADER:.c=.o)
+	rm -f $(ICQV5:.c=.o)
+	rm -f $(ICQV7:.c=.o)
+
+
+
+
+
+

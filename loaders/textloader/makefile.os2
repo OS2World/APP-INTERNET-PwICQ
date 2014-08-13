@@ -1,0 +1,23 @@
+
+#---[ Dados do projeto ]---------------------------------------------------------------#
+
+#Nome do executavel final
+PROJECT     = icqtext
+
+#Tipo do executavel
+EXETYPE     = VIO
+MAKEEXE     = 1
+
+# Lista de modulos
+SOURCES     = icqtext.c
+EXTRAINCL   = \data\ibmcpp\sources\icq2\include
+EXTRALIB    = \public\pwicq2\os2\lib\icqkrnl.lib
+
+#---[ Diretorios ]---------------------------------------------------------------------#
+
+EXEPATH     = w:\private\pwicq2
+RELEASEPATH = w:\public\pwicq2\os2\bin
+
+!include <pwMake.mak>
+
+

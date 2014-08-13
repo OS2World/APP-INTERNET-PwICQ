@@ -1,0 +1,443 @@
+/*  pwicq.c - pwICQ Panel Plugin for XFCE
+ *
+ *  Copyright (C) 2003 Perry Werneck (pwicq_devel@terra.com.br)
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+*/
+
+#ifdef HAVE_CONFIG_H
+   #include <config.h>
+#endif
+
+#include <time.h>
+
+#include <panel/global.h>
+#include <panel/controls.h>
+#include <panel/icons.h>
+#include <panel/plugins.h>
+
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/msg.h>
+
+#include "icqxpde.h"
+
+#ifdef DEBUG
+
+static void DBGPRINT(const char *fmt, ...)
+{
+   va_list arg_ptr;
+   FILE    *out             = fopen("/tmp/" PROJECT ".dbg", "a");
+
+   if(out)
+   {
+      va_start(arg_ptr, fmt);
+      vfprintf(out, fmt, arg_ptr);
+      va_end(arg_ptr);
+	  fprintf(out,"\n");
+	  fclose(out);
+   }
+
+ }
+
+ #define DBGMessage(x) DBGPRINT(__FILE__ "(%d)\t%s",       __LINE__, x);
+ #define DBGString(x)  DBGPRINT(__FILE__ "(%d)\t%s=%s",    __LINE__, #x, x);
+ #define DBGTracex(x)  DBGPRINT(__FILE__ "(%d)\t%s=%08lx", __LINE__, #x, (unsigned long) x);
+ #define DBGTrace(x)   DBGPRINT(__FILE__ "(%d)\t%s=%08ld", __LINE__, #x, (unsigned long) x);
+ #define CHKPoint()    DBGPRINT(__FILE__ "(%d)\t%s",       __LINE__, __FUNCTION__ );
+ 
+#else
+ 
+ #define DBGMessage(x) /* */
+ #define DBGString(x)  /* */
+ #define DBGTracex(x)  /* */
+ #define DBGTrace(x)   /* */
+ #define CHKPoint()    /* */
+ 
+#endif
+
+/*---[ IPC Calls with pwICQ ]-------------------------------------------------*/
+
+static ICQSHAREMEM * icqIPCGetSharedBlock(void)
+{
+   key_t                  memKey       =  ftok(PWICQ_SHAREMEM,0x230167);
+   int            shmID;
+   ICQSHAREMEM    *icq         =  NULL;
+
+   shmID = shmget(memKey,sizeof(sizeof(ICQSHAREMEM)),0660);
+
+   if( ((int) shmID) == -1)
+      return NULL;
+
+   icq = shmat(shmID,0,0);
+
+   if( ((int) icq) == -1)
+      return NULL;
+
+   if(icq->sz != sizeof(ICQSHAREMEM) || icq->si != sizeof(ICQINSTANCE))
+   {
+      shmdt(icq);
+      return NULL;
+   }
+
+   return icq;
+}
+
+static int icqIPCReleaseSharedBlock(ICQSHAREMEM *icq)
+{
+   if(!icq)
+      return -1;
+
+   shmdt(icq);
+
+   return 0;
+}
+
+static ICQINSTANCE * icqIPCGetInstance(pwICQPlugin *cfg)
+{
+   int         f;
+   ICQINSTANCE *ret;
+   
+   if(!(cfg && cfg->uin))
+	  return NULL;
+
+ //  if(!cfg->icq)
+//	  cfg->icq = icqIPCGetSharedBlock();
+   
+   if(cfg->icq && cfg->uin)
+   {
+	  ret = cfg->icq->i;
+	  
+	  for(f=0;f<PWICQ_MAX_INSTANCES;f++)
+	  {
+		 if(ret->uin == cfg->uin)
+			return ret;
+	  }
+   }
+   
+   return NULL;
+}
+ 
+/*---[ GUI ]------------------------------------------------------------------*/
+ 
+static gboolean pwicq_update(gpointer data)
+{
+    pwICQPlugin   *cfg   = (pwICQPlugin *) data;
+    ICQINSTANCE   *icq;
+    unsigned char icon;
+
+    if(!cfg)
+	   return FALSE;
+
+	cfg->event = !cfg->event;
+	icon       = cfg->icon;
+	icq        = icqIPCGetInstance(cfg);
+	
+	if(icq)
+	{
+	   if(icq->modeIcon == icq->eventIcon || icq->eventIcon >= PWICQICONBARSIZE)
+	   {
+	      icon = icq->modeIcon;   
+	   }
+	   else
+	   {
+		  icon = cfg->event ? icq->modeIcon : icq->eventIcon;
+	   }
+	}
+	else
+	{
+       icon = ICQICON_INACTIVE;
+	}
+	
+	if(icon != cfg->icon)
+	{
+	   DBGMessage("Icon has changed");
+	   cfg->icon = icon;
+	   
+	   DBGTracex(cfg->pixmap);
+	   DBGTrace(icon);
+	   
+       gtk_pixmap_set(GTK_PIXMAP(cfg->pixmap),cfg->iPixmap[icon], cfg->iBitmap[icon]);
+	}
+
+    return TRUE;
+}
+
+static gboolean on_button_press_event_cb(GtkWidget *widget, GdkEventButton *event, pwICQPlugin *cfg)
+{
+    return FALSE;
+}
+
+static gboolean on_button_release_event_cb(GtkWidget *widget, GdkEventButton *event, pwICQPlugin *cfg)
+{
+
+   return FALSE;
+}
+
+static pwICQPlugin *pwicq_new(void)
+{
+    GdkPixbuf   *icons;
+    int         f,c;
+    pwICQPlugin *cfg     = g_new(pwICQPlugin, 1);
+
+    cfg->eventbox = gtk_event_box_new();
+    icons         = gdk_pixbuf_new_from_file("/usr/share/pwicq/images/icons.gif",NULL);
+   
+    DBGTracex(icons);
+   
+    if(icons)
+	{   
+       cfg->iconSize = gdk_pixbuf_get_height(icons);
+	   DBGTrace(cfg->iconSize);
+    
+       for(f=c=0;f<PWICQICONBARSIZE;f++)
+       {
+          cfg->icons[f] = gdk_pixbuf_new( gdk_pixbuf_get_colorspace(icons),
+                                          gdk_pixbuf_get_has_alpha(icons),
+                                          gdk_pixbuf_get_bits_per_sample(icons),
+                                          cfg->iconSize, cfg->iconSize
+	   								 );
+
+          gdk_pixbuf_copy_area (icons,c,0,cfg->iconSize,cfg->iconSize,cfg->icons[f],0,0);
+          gdk_pixbuf_render_pixmap_and_mask(cfg->icons[f], &cfg->iPixmap[f], &cfg->iBitmap[f],1);
+
+          c += cfg->iconSize;
+       }
+   
+       gdk_pixbuf_unref(icons);
+	   
+       cfg->pixmap = gtk_pixmap_new(cfg->iPixmap[ICQICON_INACTIVE],cfg->iBitmap[ICQICON_INACTIVE]);
+	   DBGTracex(cfg->pixmap);
+	   
+    }
+   
+    gtk_container_add(GTK_CONTAINER(cfg->eventbox), cfg->pixmap);
+   
+    g_signal_connect(	G_OBJECT(cfg->eventbox), 
+   						"button-press-event",
+   						G_CALLBACK(on_button_press_event_cb), cfg );
+   
+    g_signal_connect(	G_OBJECT(cfg->eventbox), 
+   						"button-release-event",G_CALLBACK(on_button_release_event_cb), 
+   						cfg );
+
+	cfg->icq        = icqIPCGetSharedBlock();
+	cfg->icon       = ICQICON_INACTIVE;
+	DBGTracex(cfg->icq);
+
+    cfg->timeout_id = g_timeout_add(1000, pwicq_update, cfg);
+	DBGTrace(cfg->timeout_id);
+
+	gtk_widget_show_all(cfg->eventbox);
+	
+    return cfg;
+}
+
+static void pwicq_free(Control *control)
+{
+    pwICQPlugin *cfg;
+    int         f;
+
+    CHKPoint();
+   
+    g_return_if_fail(control != NULL);
+
+    cfg = control->data;
+    g_return_if_fail(cfg != NULL);
+
+    if (cfg->timeout_id)
+	   g_source_remove(cfg->timeout_id);
+
+    for(f=0;f<PWICQICONBARSIZE;f++)
+	{
+	   if(cfg->icons[f]);
+	      gdk_pixbuf_unref(cfg->icons[f]);
+	}
+
+	DBGTracex(cfg->icq);
+	icqIPCReleaseSharedBlock(cfg->icq);
+	cfg->icq = NULL;
+	
+    g_free(cfg);
+}
+
+extern xmlDocPtr xmlconfig;
+
+static void pwicq_read_config(Control *control, xmlNodePtr node)
+{
+    pwICQPlugin *cfg;
+    xmlChar     *value;
+
+    g_return_if_fail(control != NULL);
+    g_return_if_fail(node != NULL);
+
+    cfg = (pwICQPlugin *)control->data;
+
+    node = node->children;
+   
+    if (node == NULL || !xmlStrEqual(node->name, (const xmlChar *) "pwICQ"))
+	{
+	   CHKPoint();
+	   return;
+	}
+
+    node = node->children;
+	
+    while (node != NULL) 
+	{
+	   if (xmlStrEqual(node->name, (const xmlChar *) "UIN")) 
+	   {
+	      value = xmlNodeListGetString(xmlconfig, node->children, 1);
+	      if (value) 
+		  {
+			 cfg->uin = atol(value);
+			 DBGTrace(cfg->uin);
+		     xmlFree(value);
+		  }
+	   }
+	   node = node->next;
+    }
+}
+
+static void pwicq_write_config(Control *control, xmlNodePtr parent)
+{
+    pwICQPlugin *cfg;
+    xmlNodePtr  node;
+    char        buffer[0x0100];
+
+    g_return_if_fail (control != NULL);
+    g_return_if_fail (parent != NULL);
+   
+    cfg = (pwICQPlugin *)control->data;
+    g_return_if_fail(cfg != NULL);
+
+    node = xmlNewTextChild(parent, NULL, (const xmlChar *)"pwICQ", NULL);
+   
+    sprintf(buffer,"%ld",cfg->uin);
+    DBGMessage(buffer);
+   
+    xmlNewTextChild(node, NULL, (const xmlChar *) "UIN", buffer);
+ 
+}
+
+static void pwicq_attach_callback(Control *control, const char *signal, GCallback callback, gpointer data)
+{
+   
+}
+
+static void pwicq_apply_options_cb(GtkWidget *widget, pwICQPlugin *cfg)
+{
+    const gchar *uin = gtk_entry_get_text(GTK_ENTRY(cfg->entry));
+   
+    DBGTracex(uin);
+   
+    if(uin)
+	{
+	   DBGMessage(uin);
+	   cfg->uin = atoi(uin);
+	}
+   
+}
+
+static void pwicq_create_options(Control *control, GtkContainer *container, GtkWidget *done)
+{
+    pwICQPlugin *cfg;
+    GtkWidget   *table;
+    GtkWidget   *label;
+    char        buffer[0x0100];
+   
+    CHKPoint();
+   
+    g_return_if_fail(control != NULL);
+    g_return_if_fail(container != NULL);
+    g_return_if_fail(done != NULL);
+   
+    cfg = (pwICQPlugin *) control->data;
+    g_return_if_fail(cfg != NULL);
+   
+    table = gtk_table_new(1, 2, FALSE);
+
+    label = gtk_label_new("ICQ#:");
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 0, 1);
+   
+    cfg->entry = gtk_entry_new();
+	sprintf(buffer,"%08ld",cfg->uin);
+    gtk_entry_set_text(GTK_ENTRY(cfg->entry), buffer);
+
+    gtk_table_attach_defaults(GTK_TABLE(table),cfg->entry, 1, 2, 0, 1);
+
+    g_signal_connect(G_OBJECT(done), "clicked", G_CALLBACK(pwicq_apply_options_cb), cfg);
+
+    gtk_widget_show_all(table);
+    gtk_container_add(container, table);
+
+}
+
+
+static void pwicq_set_size(Control *control, int size)
+{
+    CHKPoint();
+   
+    g_return_if_fail(control != NULL);
+
+    gtk_widget_set_size_request(control->base, -1, -1);
+}
+
+/*  
+ * pwICQ panel control
+ */
+static gboolean create_pwicq_control(Control * control)
+{
+    pwICQPlugin *cfg = pwicq_new();
+
+    DBGTracex(cfg);
+   
+    gtk_container_add(GTK_CONTAINER(control->base), cfg->eventbox);
+
+    control->data       = (gpointer) cfg;
+    control->with_popup = FALSE;
+
+    gtk_widget_set_size_request(control->base, -1, -1);
+
+    return TRUE;
+}
+
+G_MODULE_EXPORT void xfce_control_class_init(ControlClass * cc)
+{
+    CHKPoint();
+   
+    cc->name    = "pwICQ";
+   
+#ifdef DEBUG
+    cc->caption = "pwICQ Status [DEBUG]";
+#else   
+    cc->caption = "pwICQ Status";
+#endif   
+
+    cc->create_control = (CreateControlFunc) create_pwicq_control;
+
+    cc->free            = pwicq_free;
+    cc->read_config     = pwicq_read_config;
+    cc->write_config    = pwicq_write_config;
+    cc->attach_callback = pwicq_attach_callback;
+    cc->create_options  = pwicq_create_options;
+    cc->set_size        = pwicq_set_size;
+}
+
+/* macro defined in plugins.h */
+XFCE_PLUGIN_CHECK_INIT
+
+// vim: set ts=8 sw=4 :

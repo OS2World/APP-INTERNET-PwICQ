@@ -1,0 +1,164 @@
+/*
+ * gtkframe.c - GTK Frame functions
+ */
+ 
+ #include <pwicqgui.h>
+ #include <string.h>
+ #include <unistd.h>
+
+/*---[ Defines ]--------------------------------------------------------------*/
+
+ #define IDMASC_SIZE 20
+
+/*---[ Structures ]-----------------------------------------------------------*/
+
+ #pragma pack(1)
+
+ typedef struct _childsearch
+ {
+    USHORT  sz;
+    char    key[IDMASC_SIZE];
+    hWindow ret;
+ } CHILDSEARCH;
+
+ #pragma pack()
+
+/*---[ Constants ]------------------------------------------------------------*/
+
+ static const char *id_masc = "pwICQ%04x";
+
+/*---[ Implementation ]-------------------------------------------------------*/
+
+ int icqskin_setFrameIcon(hWindow hwnd, SKINDATA *cfg, USHORT id)
+ {
+#ifdef GTK2	
+	gtk_window_set_icon(GTK_WINDOW(hwnd),cfg->icons[id]);
+#endif	
+	return 0;
+ }
+
+ int icqskin_setFrameTitle(hWindow hwnd, const char *title)
+ {
+	gtk_window_set_title(GTK_WINDOW(hwnd),title);
+	return 0;
+ }
+ 
+ static void queryChild(GtkWidget *widget, CHILDSEARCH *sr)
+ {
+        if(sr->sz != sizeof(CHILDSEARCH) || sr->ret)
+           return;
+
+        if(!strcmp(sr->key,gtk_widget_get_name(widget)))
+           sr->ret = widget;
+
+        if(GTK_IS_CONTAINER(widget))
+           gtk_container_foreach(GTK_CONTAINER(widget),(GtkCallback) queryChild, sr);
+
+ }
+
+ hWindow icqskin_getDlgItemHandle(hWindow hwnd, USHORT id)
+ {
+    CHILDSEARCH sr;
+
+    memset(&sr,0,sizeof(sr));
+    sr.sz = sizeof(CHILDSEARCH);
+
+    sprintf(sr.key,id_masc,id);
+
+    gtk_container_foreach(GTK_CONTAINER(hwnd),(GtkCallback) queryChild, &sr);
+
+    return sr.ret;
+ }
+
+ int icqskin_setDlgItemHandle(hWindow dont_use, USHORT id, hWindow child)
+ {
+    char key[IDMASC_SIZE];
+    sprintf(key,"pwICQ%04x",id);
+    gtk_widget_set_name(child,key);
+	return 0;
+ }
+
+ int icqskin_setICQHandle(hWindow hwnd, HICQ icq)
+ {
+	ICQFRAME *frame = gtk_object_get_user_data(GTK_OBJECT(hwnd));
+    frame->icq = icq;
+    return 0;	
+ }
+ 
+ void icqskin_storeFrame(hWindow hwnd,const char *key)
+ {
+	ICQFRAME *frame = gtk_object_get_user_data(GTK_OBJECT(hwnd));
+    gint     x,
+	         y,
+	         width,
+	         height;
+	
+    char buffer[80];
+	
+	if(!(frame && frame->icq))
+	   return;
+
+    if(!(hwnd && hwnd->window))
+	{
+	   sprintf(buffer,"Invalid save \"%s\" request",key);
+	   DBGMessage(buffer);
+	   icqWriteSysLog(frame->icq,PROJECT,buffer);
+	   return;
+	}
+	
+	DBGTracex(hwnd);
+	DBGTracex(hwnd->window);
+
+    if( !gdk_window_get_deskrelative_origin(hwnd->window,&x,&y))
+       return;
+
+    gdk_window_get_size(hwnd->window,&width,&height);
+
+    sprintf(buffer,"%d,%d,%d,%d",x,y,width,height);
+
+    icqSaveString(frame->icq,key,buffer);
+	
+ }
+
+ 
+ void icqskin_restoreFrame(hWindow hwnd, const char *key, USHORT w, USHORT h)
+ {
+	ICQFRAME *frame = gtk_object_get_user_data(GTK_OBJECT(hwnd));
+    int      x,
+	         y,
+	         width,
+	         height;
+	
+    char     buffer[80];
+	
+	if(key)
+       icqLoadString(frame->icq,key,"",buffer,79);
+    else
+	   *buffer = 0;
+
+    if(!*buffer)
+    {
+       gtk_window_set_default_size(GTK_WINDOW(hwnd),w,h);
+       return;
+    }
+
+    DBGMessage(buffer);
+    if(sscanf(buffer,"%d,%d,%d,%d",&x,&y,&width,&height) != 4)
+    {
+       gtk_window_set_default_size(GTK_WINDOW(hwnd),w,h);
+       return;
+    }
+
+	DBGTrace(width);
+	DBGTrace(height);
+	
+    gtk_window_set_default_size(GTK_WINDOW(hwnd),width,height);
+	
+	return;
+ }
+ 
+ int icqskin_setFrameName(hWindow hwnd, const char *name)
+ {
+	return 0;
+ }
+

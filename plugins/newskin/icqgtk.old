@@ -1,0 +1,253 @@
+/*
+ * icqgtk.c - Loader for the pwICQ GTK GUI
+ */
+
+ #include <pwicqgui.h>
+ #include <sys/types.h>
+ #include <unistd.h>
+
+/*---[ Structures ]-----------------------------------------------------------*/
+
+ #pragma pack(1)
+ struct icqevent
+ {
+	ULONG  uin;
+	char   id;
+	USHORT event;
+	ULONG  parm;
+ };
+
+/*---[ Prototipes ]-----------------------------------------------------------*/
+
+ static gboolean eventProcessor(SKINDATA *);
+
+/*---[ Skin Manager entry points ]--------------------------------------------*/
+
+ static ULONG _System loadSkin(HICQ, STATUSCALLBACK *, int, char **);
+ static int   _System executeSkin(HICQ,ULONG);
+ static int   _System event(HICQ, ULONG, char, USHORT, ULONG, SKINDATA *);
+ static int   _System timer(HICQ, SKINDATA *, char);
+ static int   _System validateEdit(USHORT);
+ static int   _System popupUserList(HICQ);
+
+/*---[ Skin Manager definition table ]----------------------------------------*/
+
+ const SKINMGR icqgui_descr =
+ {
+    sizeof(SKINMGR),
+    0,                  // flags
+	PLUGIN_ID,
+    loadSkin,
+    executeSkin,
+    (int (_System *)(HICQ,void *,char)) timer,               // timer,
+    NULL,                     // warning
+    icqskin_viewMessage,      // view
+    icqskin_newMessage,       // newMessage
+    icqskin_newWithMgr,       // msgWithMgr
+	NULL,                     // msgMultDest
+    NULL,                     // awayMessage
+    icqskin_popupMenu,        // popupmenu
+    popupUserList,            // popupUserList
+    icqskin_insertMenu,       // insertMenu,
+    (HWND (*)(HICQ,ULONG,USHORT)) icqskin_openConfig,       // openConfig,
+	validateEdit,             // validateEdit,
+    (int (_System *)(HICQ,ULONG,char,USHORT,ULONG,void *)) event       // event,
+ };
+
+/*---[ Statics ]--------------------------------------------------------------*/
+
+#ifdef EXTENDED_LOG   
+ static pid_t  eventPid            = 0;
+#endif
+ 
+ static GMutex *icqgtk_thread_lock = NULL;
+ static BOOL   icqgtk_event_lock   = FALSE;
+ 
+/*---[ Implementation ]-------------------------------------------------------*/
+
+ static ULONG _System loadSkin(HICQ icq, STATUSCALLBACK *status, int argc, char **argv)
+ {
+    SKINDATA *cfg = icqGetPluginDataBlock(icq,module);
+	
+	if(!cfg || cfg->sz != sizeof(SKINDATA))
+	{
+	   DBGTracex(icqGetSkinDataBlock(icq));
+	   DBGTracex(cfg);
+	   DBGTrace(cfg->sz);
+	   DBGTrace(sizeof(SKINDATA));
+	   icqWriteSysLog(icq,PROJECT,"Invalid or non existent GUI Data Block");
+	   return 0;
+	}
+
+    g_thread_init(NULL);
+
+#ifdef GTK2	
+    gdk_threads_init();
+#endif	
+
+	icqgtk_thread_lock = g_mutex_new();
+	
+    gtk_set_locale();
+    gtk_init(&argc, &argv);
+	
+	icqskin_Initialize(icq,cfg);
+	
+    if(icqInitialize(icq,status))
+	   return 0;
+
+	return (ULONG) cfg;
+ }
+
+ static void logStartup(HICQ icq)
+ {
+	icqPrintLog(icq,PROJECT,"Skin manager %s running (pid=%d)",icqgui_descr.id,getpid());
+ }
+ 
+ static int  _System executeSkin(HICQ icq, ULONG parm)
+ {
+   SKINDATA *cfg = icqskin_Start(icq, parm);
+	
+   if(!cfg)
+      return -1;	
+
+   cfg->pendingEvents = icqCreateList();
+
+   logStartup(icq);
+
+#ifdef EXTENDED_LOG   
+   icqPrintLog(icq,PROJECT,"GTK Main loop running in thread %d",getpid());
+#endif
+
+#ifdef DEBUG   
+   icqskin_loadString(icq, module, 100, NULL, 0);
+#endif   
+   
+
+#ifdef GTK2	
+   gdk_threads_enter();
+#endif
+
+   gtk_main();
+
+#ifdef GTK2	
+   gdk_threads_leave();
+#endif
+
+   usleep(1000);
+
+   icqDestroyList(cfg->pendingEvents);
+
+   g_mutex_free(icqgtk_thread_lock);
+   
+   return icqskin_Stop(icq,cfg);
+ }
+
+ static gboolean eventProcessor(SKINDATA *cfg)
+ {
+    struct icqevent	*e;
+	
+	if(cfg->pendingEvents)
+	{
+	   e = icqQueryFirstElement(cfg->pendingEvents);
+	   if(e)
+	   {
+		  if(!g_mutex_trylock(icqgtk_thread_lock))
+			 return TRUE;
+		  
+          if(icqgtk_event_lock)
+		  {
+ 		     g_mutex_unlock(icqgtk_thread_lock);
+	         return TRUE;
+		  }
+	
+          icqgtk_event_lock = TRUE;
+ 		  g_mutex_unlock(icqgtk_thread_lock);
+
+#ifdef EXTENDED_LOG   
+		  if(eventPid != getpid())
+			 icqPrintLog(cfg->icq,PROJECT,"Event processor running on PID %d",eventPid=getpid());
+#endif
+		  
+          icqskin_event(cfg->icq, e->uin, e->id, e->event, e->parm);
+		  
+	      icqRemoveElement(cfg->pendingEvents,e);	
+		  
+          icqgtk_event_lock = FALSE;
+		  
+	      return TRUE;
+	   }
+	}
+
+    cfg->flags &= ~SKINDATA_FLAGS_HOOKED;
+	return FALSE;
+	
+ }	
+
+ int icqskin_postEvent(HICQ icq, ULONG uin, char id, USHORT ev, ULONG parm)
+ {
+    return event(icq, uin, id, ev, parm, icqskin_getDataBlock(icq));
+ }
+
+ static int _System event(HICQ icq, ULONG uin, char id, USHORT event, ULONG parm, SKINDATA *cfg)
+ {
+    struct icqevent	*e;
+	
+    if(cfg && cfg->pendingEvents)
+    {
+       g_mutex_lock(icqgtk_thread_lock);
+	   
+	   e = icqAddElement(cfg->pendingEvents,sizeof(struct icqevent));
+	   if(e)
+	   {
+		  if(!(cfg->flags & SKINDATA_FLAGS_HOOKED))
+		  {
+			 cfg->flags |= SKINDATA_FLAGS_HOOKED;
+             g_idle_add( (gboolean (*)(gpointer)) eventProcessor,cfg);
+		  }
+			 
+		  e->uin   = uin;
+		  e->id    = id;
+		  e->event = event;
+		  e->parm  = parm;
+	   }
+	   else
+	   {
+		  icqWriteSysLog(icq,PROJECT,"Failure adding event in list");
+		  icqAbend(icq,0);
+	   }
+	   
+	   g_mutex_unlock(icqgtk_thread_lock);
+	   
+    }
+    return 0;
+ }
+
+ static int   _System validateEdit(USHORT sz)
+ {
+    if(sz != sizeof(MSGEDITHELPER))
+       return 2;
+    return 0;
+ }
+
+ static int _System timer(HICQ icq,SKINDATA *skn,char flags)
+ {
+    if(skn && skn->sz == sizeof(SKINDATA))
+    {
+       if(skn->tick++ < 5)
+          return 0;
+
+       skn->tick = 0;
+
+       skn->animate++;
+       skn->animate &= 0x07;
+	
+       event(icq,0,'g',ICQEVENT_TIMER,0,skn);
+    }
+    return 0;
+ }
+
+ int _System popupUserList(HICQ icq)
+ {
+    icqskin_postEvent(icq, 0, 'g', ICQEVENT_POPUP, 0);
+	return 0;
+ }

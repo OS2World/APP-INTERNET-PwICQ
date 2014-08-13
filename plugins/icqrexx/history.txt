@@ -1,0 +1,103 @@
+exit
+rl
+exit
+hex2dec 7fc0
+hex2dec ffff
+rexxtry say 65535 - 32704
+dec2hexx 32831
+dec2hex 32831
+rl
+exit
+rl
+exit
+cmd
+e \public\pwicq2\os2\bin\eventhelpers\icqhost.cmd
+cmd
+less os2start.old
+s:\os2tk45\H\
+grep SHE_ *.h
+grep SAF_ *.h
+less w:os2start.old
+grep PROG_ *.h
+bd
+cmd
+grep SAF_ *.h
+s:
+grep SHE_ *.h
+w:
+cmd
+cmd
+exit
+cmd
+exit
+rl
+exit
+\data\ibmcpp\sources\icq\plugins\icqrexx\
+grep WinStartApp *.c
+less exec.c
+rl
+alias rl
+rl
+exit
+exit
+rl
+exit
+rl
+exit
+run
+less *.rc
+run
+rl
+exit
+grep DLGMGR *.c
+rl
+exit
+rl
+exit
+less ..\icqv7\makefile
+rl
+type \Private\pwicq2\builds.txt
+exit
+..\icqmsg\
+less icqmsg.c
+dir
+rl
+cl
+dir
+bd
+rl
+dir
+exit
+rl
+less makefile
+exit
+exit
+rl
+exit
+\logs\scripts.log
+grep icqFormatIP *.c
+..\..\core\kernel\
+grep -i ip2string *.c
+less tools.c
+rl
+cl
+bd
+rl
+dir
+exit
+exit
+less ..\icqv8\icqv8.spec
+dir
+exit
+\data\ibmcpp\sources\icq2\config\
+open PWICQ.INI
+dir \Public\pwicq\eventhelpers
+bd
+rl
+\Private\pwicq2\
+copy icqwin.dll.new icqwin.dll
+less \data\etc\hosts
+e \data\etc\hosts
+ping pimenta_braba
+exit
+rl & exit

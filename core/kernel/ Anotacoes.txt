@@ -1,0 +1,9 @@
+01/20/2003 12:12:26 icqkrnl
+
+dbgrtf {\rtf1\ansi\def0{\fonttbl{\f0\fswiss MS Sans Serif;}}{\colortbl ;\red0\green0\blue0;}\viewkind4\pard\cf1\f0 http://lan.serverrummet.dk/~kaos/palm/books/LOTR/}
+
+
+01/20/2003 12:12:26 icqkrnl    Unexpected RTF command
+01/20/2003 12:12:26 icqkrnl    \def0
+
+

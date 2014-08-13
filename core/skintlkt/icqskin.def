@@ -1,0 +1,25 @@
+LIBRARY      ICQSKIN
+DATA         MULTIPLE READWRITE PRELOAD NONSHARED
+
+EXPORTS         sknQueryBuild           @1
+                sknRegisterClass        @2
+                sknInitialize           @3
+                sknCreateWindow         @4
+                sknLoad                 @5
+                sknCreate               @6
+                sknPaint                @7
+                sknDestroy              @8
+                sknDoTimer              @9
+                sknSetDrag              @10
+                sknDefaultButtons       @11
+                sknResize               @12
+                sknSearchElement        @13
+                sknDefWindowProc        @14
+                sknConnectListBox       @15
+                sknDrawIcon             @16
+                sknQueryIconSize        @17
+                sknReloadSkin           @18
+                sknQueryIDString	@19
+     	        sknLoadBitmap           @20
+
+

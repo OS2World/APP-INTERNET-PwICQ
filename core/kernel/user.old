@@ -1,0 +1,1457 @@
+/*
+ * user.c - User management
+ */
+
+ #define INCL_DOSPROCESS
+ #define INCL_WINSHELLDATA
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <malloc.h>
+ #include <string.h>
+ #include <ctype.h>
+ #include <icqkernel.h>
+ #include <time.h>
+
+ #ifndef linux
+    #include <io.h>
+ #endif
+
+ #include "icqcore.h"
+
+/*---[ Definicoes ]----------------------------------------------------------------*/
+
+ #define MAX_LINE_SIZE  1024
+
+ struct type
+ {
+    char        code;
+    ULONG       flag;
+ };
+
+/*---[ Constantes ]----------------------------------------------------------------*/
+
+const static struct type userFlags[] =
+                        {
+                                { 'A',    USRF_AUTHORIZE },
+                                { 'a',    USRF_AUTOOPEN },
+                                { 'E',    USRF_EXTENDED },
+                                { 'i',    USRF_IGNORE },
+                                { 'I',    USRF_INVISIBLE },
+                                { 'R',    USRF_REFRESH },
+                                { 'T',    USRF_TEMPORARY },
+                                { 'V',    USRF_VISIBLE },
+                                { 'w',    USRF_WAITING },
+                                { 'X',    USRF_REJECTED },
+                                { 'h',    USRF_HISTORY },
+                                { 'C',    USRF_CACHED  },
+
+                                { 'd',    0 }, // USR_FILEDIR,
+                                { 'F',    0 }, // USR_ACCEPT,
+                                { 'f',    0 }, // USR_AUTORESUME,
+                                { 'H',    0 }, // USR_HIDE,
+                                { 'l',    0 }, // USR_LOGMSG,
+                                { 'm',    0 }, // USR_NOAWAY,
+                                { 'n',    0 }, // USR_NOINFO,
+                                { 'o',    0 }, // USR_NOSNDAWAY,
+                                { 'r',    0 }, // USR_REFUSED,
+                                { 'S',    0 }, // USR_REXX,
+                                { 'W',    0 }, // USR_WINPOS,
+
+                                {  0,     0 }
+                        };
+
+
+/*---[ Funcoes estaticas ]---------------------------------------------------------*/
+
+ static char  *insertString(char *, const char *);
+ static char  *queryString(char **);
+ static ULONG queryValue(char **);
+ static HUSER insertUser(HICQ, const char *, ICQITEM *);
+ static HUSER updateUser(HICQ, HUSER, const char *, const char *, const char *, const char *, const char *, BOOL, BOOL);
+ static char  *getFilename(HICQ, char *, const char *ext);
+ static HUSER insertTemporary(HICQ,ULONG,ULONG,BOOL);
+ static int   procAdding(HICQ, HUSER, ULONG);
+ static int   deleteUser(HICQ, HUSER);
+
+/*---[ Implementation ]------------------------------------------------------------*/
+
+ HUSER EXPENTRY icqInsertTemporaryUser(HICQ icq, ULONG uin)
+ {
+    return insertTemporary(icq,uin,0,TRUE);
+ }
+
+ HUSER EXPENTRY icqAddUserInCache(HICQ icq, ULONG uin)
+ {
+    return insertTemporary(icq,uin,USRF_HIDEONLIST,FALSE);
+ }
+
+ static HUSER insertTemporary(HICQ icq, ULONG uin, ULONG flags, BOOL event)
+ {
+#ifdef EXTENDED_LOG
+    char        logBuffer[0x0100];
+#endif
+
+    char        nickname[40];
+    HUSER       ret             = icqQueryUserHandle(icq,uin);
+
+    if(ret)
+       return ret;
+
+    sprintf(nickname,"%lu",uin);
+
+    DBGPrint("Usuario temporario %lu anexado ***********************",uin);
+
+    ret = icqInsertUser(icq, uin, nickname, "", "", "", "", USRF_TEMPORARY|flags);
+
+    if(!ret)
+       return ret;
+
+    if(icq->c2s && icq->c2s->addUser)
+       icq->c2s->addUser(icq,ret);
+
+    if(event)
+       icqUserEvent(icq, ret, ICQEVENT_USERADDED);
+
+    icq->cntlFlags |= ICQFC_SAVEUSER;
+    ret->u.flags   |= USRF_REFRESH;
+
+#ifdef EXTENDED_LOG
+    sprintf(logBuffer,"Temp User added. RFlags: %08lx (%08lx) OFlags: %08lx Searchs: %u",
+                                (ULONG) icq->cntlFlags & (ICQFC_LOGONCOMPLETE|ICQFC_CLEAR),
+                                (ULONG) ICQFC_LOGONCOMPLETE|ICQFC_CLEAR,
+                                (ULONG) icq->onlineFlags & ICQF_ONLINE,
+                                icq->searchs );
+    DBGMessage(logBuffer);
+    icqWriteSysLog(icq,PROJECT,logBuffer);
+#endif
+
+    return ret;
+
+ }
+
+ static HUSER updateUser(HICQ icq, HUSER usr, const char *nickName, const char *firstName, const char *lastName, const char *email, const char *sound, BOOL auth, BOOL event)
+ {
+    ICQITEM     *itn;
+    HUSER       ret;
+    int         sz      = sizeof(ICQITEM) + sizeof(USERINFO);
+    char        *ptr,*src;
+    char        buffer[80];
+    int         f;
+
+    if(!usr)
+    {
+       icqSysLog(icq,"Invalid user update requested");
+       return NULL;
+    }
+
+    icq->cntlFlags |= ICQFC_SAVEUSER;
+    usr->u.flags   &= ~USRF_REFRESH;
+
+#ifdef EXTENDED_LOG
+    for(ptr = (char *) nickName;*ptr && isspace(*ptr);ptr++);
+
+    if(isspace(*ptr))
+    {
+       icqSysLog(icq,"Invalid update user request - No nickName supplied");
+       nickName = icqQueryUserNick(usr);
+    }
+#endif
+
+    if(isEmpty(nickName))
+       nickName = icqQueryUserNick(usr);
+
+    if(!firstName || !*firstName)
+       firstName = icqQueryUserFirstName(usr);
+
+    if(!lastName || !*lastName)
+       lastName = icqQueryUserLastName(usr);
+
+    if(!email || !*email)
+       email = icqQueryUserEmail(usr);
+
+    if(!sound)
+       sound = icqQueryUserSound(usr);
+
+    if( !(      strcmp(nickName,icqQueryUserNick(usr))
+                | strcmp(firstName,icqQueryUserFirstName(usr))
+                | strcmp(lastName,icqQueryUserLastName(usr))
+                | strcmp(email,icqQueryUserEmail(usr))
+                | strcmp(sound,icqQueryUserSound(usr)) ) )
+    {
+       DBGMessage("Nao foi necessario atualizar o usuario");
+       icqUpdateUserFlag(icq, usr, auth, USRF_AUTHORIZE);
+       if(event)
+          icqUserEvent(icq, usr, ICQEVENT_UPDATED);
+       return usr;
+    }
+
+    DBGMessage("Atualizar dados de usuario");
+    sprintf(buffer,"ICQ#%lu information was updated",usr->u.uin);
+    icqSysLog(icq,buffer);
+
+    usr->u.idle    = 0;
+
+    if(!*nickName)
+    {
+       /* Nao tem nickname */
+       if(*firstName)
+       {
+          nickName = firstName;
+       }
+       else
+       {
+          sprintf(buffer,"%lu",usr->u.uin);
+          nickName = (const char *) buffer;
+       }
+    }
+
+
+    sz += strlen(nickName);
+    sz += strlen(firstName);
+    sz += strlen(lastName);
+    sz += strlen(email);
+    sz += strlen(sound);
+    sz += 7;
+
+    itn = malloc(sz);
+
+    if(!itn)
+    {
+       icqWriteSysLog(icq,PROJECT,"Unable to allocate memory for user update");
+       return NULL;
+    }
+
+    memset(itn,0,sz);
+
+    src = (char *) usr;
+    ptr = (char *) (itn+1);
+    ret = (HUSER) ptr;
+
+    for(f=0;f<sizeof(USERINFO);f++)
+       *(ptr++) = *(src++);
+
+    ptr = insertString((char *)(ret+1), nickName);
+    ptr = insertString(ptr,firstName);
+    ptr = insertString(ptr,lastName);
+    ptr = insertString(ptr,email);
+    ptr = insertString(ptr,sound);
+
+    icqUserEvent(icq, usr, ICQEVENT_WILLCHANGE);
+
+    insertUser(icq, nickName, itn);
+
+    usr->u.flags |= USRF_DELETED;
+    usr->msg      = NULL;
+
+    if(auth)
+       ret->u.flags |= USRF_AUTHORIZE;
+    else
+       ret->u.flags &= ~USRF_AUTHORIZE;
+
+    icqAjustUserIcon(icq,ret,TRUE);
+
+    icqUserEvent(icq, ret, ICQEVENT_UPDATED);
+
+    icq->cntlFlags |= ICQFC_SAVEUSER;
+
+    return ret;
+
+ }
+
+ int EXPENTRY icqAddUserInContactList(HICQ icq, ULONG uin)
+ {
+    return procAdding(icq,icqQueryUserHandle(icq, uin),uin);
+ }
+
+ static int procAdding(HICQ icq, HUSER usr, ULONG uin)
+ {
+    int         ret     = 0;
+
+    if(!usr)
+    {
+       usr = icqInsertTemporaryUser(icq, uin);
+       if(!usr)
+          return -1;
+       usr->u.flags |= USRF_REFRESH;
+    }
+
+    if(!usr)
+       return -1;
+
+    if(icq->c2s && icq->c2s->addUser)
+    {
+       ret = icq->c2s->addUser(icq,usr);
+       if(ret)
+          return ret;
+    }
+
+    usr->u.flags &= ~(USRF_TEMPORARY|USRF_CACHED);
+    usr->u.flags |= USRF_ONLIST;
+
+    if(usr->u.flags & USRF_HIDEONLIST)
+       icqUserEvent(icq, usr, ICQEVENT_SHOW);
+
+    icq->cntlFlags |= ICQFC_SAVEUSER;
+    return ret;
+ }
+
+ HUSER EXPENTRY icqAddNewUser(HICQ icq, ULONG uin, const char *nickName, const char *firstName, const char *lastName, const char *email, BOOL authorize)
+ {
+    HUSER               usr     =  icqQueryUserHandle(icq, uin);
+
+    DBGTracex(usr);
+
+    if(!usr)
+    {
+       usr = icqInsertUser(icq, uin, nickName, firstName, lastName, email, NULL, authorize ? USRF_AUTHORIZE : 0 );
+    }
+    else if(usr->u.flags & USRF_TEMPORARY)
+    {
+       CHKPoint();
+
+       usr->u.flags &= ~USRF_TEMPORARY;
+       usr = updateUser(icq, usr, nickName, firstName, lastName, email, NULL, authorize, TRUE);
+    }
+    else
+    {
+       icqWriteSysLog(icq,PROJECT,"Unexpected add user request");
+       return NULL;
+    }
+
+    procAdding(icq, usr, uin);
+
+    icqSendConfirmation(icq,uin,MSG_ADD,FALSE,NULL);
+
+    return usr;
+
+ }
+
+ HUSER EXPENTRY icqUpdateUserInfo(HICQ icq, ULONG uin, BOOL add, const char *nickName, const char *firstName, const char *lastName, const char *email, BOOL authorize)
+ {
+    HUSER usr;
+
+    if(uin == icq->uin)
+    {
+       if(isEmpty(nickName))
+          return NULL;
+
+       DBGMessage("Atualizar usuario corrente");
+       icqSaveString(icq, "NickName",   nickName);
+       icqSaveString(icq, "FirstName",  firstName);
+       icqSaveString(icq, "LastName",   lastName);
+       icqSaveString(icq, "EMail",      email);
+       icqSaveValue( icq, "Authorize",  authorize ? 1 : 0);
+       icqSaveValue( icq, "UpdateUser", 0);
+       return NULL;
+    }
+
+    usr =  icqQueryUserHandle(icq, uin);
+
+    if(usr)
+    {
+       usr->u.flags &= ~USRF_REFRESH;
+       if(isEmpty(nickName))
+          nickName = firstName;
+       return updateUser(icq, usr, nickName, firstName, lastName, email, NULL, authorize, FALSE);
+    }
+
+    if(add)
+       return icqInsertUser(icq, uin, nickName, firstName, lastName, email, "", authorize ? USRF_AUTHORIZE : 0);
+
+    usr = icqInsertUser(icq, uin, nickName, firstName, lastName, email, "", (authorize ? USRF_AUTHORIZE : 0)|USRF_HIDEONLIST|USRF_TEMPORARY);
+
+    icq->cntlFlags |= ICQFC_SAVEUSER;
+
+    return usr;
+ }
+
+ HUSER EXPENTRY icqInsertUser(HICQ icq, ULONG uin, const char *nickName, const char *firstName, const char *lastName, const char *email, const char *sound, ULONG flags)
+ {
+    ICQITEM     *itn;
+    int         sz      = sizeof(ICQITEM) + sizeof(USERINFO);
+    HUSER       usr;
+    char        *ptr;
+
+    if(!uin || uin == icq->uin || icq->sz != sizeof(ICQ))
+    {
+       icqWriteSysLog(icq, PROJECT, "Invalid request in icqInsertUser()");
+       return NULL;
+    }
+
+    sz += strlen(nickName);
+    sz += strlen(firstName);
+    sz += strlen(lastName);
+    sz += strlen(email);
+    sz += strlen(sound);
+    sz += 7;
+
+    itn = malloc(sz);
+
+    if(!itn)
+       return NULL;
+
+    memset(itn,0,sz);
+    usr = (HUSER) (itn+1);
+
+    /* Inicializa campos para default */
+    usr->u.sz           = sizeof(ICQUSER);
+    usr->u.uin          = uin;
+    usr->u.flags        = flags;
+    usr->u.mode         = icqQueryOfflineMode(icq);
+    usr->u.offlineIcon  = 10;
+
+    usr->msg            = icqCreateList();
+
+    icqAjustUserIcon(icq,usr,TRUE);
+
+    /* Copia informacoes do usuario */
+    ptr = insertString((char *)(usr+1), nickName);
+    ptr = insertString(ptr,firstName);
+    ptr = insertString(ptr,lastName);
+    ptr = insertString(ptr,email);
+    ptr = insertString(ptr,sound);
+
+    insertUser(icq, nickName, itn);
+
+    icqUserEvent(icq, usr, ICQEVENT_UPDATED);
+
+    return usr;
+ }
+
+ static HUSER insertUser(HICQ icq, const char *nickName, ICQITEM *itn)
+ {
+    ICQITEM     *i;
+    ICQITEM     *pos    = NULL;
+
+    icqLockList(icq->users);
+
+    for(i = icq->users->first; i && !pos; i = i->down)
+    {
+       if(stricmp((((char *) i) + sizeof(ICQITEM) + sizeof(USERINFO)),nickName) > 0)
+          pos = i;
+    }
+
+    if(pos)
+    {
+       /* Inserir antes do usuario em POS */
+       itn->up          = pos->up;
+       itn->down        = pos;
+
+       if(itn->down)
+          itn->down->up         = itn;
+       else
+          icq->users->last      = itn;
+
+       if(itn->up)
+          itn->up->down         = itn;
+       else
+          icq->users->first     = itn;
+
+    }
+    else
+    {
+       /* Inserir no final da lista */
+
+       if(icq->users->first == NULL)
+       {
+          /* A lista est  vazia */
+          icq->users->first = icq->users->last = itn;
+          itn->up                              = itn->down = NULL;
+       }
+       else
+       {
+          /* Tem elemento na lista, anexa no final */
+          icq->users->last->down = itn;
+          itn->up                = icq->users->last;
+          itn->down              = NULL;
+          icq->users->last       = itn;
+       }
+    }
+
+    icqUnlockList(icq->users);
+
+    return (HUSER) (itn+1);
+
+ }
+
+ static char *insertString(char *dst, const char *src)
+ {
+    strcpy(dst,src);
+    dst += strlen(src)+1;
+    return dst;
+ }
+
+ static char * getFilename(HICQ icq, char *buffer, const char *ext)
+ {
+    char key[40];
+
+    sprintf(key,"%lu.%s",icq->uin,ext);
+    icqQueryPath(icq,key,buffer,0xFF);
+
+/*
+    icqLoadString(icq, "contact-list", "", buffer, 0xFF);
+    if(!*buffer)
+    {
+       sprintf(key,"%lu.%s",icq->uin,ext);
+       icqQueryPath(icq,key,buffer,0xFF);
+    }
+*/
+    return buffer;
+ }
+
+ void loadUserList(HICQ icq)
+ {
+    FILE                *arq;
+    char                buffer[0x0100];
+    char                *ptr;
+    ULONG               uin;
+    char                *nickname;
+    char                *firstname;
+    char                *lastname;
+    char                *sound;
+    char                *email;
+    char                *flags;
+    ULONG               UFlag;
+    ULONG               gMasc;
+    ULONG               lastOnline;
+    ULONG               lastMsg;
+    ULONG               memberSince;
+    ULONG               lastAction;
+    HUSER               usr;
+    UCHAR               age;
+    UCHAR               sex;
+    int                 qtd             = 0;
+    BOOL                oldFormat       = TRUE;
+    USHORT              c2sGroup        = 0;
+    USHORT              c2sIDNumber     = 0;
+    const struct type   *types;
+#ifdef __OS2__
+//    BOOL                convert         = icqLoadValue(icq,"cnvtUsersFile", 0) && icq->convertCpg;
+    ULONG               fileCpg         = icqLoadValue(icq,"cnvtUsersFile", 0) && icq->convertCpg ? icq->cpgOut : 0;
+#endif
+
+    sprintf(buffer,"Loading contact-list for ICQ#%lu",icq->uin);
+    sysLog(icq,buffer);
+
+#ifdef __OS2__
+
+    getFilename(icq,buffer,"dat");
+    DBGMessage(buffer);
+
+    if(access(buffer,0))
+    {
+       uin     = 0x80;
+       if(PrfQueryProfileData(HINI_USERPROFILE, "pwICQ", "ProgramPath", buffer, &uin))
+          *(buffer+uin) = 0;
+       else
+          *buffer = 0;
+
+       sprintf(buffer+strlen(buffer),"%lu.dat",icq->uin);
+       DBGMessage(buffer);
+       fileCpg = 0;
+    }
+
+    arq = fopen(buffer,"r");
+
+#else
+
+    arq = fopen(getFilename(icq,buffer,"dat"),"r");
+
+#endif
+
+    if(!arq)
+    {
+       sprintf(buffer,"Can't open contact-list file");
+       sysLog(icq,buffer);
+       return;
+    }
+
+    while(!feof(arq))
+    {
+       *buffer = 0;
+       fgets(buffer,0xFF,arq);
+
+#ifdef __OS2__
+       if(fileCpg && fileCpg != icq->cpgIn && icq->convertCpg)
+          icq->convertCpg(icq,fileCpg,icq->cpgIn,buffer,-1);
+#endif
+
+       switch(*buffer)
+       {
+       case 0:
+       case ';':
+          break;
+
+       case '$':
+          oldFormat = FALSE;
+#ifdef __OS2__
+          if(!strncmp(buffer+1,"OS2",3) && atoi(buffer+5) == icq->countryCode)
+             fileCpg = atoi(buffer+9);
+#endif
+          break;
+
+       default:
+          if(isdigit(*buffer))
+          {
+             for(ptr=buffer;*ptr && *ptr != ',';ptr++);
+
+             if(*ptr == ',')
+             {
+                *(ptr++)    = 0;
+                uin         = atol(buffer);
+                nickname    = queryString(&ptr);
+                email       = queryString(&ptr);
+                flags       = queryString(&ptr);
+                gMasc       = queryValue(&ptr);
+                firstname   = queryString(&ptr);
+                lastname    = queryString(&ptr);
+                sound       = queryString(&ptr);
+                lastOnline  = queryValue(&ptr);
+                lastMsg     = queryValue(&ptr);
+                memberSince = queryValue(&ptr);
+                lastAction  = queryValue(&ptr);
+                sex         = queryValue(&ptr);
+                age         = queryValue(&ptr);
+                c2sGroup    = queryValue(&ptr);
+                c2sIDNumber = queryValue(&ptr);
+
+                for(UFlag = 0;*flags;flags++)
+                {
+                   for(types = userFlags;types->code && types->code != *flags;types++);
+                   if(types->code == *flags)
+                      UFlag |= types->flag;
+                }
+
+                if(UFlag & USRF_TEMPORARY)
+                   UFlag |= USRF_HIDEONLIST;
+                else if( !(UFlag & USRF_REJECTED) )
+                   UFlag |= USRF_ONLIST;
+
+                usr = icqInsertUser(icq, uin, nickname, firstname, lastname, email, sound, UFlag);
+                if(usr)
+                {
+                   usr->u.idle          = 10;
+                   usr->u.groupMasc     = gMasc;
+                   usr->u.lastOnline    = lastOnline;
+                   usr->u.memberSince   = memberSince;
+                   usr->u.lastMessage   = lastMsg;
+                   usr->u.lastAction    = lastAction;
+                   usr->u.age           = age;
+                   usr->u.sex           = sex;
+                   usr->u.c2sGroup      = c2sGroup;
+                   usr->u.c2sIDNumber   = c2sIDNumber;
+                   icqAjustUserIcon(icq, usr, TRUE);
+                }
+                qtd++;
+             }
+          }
+       }
+    }
+
+    fclose(arq);
+
+    if(oldFormat)
+    {
+       sprintf(buffer,"%d users in converted list",qtd);
+       icq->cntlFlags |= ICQFC_SAVEUSER;
+    }
+    else
+    {
+       sprintf(buffer,"%d users in list",qtd);
+    }
+
+
+    sysLog(icq,buffer);
+ }
+
+ static char *queryString(char **str)
+ {
+    char *ret = *str;
+    char *ptr;
+
+    while(*ret && *ret != '\"')
+       ret++;
+
+    if(!*ret)
+    {
+       *str = ret;
+       return "";
+    }
+
+    ret++;
+
+    for(ptr = ret;*ptr && *ptr != '\"';ptr++);
+
+    if(!*ptr)
+    {
+       *str = ptr;
+       return ret;
+    }
+    *(ptr++) = 0;
+
+    *str = ptr;
+    return ret;
+ }
+
+ static ULONG queryValue(char **str)
+ {
+    char        *ptr   = *str;
+    ULONG       ret     = 0;
+
+    while(*ptr && (isspace(*ptr) || *ptr == ','))
+       ptr++;
+
+    if(!*ptr)
+    {
+       *str = ptr;
+       return 0;
+    }
+
+    if(*ptr == '\"')
+       return atol(queryString(str));
+
+    while(*ptr && isdigit(*ptr))
+    {
+       ret *= 10;
+       ret += (*ptr & 0x0F);
+       ptr++;
+    }
+    *str = ptr;
+
+    return ret;
+ }
+
+
+ void saveUserList(HICQ icq, BOOL mkBackup)
+ {
+    char                buffer[0x0100];
+    char                            temp[0x0100];
+    char                key[20];
+    HUSER               usr;
+    const struct type   *types;
+    FILE                *arq;
+    char                *ptr;
+    time_t              tm;
+//    int                 rc;
+    char                *lineBuffer;
+#ifdef __OS2__
+    BOOL                convert         = icqLoadValue(icq,"cnvtUsersFile", 0) && icq->convertCpg;
+#endif
+
+    if(!(icq->cntlFlags & ICQFC_STARTUPOK))
+       return;
+
+    if(!(icq->cntlFlags &ICQFC_SAVEUSER))
+       return;
+
+    icq->cntlFlags &= ~ICQFC_SAVEUSER;
+
+    sysLog(icq,"Saving contact-list");
+
+    time(&tm);
+
+    lineBuffer = malloc(MAX_LINE_SIZE);
+
+    if(!lineBuffer)
+    {
+       sysLog(icq,"Memory allocation error in contact-list save procedure");
+       return;
+    }
+
+    arq = fopen(getFilename(icq, buffer, "tmp"),"w");
+    if(!arq)
+    {
+       sysLog(icq,"Unable to write user information file");
+       free(lineBuffer);
+       return;
+    }
+
+    fprintf(arq,   ";This is an automatically generated file.\n"
+                   ";It will be read and overwritten.\n"
+                   ";Do Not Edit!\n"
+                   ";Created by pwICQ"
+#ifdef __OS2__
+                   " for OS/2"
+#endif
+#ifdef linux
+                   " for linux"
+#endif
+                   " version " PWICQVERSION " Build " BUILD "\n"
+                );
+
+#ifdef __OS2__
+    fprintf(arq,        "$%s %03u %04u %08u\n",
+                        "OS2",
+                        icq->countryCode,
+                        convert ? icq->cpgOut : icq->cpgIn,
+                        icq->countryCode^icq->cpgIn );
+#endif
+
+#ifdef linux
+    fprintf(arq,"$LNX\n");
+#endif
+
+
+    for(usr = icqQueryFirstElement(icq->users);usr;usr = icqQueryNextElement(icq->users,usr))
+    {
+#ifdef DEBUG
+       if(usr->u.sz != sizeof(ICQUSER))
+          DBGMessage("-------->>>> ERRO NO ENCADEAMENTO DE USUARIOS");
+#endif
+
+
+
+       if(usr->u.lastAction && (usr->u.flags & USRF_REJECTED) && difftime(tm,usr->u.lastAction) > 4320)
+       {
+          // Usuario rejeitados sao removidos em 4 dias
+          sprintf(lineBuffer,"Discarding rejected user %s (ICQ#%ld)",icqQueryUserNick(usr),usr->u.uin);
+          icqWriteSysLog(icq,PROJECT,lineBuffer);
+       }
+       else if(usr->u.lastAction && (usr->u.flags & USRF_HIDEONLIST) && (usr->u.flags & USRF_TEMPORARY) && !(usr->u.flags & USRF_IGNORE) && difftime(tm,usr->u.lastAction) > 172800)
+       {
+          sprintf(lineBuffer,"Discarding temporary user %s (ICQ#%ld)",icqQueryUserNick(usr),usr->u.uin);
+          icqWriteSysLog(icq,PROJECT,lineBuffer);
+          usr->u.flags &= USRF_DELETED;
+       }
+
+       if(!(usr->u.flags&USRF_DELETED))
+       {
+          *(ptr=key) = 0;
+          for(types = userFlags;types->code;types++)
+          {
+             if(usr->u.flags & types->flag)
+                *(ptr++) = types->code;
+          }
+          *ptr = 0;
+
+#ifdef __OS2__
+          sprintf(lineBuffer,
+                        "%lu,\"%s\",\"%s\",\"%s\",%lu,\"%s\",\"%s\",\"%s\",",
+                        usr->u.uin,
+                        icqQueryUserNick(usr),
+                        icqQueryUserEmail(usr),
+                        key,
+                        usr->u.groupMasc,
+                        icqQueryUserFirstName(usr),
+                        icqQueryUserLastName(usr),
+                        ""
+          );
+
+          if(convert)
+             icqConvertCodePage(icq, FALSE, lineBuffer, -1);
+
+          fprintf(arq,lineBuffer);
+#else
+          fprintf(arq,"%lu,",usr->u.uin);
+          fprintf(arq,"\"%s\",",icqQueryUserNick(usr));
+          fprintf(arq,"\"%s\",",icqQueryUserEmail(usr));
+          fprintf(arq,"\"%s\",",key);
+          fprintf(arq,"%lu,",usr->u.groupMasc);
+          fprintf(arq,"\"%s\",",icqQueryUserFirstName(usr));
+          fprintf(arq,"\"%s\",",icqQueryUserLastName(usr));
+          fprintf(arq,"\"%s\",","");
+#endif
+
+          fprintf(arq,"%lu,",usr->u.lastOnline);
+          fprintf(arq,"%lu,",usr->u.lastMessage);
+          fprintf(arq,"%lu,",usr->u.memberSince);
+          fprintf(arq,"%lu,",usr->u.lastAction);
+          fprintf(arq,"%d,",usr->u.sex);
+          fprintf(arq,"%d,",usr->u.age);
+          fprintf(arq,"%d,",usr->u.c2sGroup);
+          fprintf(arq,"%d",usr->u.c2sIDNumber);
+
+          fprintf(arq,"\n");
+
+       }
+    }
+
+    strcpy(buffer,ctime(&tm));
+
+    for(ptr = buffer;*ptr && *ptr >= ' ';ptr++);
+    *ptr = 0;
+
+    fprintf(arq,   ";%s\n", buffer);
+
+#ifdef __OS2__
+    fprintf(arq,   ";@#PerryWerneck: " PWICQVERSION " #@##1##%s %s:"ASDFEATUREID":%u:%u:0::" LEVEL_REQUIRED "@@pwICQ contact-list file\n",
+                                buffer, getenv("HOSTNAME"), convert ? icq->cpgOut : icq->cpgIn,icq->countryCode );
+#endif
+
+    fclose(arq);
+
+    remove(getFilename(icq, buffer, "bak"));
+    rename(getFilename(icq, buffer, "dat"), getFilename(icq,temp,"bak"));
+    rename(getFilename(icq, buffer, "tmp"), getFilename(icq,temp,"dat"));
+
+    free(lineBuffer);
+
+
+
+ }
+
+ HUSER EXPENTRY icqQueryUserHandle(HICQ icq, ULONG uin)
+ {
+    HUSER ret;
+
+    for(ret = icqQueryFirstElement(icq->users);ret && ((ret->u.uin != uin) || (ret->u.flags&USRF_DELETED));ret = icqQueryNextElement(icq->users,ret));
+
+#ifdef DEBUG
+    if(ret && ret->u.uin != uin)
+    {
+       icqWriteSysLog(icq,PROJECT,"FATAL ERROR!! Failure in userlist management");
+       DBGMessage("*************** ERRO GRAVE!!!! Achou o usuario errado");
+       icq->ready = FALSE;
+    }
+#endif
+    return ret;
+ }
+
+ HUSER EXPENTRY icqQueryUserByNick(HICQ icq, const char *nick)
+ {
+    ULONG uin;
+    HUSER ret;
+
+    if(!icq->users)
+       return NULL;
+
+    for(ret = icqQueryFirstElement(icq->users);ret && (stricmp((char *)(ret+1),nick) || (ret->u.flags|USRF_DELETED));ret = icqQueryNextElement(icq->users,ret));
+
+    if(ret)
+       return ret;
+
+    uin = atoi(nick);
+
+    if(uin)
+       return icqQueryUserHandle(icq, uin);
+
+    return ret;
+ }
+
+ HUSER EXPENTRY icqQueryNextUser(HICQ icq, HUSER usr)
+ {
+    /* Obtem o proximo usuario da lista */
+
+    if(!icq->users)
+       return NULL;
+
+    if(usr)
+       usr = icqQueryNextElement(icq->users,usr);
+    else
+       usr = icqQueryFirstElement(icq->users);
+
+    while(usr && usr->u.flags & (USRF_DELETED|USRF_CACHED) )
+       usr = icqQueryNextElement(icq->users,usr);
+
+    return usr;
+
+ }
+
+ HUSER EXPENTRY icqSetUserOnlineMode(HICQ icq, ULONG uin, ULONG mode)
+ {
+    char        buffer[0x0100];
+    HUSER       usr             = icqQueryUserHandle(icq,uin);
+    ULONG       offline         = icqQueryOfflineMode(icq);
+    ULONG       lastMode;
+    USHORT      event           = 0xFFFF;
+
+    if(!usr)
+       return usr;
+
+    usr->u.idle = 0;
+
+    if(usr->u.mode == mode)
+       return usr;
+
+    lastMode    = usr->u.mode;
+    usr->u.mode = mode;
+
+    icqAjustUserIcon(icq,usr,TRUE);
+
+    if(mode == offline)
+    {
+       sprintf(buffer,"User %s (ICQ#%ld) is offline",(char *)(usr+1),usr->u.uin);
+       sysLog(icq,buffer);
+       event = ICQEVENT_OFFLINE;
+
+       usr->u.flags     &= ~USRF_ONLINE;
+
+       usr->ip[0]        =
+       usr->ip[1]        = 0;
+       usr->port         = 0;
+
+    }
+    else if(lastMode == offline)
+    {
+       usr->ip[0]         =
+       usr->ip[1]         = 0;
+
+       usr->port          = 0;
+
+       usr->u.lastAction  =
+       usr->u.lastOnline  = time(NULL);
+
+       usr->u.flags      |= USRF_ONLINE;
+
+       sprintf(buffer,"User %s (ICQ#%ld) is online",(char *)(usr+1),usr->u.uin);
+       sysLog(icq,buffer);
+
+       event = ICQEVENT_ONLINE;
+    }
+    else
+    {
+       event = ICQEVENT_CHANGED;
+       icqRegisterUserAction(usr);
+    }
+
+    if(!(usr->u.flags & USRF_HIDEONLIST))
+       icqUserEvent(icq, usr, event);
+
+    return usr;
+ }
+
+ HUSER EXPENTRY icqUserOnline(HICQ icq, ULONG uin, ULONG status, long ip, long gateway, short port, long tcpVersion, ULONG version)
+ {
+    char        buffer[0x0100];
+    HUSER       usr             = icqQueryUserHandle(icq,uin);
+
+    if(!usr)
+       return usr;
+
+    usr->u.idle                 = 0;
+    usr->ip[0]                  = ip;
+    usr->port                   = port;
+
+    usr->u.clientVersion        = version;
+    usr->u.peerVersion          = tcpVersion;
+    usr->u.lastOnline           = time(NULL);
+
+    usr->u.flags                |= USRF_ONLINE;
+
+    if(usr->ip[1] != gateway)
+    {
+       usr->ip[1] = gateway;
+       icqUserEvent(icq, usr, ICQEVENT_IPCHANGED);
+
+       sprintf(buffer,"User %s (ICQ#%ld) is online at ",(char *)(usr+1),usr->u.uin);
+       icqIP2String(gateway, buffer+strlen(buffer));
+       strncat(buffer," (changed)",0xFF);
+    }
+    else if(usr->u.mode == icqQueryOfflineMode(icq))
+    {
+       sprintf(buffer,"User %s (ICQ#%ld) is online at ",(char *)(usr+1),usr->u.uin);
+       icqIP2String(gateway, buffer+strlen(buffer));
+       strncat(buffer," (no change)",0xFF);
+    }
+    else if(usr->u.mode == status)
+    {
+       DBGMessage("Repetiu status de usuario");
+       return usr;
+    }
+    else
+    {
+       sprintf(buffer,"User %s (ICQ#%ld) online (%s)",(char *)(usr+1),usr->u.uin,gateway ? "No change" : "No IP Address");
+    }
+
+    usr->u.mode = status;
+
+    sysLog(icq,buffer);
+
+    icqAjustUserIcon(icq,usr,TRUE);
+
+    icqUserEvent(icq, usr, ICQEVENT_ONLINE);
+
+    return usr;
+ }
+
+/*
+#ifdef linux
+ int stricmp(const char *str1, const char *str2)
+ {
+     char c1, c2;
+
+     while ((c1 = (char)toupper(*str1)) == (c2 = (char)toupper(*str2)) && c1 != '\0')
+     {
+         str1++;
+         str2++;
+     }
+     return (c1 - c2);
+ }
+#endif
+*/
+
+ USHORT EXPENTRY icqQueryUserPosLimit(HICQ icq)
+ {
+    /*
+     * Posicoes para a lista
+     *
+     * 0 - Online e com evento
+     * 1 - Online, sem evento, com atividade
+     * 2 - Online, sem evento e sem atividade
+     * 3 - Offline e com evento
+     * 4 - Offline, sem evento, com atividade
+     * 5 - Offline, sem evento e sem atividade
+     * 6 - Aguardando autorizacao
+     *
+     */
+    return 7;
+ }
+
+ void EXPENTRY icqAjustUserIcon(HICQ icq, HUSER usr, BOOL event)
+ {
+    ICQMSG                       *msg           = NULL;
+    USHORT                       modeIcon       = usr->u.modeIcon;
+    USHORT                       eventIcon      = usr->u.eventIcon;
+    USHORT                       index          = usr->u.index;
+
+#ifdef NDEBUG
+    if(!usr)
+       return;
+#else
+    if(!usr)
+    {
+       DBGMessage("**************** ERRO GRAVE! Tentou ajustar icone de usuario inexistente");
+       return;
+    }
+#endif
+
+    /* Verifica o primeiro evento do usuario */
+    if(usr->msg)
+       msg = icqQueryFirstElement(usr->msg);
+
+    /* Ajusta posicionamento do usuario */
+    if(msg)
+    {
+       /* Tem evento no usuario */
+       usr->u.index     = 0;
+       usr->u.idle      = 0;    /* Usuario com evento pendente nao conta como IDLE */
+
+       if(usr->u.flags & USRF_HIDEONLIST)
+          icqUserEvent(icq, usr, ICQEVENT_SHOW);
+
+    }
+    else if(usr->u.idle < 5)
+    {
+       /* Teve atividade nos £ltimos 5 minutos */
+       usr->u.index     = 1;
+    }
+    else
+    {
+       /* Usuario sem atividade */
+       usr->u.index = 2;
+    }
+
+    /* Faz a corre‡Æo da posicao de acordo com o modo */
+
+    if( usr->u.mode  == icqQueryOfflineMode(icq))
+    {
+       /* Usuario offline, ajustar de acordo */
+       usr->u.modeIcon  = usr->u.offlineIcon;
+       usr->u.index    += 3;
+
+       if(usr->u.flags & USRF_REJECTED)
+       {
+          usr->u.index    = 6;
+          usr->u.modeIcon = 32;
+       }
+       else if(!msg && (usr->u.flags & USRF_WAITING))
+       {
+          usr->u.index = 6;
+       }
+
+    }
+    else
+    {
+       /* Usuario online, ajustar ¡cone */
+       usr->u.modeIcon = icqQueryModeIcon(icq,usr->u.mode);
+    }
+
+    if(msg)
+    {
+       if(msg->mgr)
+          usr->u.eventIcon = msg->mgr->icon[0];
+       else
+          usr->u.eventIcon = 0;
+    }
+    else
+    {
+       usr->u.eventIcon = usr->u.modeIcon;
+
+       if(usr->u.flags & USRF_HIDEONLIST)
+          usr->u.index = 0xFFFF;           /* Manda bem p'ro final de forma a nao aparecer na lista */
+    }
+
+/*
+    if(msg && msg->mgr)
+       usr->u.eventIcon = msg->mgr->icon[0];
+    else
+       usr->u.eventIcon = usr->u.modeIcon;
+*/
+
+    if(event)
+    {
+       if( (usr->u.eventIcon != eventIcon) || (usr->u.modeIcon != modeIcon) )
+          icqUserEvent(icq, usr, ICQEVENT_ICONCHANGED);
+       if(usr->u.index != index)
+          icqUserEvent(icq, usr, ICQEVENT_POSCHANGED);
+    }
+
+ }
+
+ void EXPENTRY icqOpenUserMessageWindow(HICQ icq, HUSER usr)
+ {
+    openUserMessageWindow(icq, usr, TRUE);
+ }
+
+ void openUserMessageWindow(HICQ icq, HUSER usr, BOOL edit)
+ {
+    HMSG        m   = NULL;
+
+    CHKPoint();
+
+    if(!(icq && usr))
+       return;
+
+    if(ALWAYS_HIDE_USER(icq,usr))
+       return;
+
+    DBGMessage("Abrir caixa de mensagems para o usuario");
+
+    m = icqQueryFirstElement(usr->msg);
+
+    DBGTracex(m);
+
+    if(m)
+    {
+       DBGMessage("Usuario tem mensagem, abri-la");
+       icqOpenMessage(icq, usr->u.uin, m);
+       return;
+    }
+
+    if(edit)
+       icqNewUserMessage(icq, usr->u.uin, 0, 0, 0);
+
+/*
+    if(icq->skin && icq->skin->newMessage)
+       icq->skin->newMessage(icq, usr->u.uin, MSG_NORMAL, 0, 0);
+    else
+       icqWriteSysLog(icq,PROJECT,"Can't determine a valid message editor");
+*/
+
+ }
+
+ void EXPENTRY icqSetUserAutoOpen(HICQ icq, HUSER usr, BOOL flag)
+ {
+    if(flag)
+       usr->u.flags |= USRF_AUTOOPEN;
+    else
+       usr->u.flags &= ~USRF_AUTOOPEN;
+
+    icqUserEvent(icq, usr, ICQEVENT_UPDATED);
+
+ }
+
+ void EXPENTRY icqNewUserMessage(HICQ icq, ULONG uin, USHORT type, const char *p1, const char *p2)
+ {
+    const MSGMGR *mgr = icqQueryMessageManager(icq, type);
+
+#ifdef DEBUG
+
+    DBGTracex(mgr);
+
+    if(mgr)
+    {
+       DBGTrace(mgr->sz);
+       DBGTracex(mgr->edit);
+    }
+
+    if(icq->skin)
+    {
+       DBGTracex(icq->skin);
+       DBGTracex(icq->skin->newMessage);
+    }
+
+#endif
+
+    if(mgr && mgr->edit)
+    {
+       CHKPoint();
+       mgr->edit(icq,uin,TRUE,NULL,p1,p2);
+    }
+    else if(icq->skin && icq->skin->newMessage)
+    {
+       CHKPoint();
+       icq->skin->newMessage(icq,uin,type,p1,p2);
+    }
+    else
+    {
+       CHKPoint();
+       sysLog(icq,"Can't determine a valid message editor");
+    }
+
+ }
+
+ ULONG EXPENTRY icqUpdateUserFlag(HICQ icq, HUSER usr, BOOL modo, ULONG flag)
+ {
+    ULONG lastStatus = usr->u.flags;
+
+    if(modo)
+       usr->u.flags |= flag;
+    else
+       usr->u.flags &= ~flag;
+
+    if(lastStatus == usr->u.flags)
+       return usr->u.flags;
+
+    /* Tabela de flags foi mudada */
+
+    icq->cntlFlags |= ICQFC_SAVEUSER;
+    icqUserEvent(icq, usr, ICQEVENT_UPDATED);
+
+    return usr->u.flags;
+ }
+
+ static int RejectUser(HICQ icq, HUSER usr)
+ {
+#ifdef EXTENDED_LOG
+    char        logBuffer[0x0100];
+    int         qtdRemoved      = 0;
+#endif
+    HMSG        msg;
+
+    if(!usr)
+       return -1;
+
+    msg = icqQueryFirstElement(usr->msg);
+
+    if(msg)
+    {
+#ifdef EXTENDED_LOG
+       sprintf(logBuffer,"Removing messages from ICQ#%lu",usr->u.uin);
+       icqWriteSysLog(icq,PROJECT,logBuffer);
+#endif
+       while(msg)
+       {
+          icqRemoveElement(usr->msg,msg);
+#ifdef EXTENDED_LOG
+          qtdRemoved++;
+#endif
+          msg = icqQueryFirstElement(usr->msg);
+       }
+
+#ifdef EXTENDED_LOG
+       sprintf(logBuffer,"Removed messages: %d",qtdRemoved);
+       icqWriteSysLog(icq,PROJECT,logBuffer);
+#endif
+
+       icqUserEvent(icq,usr,ICQEVENT_MESSAGECHANGED);
+       icq->cntlFlags |= ICQFC_SAVEQUEUES;
+    }
+
+    icqUserEvent(icq, usr, ICQEVENT_HIDE);
+
+    if(icq->userDB && icq->userDB->deleteUserDB)
+       icq->userDB->deleteUserDB(icq,usr);
+
+#ifdef EXTENDED_LOG
+       icqWriteSysLog(icq,PROJECT,"User Rejected");
+#endif
+
+    return 0;
+ }
+
+
+ ULONG EXPENTRY icqRejectUser(HICQ icq, HUSER usr, BOOL spammer)
+ {
+    ULONG       uin     = usr->u.uin;
+    int         ret     = RejectUser(icq,usr);
+
+    if(ret)
+    {
+#ifdef EXTENDED_LOG
+       icqWriteUserLog(icq,PROJECT, usr, "Failure rejecting user");
+#endif
+       return ret;
+    }
+
+
+    if(usr->u.flags & USRF_REJECTED)
+    {
+#ifdef EXTENDED_LOG
+       icqWriteUserLog(icq,PROJECT, usr, "Already rejected");
+#endif
+       return 0;
+    }
+
+    usr->u.flags |= USRF_IGNORE|USRF_REJECTED;
+
+    if(spammer)
+    {
+#ifdef EXTENDED_LOG
+       icqWriteUserLog(icq,PROJECT, usr, "Adding in ICQ# Blacklist (temporary)");
+#endif
+       icqBlacklistUser(icq,uin);
+       deleteUser(icq, usr);
+    }
+#ifdef EXTENDED_LOG
+    else
+    {
+       icqWriteUserLog(icq,PROJECT, usr, "Not added in temporary blacklist");
+    }
+#endif
+
+    return ret;
+
+ }
+
+ static int removeUser(HICQ icq, HUSER usr)
+ {
+    int ret   = 0;
+
+    if( (usr->u.flags & USRF_ONLIST) && icq->c2s && icq->c2s->delUser)
+       ret = icq->c2s->delUser(icq,usr);
+
+    if(ret)
+       return ret;
+
+    return 0;
+
+ }
+
+ static int deleteUser(HICQ icq, HUSER usr)
+ {
+    icqWriteUserLog(icq,PROJECT,usr, "User removed");
+    icqUserEvent(icq,usr,ICQEVENT_DELETED);
+    icq->cntlFlags |= ICQFC_SAVEUSER;
+    usr->u.flags   |= USRF_DELETED;
+    return 0;
+ }
+
+ ULONG EXPENTRY icqRemoveUser(HICQ icq, HUSER usr)
+ {
+    int ret = removeUser(icq,usr);
+
+    if(ret)
+    {
+       icqWriteUserLog(icq,PROJECT,usr, "Can't remove user");
+       icqUserEvent(icq,usr,ICQEVENT_CANTREMOVE);
+       return ret;
+    }
+
+    ret = RejectUser(icq,usr);
+
+    if(ret)
+    {
+       icqWriteUserLog(icq,PROJECT,usr, "Can't reject user");
+       icqUserEvent(icq,usr,ICQEVENT_CANTREMOVE);
+       return ret;
+    }
+
+    return deleteUser(icq,usr);
+
+ }
+
+ void EXPENTRY icqRegisterUserAction(HUSER usr)
+ {
+    usr->u.lastMessage = time(NULL);
+ }

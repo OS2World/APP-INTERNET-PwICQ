@@ -1,0 +1,23 @@
+
+[executer]
+RunInTerminal=true
+
+[Project DBase]
+ShowLocals=true
+
+[filenumbers]
+0=54
+1=20
+2=29
+3=49
+
+[filemarkers]
+0=
+1=
+2=
+3=
+
+[filelist]
+0=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqulog/icqulog.c
+1=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqulog/makefile
+2=/mnt/os2data/data/ibmcpp/sources/icq2/core/lnxlib/pwicqlib.c

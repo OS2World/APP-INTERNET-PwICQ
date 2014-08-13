@@ -1,0 +1,149 @@
+/*
+ * gtkbutton.c - GTK Implementation of pwICQGUI Button system
+ */
+
+ #include <pwicqgui.h>
+ #include <malloc.h>
+ #include <string.h>
+
+/*---[ Structures ]-----------------------------------------------------------*/
+
+ #pragma pack(1)
+ 
+ typedef struct _icqbutton
+ {
+	ICQGUI_STANDARD_PREFIX;
+
+	/* Button information */
+	const char *name;
+	USHORT     id;
+	SKINDATA   *skn;
+
+    /* Button icon */	
+	hWindow    icon;
+	
+	/* Button label */
+	hWindow    label;
+	
+ } ICQBUTTON;
+
+/*---[ Constants ]------------------------------------------------------------*/
+ 
+ const char *icqButtonWindowClass = "pwICQButton";
+ 
+/*---[ Prototipes ]-----------------------------------------------------------*/
+
+ static void destroy( GtkWidget *, ICQBUTTON *);
+
+/*---[ Implementation ]-------------------------------------------------------*/
+
+ hWindow icqskin_createButton(hWindow hwnd, USHORT id, SKINDATA *cfg, USHORT img, const char *title, const char *name, void (ICQCALLBACK *cbk)(hWindow,void *), void *parm)
+ {
+	char            buffer[0x0100];
+	hWindow         ret;
+	hWindow         temp;
+	GdkPixbuf       *pixBuf           = NULL;
+	ICQBUTTON       *btn;
+	
+	btn = malloc(sizeof(ICQBUTTON));
+	
+	if(!btn)
+	   return NULL;
+	
+	memset(btn,0,sizeof(ICQBUTTON));
+	btn->sz        = sizeof(ICQBUTTON);
+	btn->id        = id;
+	btn->skn       = cfg;
+	btn->name      = name;
+
+	ret = gtk_button_new();
+    gtk_object_set_user_data(GTK_OBJECT(ret), (gpointer) btn);
+
+    icqskin_setDlgItemHandle(hwnd, id, ret);
+	
+    temp = gtk_hbox_new(FALSE,5);
+	
+    if(img == 0xFFFF)
+    {
+       sprintf(buffer,"%s.gif",name);	   
+	   pixBuf = icqskin_loadImage(cfg->icq,buffer);
+	}
+	
+	if(pixBuf)
+	{
+	   /* The button has image, use it */
+       gtk_box_pack_start(GTK_BOX(temp),gtk_pixmap_new_from_pixbuf(pixBuf), FALSE, FALSE, 0);
+	}
+	else
+	{
+       gtk_box_pack_start(GTK_BOX(temp), gtk_label_new(""),  TRUE, FALSE, 0);
+	
+	   if(img != 0xFFFF)
+	   {
+		  btn->icon = gtk_pixmap_new(cfg->iPixmap[img],cfg->iBitmap[img]);
+          gtk_box_pack_start(GTK_BOX(temp), btn->icon,  FALSE, FALSE, 0);
+	   }
+
+       btn->label = gtk_label_new(title);
+       gtk_box_pack_start(GTK_BOX(temp), btn->label,  FALSE, FALSE, 0);
+       gtk_box_pack_end(GTK_BOX(temp), gtk_label_new(""),  TRUE, FALSE, 0);
+	}
+	   
+    gtk_container_add(GTK_CONTAINER(ret),temp);
+
+	if(hwnd)
+       gtk_box_pack_start(GTK_BOX(hwnd), ret, FALSE, FALSE, 0);
+	
+    gtk_signal_connect(GTK_OBJECT(ret), "destroy", GTK_SIGNAL_FUNC(destroy), btn);
+	
+    icqskin_setButtonCallback(ret,cbk,parm);
+
+	/*
+	if(!pixBuf)
+	{   
+       gtk_widget_size_request(ret,&size);
+       gtk_widget_set_usize(ret,cfg->iconSize+4,size.height);
+	}
+	*/
+	
+	return ret;
+ }
+
+ static void destroy( GtkWidget *widget, ICQBUTTON *wnd)
+ {
+    if(wnd->sz != sizeof(ICQBUTTON))
+       return;
+	
+    DBGPrint("Button \"%s\" destroyed",wnd->name);
+
+    memset(wnd,0,sizeof(ICQBUTTON));    
+    free(wnd);
+ }
+
+ int icqskin_setButtonIcon(hWindow hwnd, USHORT icon)
+ {
+	ICQBUTTON  *ctl = gtk_object_get_user_data(GTK_OBJECT(hwnd));
+	if(!ctl || ctl->sz != sizeof(ICQBUTTON))
+	{
+	   DBGTracex(hwnd);
+	   DBGMessage("****** Invalid button in icqskin_setButtonIcon");
+	   return -1;
+	}
+    gtk_pixmap_set(GTK_PIXMAP(ctl->icon),ctl->skn->iPixmap[icon],ctl->skn->iBitmap[icon]);
+	return 0;
+ }
+    
+ int icqskin_setButtonText(hWindow hwnd, const char *text)
+ {
+	ICQBUTTON  *ctl = gtk_object_get_user_data(GTK_OBJECT(hwnd));
+	if(!ctl || ctl->sz != sizeof(ICQBUTTON))
+	{
+   	   DBGMessage("****** Invalid button in icqskin_setButtonText");
+	   return -1;
+	}
+    gtk_label_set_text(GTK_LABEL(ctl->label),text);
+	return 0;
+ }
+ 
+
+

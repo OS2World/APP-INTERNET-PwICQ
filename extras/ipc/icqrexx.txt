@@ -1,0 +1,23 @@
+:userdoc.
+:title.pwICQ Version 2 IPC Documentation
+:h1 res=010.ICQIPC.DLL
+
+:p.
+BBRxUtil ‚ um biblioteca dinƒmica (DLL) que implementa fun‡äes normalmente nÆo dipon¡veis
+ao sistema Rexx padrÆo do OS/2.
+:p.
+Para utilizar as fun‡äes supridas pela BBRxUtil em um programa Rexx vocˆ deve inicialmente
+carregar a fun‡Æo desejada atrav‚s de RxFuncAdd
+:p.
+Exemplo:
+:p.
+call RxFuncAdd 'rxGetMac', 'BBRxUtil', 'rxGetMac'
+:p.
+A fun‡Æo rxBBLoadFuncs carrega automaticamente todas as fun‡äes dispon¡veis na DLL. Para
+fazer isso em um programa utilize as linhas abaixo:
+:p.
+call RxFuncAdd 'rxBBLoadFuncs', 'BBRxUtil', 'rxBBLoadFuncs'
+call rxBBLoadFuncs
+:p.
+
+

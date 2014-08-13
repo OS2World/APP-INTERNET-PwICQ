@@ -1,0 +1,91 @@
+less \data\ibmcpp\sources\include\skinapi.h
+grep sknLoad *.c
+less skmain.c
+dir *.c
+less defwinp.c
+grep maxSize *.c
+grep maxSize *
+less skin.h
+db
+less \Public\pwicq\skins\default.skn
+run
+run
+e \Public\pwicq\skins\default.skn
+run
+run
+run
+type go.cmd
+run
+type skintest.DBG | grep -i frame
+run
+run
+run
+run
+grep WMSKS_SIZEBUTTON *.c
+grep WMSKN_RESIZE *.c
+grep sknSetDrag *.c
+grep drgMode *.c
+run
+run
+e \Public\pwicq\skins\QNX.skn
+e \Public\pwicq\skins\default.skn
+run
+rl
+exit
+grep WMSKN_RESIZE *.c
+cl
+db
+run
+run
+grep WM_SIZE *.c
+grep sknResize *.c
+less defwinp.c
+grep -i minsize *.c
+less skmain.c
+run
+grep OWNER *.c
+grep OWNER *.c | grep -i frame
+less load.c
+run
+run
+rl
+exit
+..\..\
+dir
+dir /f pwicq2.spec
+exit
+less ..\..\plugins\icqskmgr\config.c
+run
+run
+run
+run
+less go.cmd
+less skintest.DBG
+run
+run
+run
+run
+run
+run
+rl
+exit
+db
+m
+run
+rl
+exit
+grep CLR_PINK *.c
+exit
+grep -i winregister *.c
+grep -i menuwindowname *.c
+exit
+rl
+exit
+exit
+grep sknDrawIcon *.c
+grep ICON *.c
+grep ICONBARS *.c
+less skmain.c
+grep ICONBARS *
+exit
+exit

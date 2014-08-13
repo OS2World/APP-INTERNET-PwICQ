@@ -1,0 +1,17 @@
+;========================================================================
+; ICQSKMGR.DEF - Definicoes para o gerenciador de skins do pwICQ
+;========================================================================
+
+LIBRARY      ICQSKMGR INITINSTANCE TERMINSTANCE
+
+PROTMODE
+
+DATA         MULTIPLE READWRITE LOADONCALL NONSHARED
+CODE         LOADONCALL
+
+EXPORTS      icqskmgr_Configure
+             icqskmgr_Timer
+             icqskmgr_ConfigPage
+             icqskmgr_Event
+
+

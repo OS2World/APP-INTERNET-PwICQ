@@ -1,0 +1,21 @@
+;========================================================================
+; ICQSOUND.DEF - Definicoes para o modulo Multimidia do pwICQ2
+;========================================================================
+
+LIBRARY      ICQSOUND
+
+PROTMODE
+DATA         MULTIPLE NONSHARED READWRITE LOADONCALL
+CODE         MOVEABLE DISCARDABLE LOADONCALL EXECUTEONLY
+
+
+EXPORTS      icqsound_Configure
+             icqsound_Event
+             icqsound_ConfigPage
+             icqsound_Play
+             icqsound_saveScheme
+             icqsound_loadScheme
+             icqsound_rpcRequest
+
+
+

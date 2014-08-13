@@ -1,0 +1,154 @@
+/*
+ * ICQFTABLE.H - Tabela estatica de funcoes
+ */
+
+ #pragma pack(1)
+
+ #define ICQFTABLE_VERSION 1
+
+ struct icqftable
+ {
+    USHORT              sz;                     /* Tamanho dessa estrutura                      */
+    USHORT              Version;                /* Versao da tabela                             */
+    const char          *build;                 /* icqkrnl build                                */
+    const char          *ident;
+    USHORT              szKrnl;                 /* Tamanho da estrutura KRNL                    */
+    USHORT              szUser;                 /* Tamanho da estrutura de usuario              */
+    ULONG               pwICQVersion;           /* Versao do pwICQ */
+
+    /*---[ Skin manager ]-------------------------------------------------------------*/
+
+    BOOL         ( * _System icqRegisterSkinManager)(HICQ, const SKINMGR *);
+    void *       ( * _System icqGetSkinDataBlock)(HICQ);
+    void         ( * _System icqSetSkinDataBlock)(HICQ,void *);
+
+    BOOL         ( * _System icqRegisterServerProtocolManager)(HICQ, const C2SPROTMGR *);
+    BOOL         ( * _System icqDeRegisterServerProtocolManager)(HICQ, const C2SPROTMGR *);
+
+    /*---[ Users-list management ]----------------------------------------------------*/
+    HUSER        ( * _System icqQueryUserHandle)(HICQ, ULONG);
+    HUSER        ( * _System icqQueryUserByNick)(HICQ, const char *);
+    HUSER        ( * _System icqQueryNextUser)(HICQ, HUSER);
+
+    const char * ( * _System icqQueryUserNick)(HUSER);
+    const char * ( * _System icqQueryUserEmail)(HUSER);
+    const char * ( * _System icqQueryUserFirstName)(HUSER);
+    const char * ( * _System icqQueryUserLastName)(HUSER);
+
+    HUSER        ( * _System icqSetUserOnlineMode)(HICQ, ULONG, ULONG);
+
+    const char * ( * _System icqLoadUserDB)(HICQ, HUSER, const char *, const char *, char *, int);
+    const char * ( * _System icqSaveUserDB)(HICQ, HUSER, const char *, char *);
+
+    HUSER        ( * _System icqUserOnline)(HICQ, ULONG, ULONG, long, long, short, long, ULONG);
+
+    void         ( * _System icqRegisterUserAction)(HUSER);
+
+    HUSER        ( * _System icqUpdateUserInfo)(HICQ, ULONG, BOOL, const char *, const char *, const char *, const char *, BOOL);
+
+    int          ( * _System icqAddUserInContactList)(HICQ, ULONG);
+
+    int          ( * _System icqBlacklistUser)(HICQ, ULONG);
+
+    ULONG        ( * _System icqRemoveUser)(HICQ,HUSER);
+    ULONG        ( * _System icqRejectUser)(HICQ,HUSER,BOOL);
+
+    int          ( * _System icqRequestUserUpdate)(HICQ, ULONG);
+
+    HUSER        ( * _System icqAddNewUser)(HICQ, ULONG, const char *, const char *, const char *, const char *, BOOL);
+
+
+    /*---[ Event Launchers ]----------------------------------------------------------*/
+    void         ( * _System icqSystemEvent)(HICQ,USHORT);
+    void         ( * _System icqUserEvent)(HICQ,HUSER,USHORT);
+    void         ( * _System icqEvent)(HICQ, ULONG, char, USHORT, ULONG);
+    void         ( * _System icqAbend)(HICQ, ULONG);
+
+    /*---[ Configuration file ]-------------------------------------------------------*/
+    ULONG        ( * _System icqLoadValue)(HICQ, const char *, ULONG);
+    char *       ( * _System icqLoadString)(HICQ, const char *, const char *, char *, int);
+    char *       ( * _System icqLoadProfileString)(HICQ, const char *, const char *, const char *, char *, int);
+
+    ULONG        ( * _System icqSaveValue)(HICQ, const char *, ULONG);
+    void         ( * _System icqSaveString)(HICQ, const char *, const char *);
+    void         ( * _System icqSaveProfileString)(HICQ, const char *, const char *, const char *);
+
+    /*---[ Protocol ]-----------------------------------------------------------------*/
+    ULONG        ( * _System icqReconnect)(HICQ);
+    ULONG        ( * _System icqSetOnlineMode)(HICQ, ULONG);
+    BOOL         ( * _System icqClearToSend)(HICQ);
+
+    void         ( * _System icqSetServerBusy)(HICQ, BOOL);
+    long         ( * _System icqQueryPeerPort)(HICQ);
+
+    BOOL         ( * _System icqSetLocalIP)(HICQ, long);
+
+    void         ( * _System icqSetServiceStatus)(HICQ,int, BOOL);
+    int          ( * _System icqIsOnline)(HICQ);
+    ULONG        ( * _System icqDisconnect)(HICQ);
+
+
+    /*---[ Miscellaneous (Core) ]-----------------------------------------------------*/
+
+    int          ( * _System icqInitialize)(HICQ , void (* _System)(int) );
+    int          ( * _System icqSetCurrentUser)(HICQ, ULONG, const char *, BOOL);
+
+    BOOL         ( * _System icqIsActive)(HICQ);
+    int          ( * _System icqCreateThread)(HICQ, void (* _System)(ICQTHREAD *), unsigned int, int, void *, const char *);
+    int          ( * _System icqStartThread)(HICQ, void (* _System)(ICQTHREAD *, void *), unsigned int, int, const void *, const char *);
+
+    void         ( * _System icqWriteSysLog)(HICQ, const char *, const char *);
+    int          ( * _System icqQueryUserDataBlockLength)(void);
+    UCHAR *      ( * _System icqConvertCodePage)(HICQ, BOOL, UCHAR *, int);
+    void         ( * _System icqQueryPassword)(HICQ, char *);
+    ULONG        ( * _System icqQueryOnlineMode)(HICQ);
+    void         ( * _System icqProcessRemoteBlock)(HICQ, ICQQUEUEBLOCK *);
+    CPGCONV *    ( * _System icqSetCodePageConverter)(HICQ, CPGCONV *);
+    const char * ( * _System icqQueryProgramPath)(HICQ, const char *, char *, int);
+    const ICQMODETABLE * ( * _System icqQueryModeTable)(HICQ);
+    BOOL         ( * _System icqQueryLogonStatus)(HICQ);
+
+
+    /*---[ Messages ]-----------------------------------------------------------------*/
+    BOOL           ( * _System icqInsertMessage)(HICQ, ULONG, USHORT, time_t, ULONG, int, const char *);
+    BOOL           ( * _System icqInsertAwayMessage)(HICQ, ULONG, const char *, char *);
+    const char *   ( * _System icqQueryAwayMessage)(HICQ);
+    int            ( * _System icqSetAwayMessage)(HICQ, const char *);
+
+    const MSGMGR * ( * _System icqQueryMessageManager)(HICQ, USHORT);
+
+    void           ( * _System icqProcessServerConfirmation)(HICQ, ULONG, ULONG);
+
+    BOOL           ( * _System icqRemoveMessage)(HICQ, ULONG, HMSG);
+    HMSG           ( * _System icqQueryMessage)(HICQ, ULONG);
+    void           ( * _System icqNewUserMessage)(HICQ, ULONG, USHORT);
+
+    BOOL 	   ( * _System icqOpenSystemMessage)(HICQ);
+    void           ( * _System icqOpenUserMessageWindow)(HICQ, HUSER);
+
+    /*---[ List management ]----------------------------------------------------------*/
+    HLIST        ( * _System icqCreateList)(void);
+    HLIST        ( * _System icqDestroyList)(HLIST);
+    void         ( * _System icqClearList)(HLIST);
+    void *       ( * _System icqAddElement)(HLIST, int);
+    int          ( * _System icqRemoveElement)(HLIST, void *);
+    void *       ( * _System icqQueryFirstElement)(HLIST);
+    void *       ( * _System icqQueryLastElement)(HLIST);
+    void *       ( * _System icqQueryNextElement)(HLIST, void *);
+    void *       ( * _System icqQueryPreviousElement)(HLIST, void *);
+    void *       ( * _System icqResizeElement)(HLIST, int, void *);
+
+    /*---[ Miscellaneous ]-----------------------------------------------------------*/
+
+    int          ( * _System icqOpenURL)(HICQ, const char *);
+    void         ( * _System icqInsertSendToOptions)(HICQ, MSGEDITWINDOW, USHORT, BOOL, const MSGMGR *, int ( * _System)(HWND, USHORT, const char *, SENDTOCALLBACK *));
+    void 	 ( * _System icqInsertConfigPage)(HICQ, ULONG, USHORT, HWND, const DLGINSERT *, char *);
+
+ };
+
+ extern const struct icqftable pwICQLibraryEntryPoints;
+
+ int EXPENTRY pwICQConfigureLibrary(const struct icqftable *);
+
+
+

@@ -1,0 +1,327 @@
+<html>
+<body>
+<h1>V8 File Transfers hex dumps</h1>
+<pre>
+<b>Usual PEER packets and v6 file transfers description can be found on <a target="_blank" href="http://www.stud.uni-karlsruhe.de/~uck4/ICQ/">http://www.stud.uni-karlsruhe.de/~uck4/ICQ/</a>.</b>
+
+<b>SRV_USERONLINE packet is present here only for showing where to
+get the direct protocol cookie.</b>
+
+2a 02 62 cb 00 a9 00 03 00 0b 00 00 93 e2 cc 33   *.b............3
+07 34 30 32 34 37 38 31 00 00 00 07 00 01 00 02   .4024781........
+00 50 00 0c 00 25 d4 38 c4 82 00 00 20 58 04 00   .P...%.8.... X..
+08 <b>4c 4f 48 97</b> 00 00 00 50 00 00 00 03 3d 5a b9   .LOH....P....=Z. 
+d2 3d 5a b9 d2 3d 5a b5 41 00 00 00 0a 00 04 d4   .=Z..=Z.A.......
+38 c4 82 00 06 00 04 20 02 00 00 00 0d 00 40 09   8...... ......@.
+46 13 49 4c 7f 11 d1 82 22 44 45 53 54 00 00 09   F.IL..."DEST...
+46 13 4e 4c 7f 11 d1 82 22 44 45 53 54 00 00 97   F.NL..."DEST...
+b1 27 51 24 3c 43 34 ad 22 d6 ab f7 3f 14 92 09   .'Q$.C4."...?...
+46 13 44 4c 7f 11 d1 82 22 44 45 53 54 00 00 00   F.DL..."DEST...
+0f 00 04 00 00 19 d4 00 03 00 04 3d 63 f4 5f      ...........=c._
+<b>(comments: 4c 4f 48 97 is a cookie used in PEER_INIT)</b>
+
+<b>Before sending a file remove client connects to our direct connection server and
+inits connection.
+</b>
+
+
+Incoming packet! Command: PEER_INIT, length: 48
+30 00 
+ff 
+08 00 
+2b 00 
+9a 67 d4 09 
+00 00 
+58 20 00 00 
+cd 69 3d 00 
+d4 38 c4 82 
+d4 38 c4 82 
+04 
+58 20 00 00 
+97 48 4f 4c 
+50 00 00 00 
+03 00 00 00 
+00 00 00 00                                             
+
+
+Outgoing packet! Command: PEER_INIT_ACK, length: 4
+04 00 
+01 00 00 00                                 
+
+
+Outgoing packet! Command: PEER_INIT, length: 48
+30 00 
+ff 
+08 00 
+2b 00 
+cd 69 3d 00 
+00 00 
+b8 0b 00 00 
+9a 67 d4 09 
+d4 38 c4 82 
+d4 38 c4 82 
+04 
+b8 0b 00 00 
+97 48 4f 4c 
+50 00 00 00 
+03 00 00 00 
+00 00 00 00                                             
+
+
+Incoming packet! Command: PEER_INIT_ACK, length: 4
+04 00 
+01 00 00 00                                 
+
+
+Incoming packet! Command: PEER_INIT2, length: 33
+21 00 
+03 
+0a 00 00 00 
+01 00 00 00 
+00 00 00 00 
+00 00 00 00 
+00 00 00 00 
+00 00 00 00 
+00 00 00 00 
+01 00 04 00                                          
+
+
+Outgoing packet! Command: PEER_INIT2, length: 33
+21 00 
+03 
+0a 00 00 00 
+01 00 00 00 
+01 00 00 00 
+00 00 00 00 
+00 00 00 00 
+01 00 04 00 
+00 00 00 00 
+00 00 00 00                                          
+
+<b>After sending the PEER_INIT2 packet direct connection is estabilished. You can 
+receive and send now through it messages, urls, file & chat requests, etc.</b>
+
+
+
+
+
+<b>Description of the following 2 packets can be found here: <A href="fpeer_msg.html">fpeer_msg.html</a>.
+Note: PEER_MSG files are encrypted. See <a href="http://www.cobans.net/files/pkt_decrypt.zip">PktDecrypt</a>(Delphi sources)
+or <A href="http://www.micq.org">mICQ</A>(C++ sources) for decrypting algorithms 
+
+Also, see <A href="../files/dc.zip">dc.zip</A> - archive with non-commented dumps (including encrypted PEER_MSG packets)
+</b>
+
+
+Incoming packet! Command: PEER_MSG, length: 107
+6b 00
+02                                              - Command: PEER_MSG
+96 d4 df de                                     - Checkcode
+ee 07                                           - Command
+0e 00                                           - Unknown
+e9 ff                                           - Seq
+00 00 00 00 00 00 00 00 00 00 00 00             - 12 empty bytes
+1a 00                                           - SUBCMD
+00 00                                           - Unknown
+01 00                                           - Status: online
+01                                              - Flags
+00 00                                           - Unknown
+                                                
+29 00                                           - Length of the following message
+   f0 2d 12 d9 30 91 d3 11 8d d7 00 10 4b 06 46 2e - Signature
+   00 00                                        - Unknown
+   04 00 00 00                                  - Length of the text command
+      46 69 6c 65                               - Text command: 'File'
+   00 00 01 00 00 01 00 00 00 00 00 00 00 00 00 - Unknown
+   
+1c 00 00 00                                     - Length of the following data
+   00 00 00 00                                  - Length of description
+   70 55                                        - Port: 28757
+   6b 01                                        - Seq2: 363
+   0a 00                                        - Length of filename
+      66 69 6c 65 32 2e 74 78 74 00             - Filename: 'file2.txt'
+   f7 01 00 00                                  - Total bytes of all files: 503
+   55 70 00 00                                  - Port: 28757
+
+
+
+Outgoing packet! Command: PEER_MSG, length: 108
+6c 00                                           
+02                                              - Command: PEER_MSG
+97 6a f1 e1                                     - Checkcode
+da 07                                           - Command
+0e 00                                           - Unknown
+e9 ff                                           - Seq
+00 00 00 00 00 00 00 00 00 00 00 00             - 12 empty bytes
+1a 00                                           - SUBCMD
+00 00                                           - Unknown
+00 00                                           - Status: online
+01                                              - Flags
+00 00                                           - Unknown
+
+29 00                                           - Length of the following message
+   f0 2d 12 d9 30 91 d3 11 8d d7 00 10 4b 06 46 2e - Signature
+   00 00 
+   04 00 00 00                                  - Length of the text command
+      46 69 6c 65                               - Text command: 'File' 
+  00 00 01 00 00 01 00 00 00 00 00 00  00 00 00 - Unknown
+
+1d 00 00 00                                     - Length of the following data
+   00 00 00 00                                  - Length of description
+   0b b9                                        - Port: 2825
+   00 00                                        - Seq2
+   0b 00                                        - Length of filename
+      66 69 6c 65 32 2e 74 78 74 00 00          - Filename: 'file2.txt'
+   f7 01 00 00                                  - Total bytes of all files: 503
+   b9 0b 00 00                                  - Port: 2825
+
+
+<b>After this I'm binding the server to the 2825 port and waiting untill ICQ client 
+will connect to me. After connection to a new server, usual DC connection is
+estabilished without PEER_INIT2 packet.<br>
+Following packets are sent through a new connection:</b>
+
+
+Incoming packet! Command: PEER_INIT, length: 48
+30 00 
+ff 
+08 00 
+2b 00 
+9a 67 d4 09 
+00 00 
+60 1b 00 00
+cd 69 3d 00 
+d4 38 c4 82 
+d4 38 c4 82 
+04 
+60 1b 00 00 
+97 48 4f 4c 
+50 00 00 00 
+03 00 00 00 
+00 00 00 00                                             
+
+
+Outgoing packet! Command: PEER_INIT_ACK, length: 4
+04 00 
+01 00 00 00                                 
+
+
+Outgoing packet! Command: PEER_INIT, length: 48
+30 00 
+ff 
+08 00 
+2b 00 
+cd 69 3d 00 
+00 00 
+b9 0b 00 00 
+9a 67 d4 09 
+d4 38 c4 82 
+d4 38 c4 82 
+04 
+b9 0b 00 00 
+97 48 4f 4c 
+50 00 00 00 
+03 00 00 00 
+00 00 00 00                                             
+
+
+Incoming packet! Command: PEER_INIT_ACK, length: 4
+04 00 
+01 00 00 00                                 
+
+
+<b>After connection is beeing estabilished. Remote client 
+starts the FILE INITIALIZATION.</b>
+
+
+Incoming packet! Command: PEER_FILE_INIT, length: 25
+19 00 
+00                                              - Command: PEER_FILE_INIT
+00 00 00 00                                     - Unknown
+01 00 00 00                                     - Total number of files to be sent: 1
+f7 01 00 00                                     - Total bytes of all files to sent: 503
+64 00 00 00                                     - Speed: 0x64
+06 00                                           - Length of nickname
+   43 6f 62 61 6e 00                            - Nickname: 'Coban'
+
+
+<b>This is not usual PEER_INIT_ACK!</b>
+Outgoing packet! Command: PEER_INIT_ACK, length: 17
+11 00 
+01                                              - Command: PEER_INIT_ACK
+40 00 00 00                                     - Speed: 0x40
+0a 00                                           - Length of nickname
+   31 36 34 39 31 35 30 39 38 00                - Nickname: '164915098'
+
+
+<b>This is not usual PEER_MSG file. It's sent before each file.</b>
+Incoming packet! Command: PEER_MSG, length: 29
+1d 00 
+02 00 
+0a 00                                           - Length of the filename
+   66 69 6c 65 32 2e 74 78 74                   - Filename: 'file2.txt'
+00 01 00 00                                     - Unknown
+f7 01 00 00                                     - Size in bytes of this file
+df ac 60 3d                                     - Unknown
+64 00 00 00                                     - Speed: 0x64
+
+
+
+<b>This is not usual PEER_INIT2! This is ACK on every unusual PEER_MSG packet.</b>
+Outgoing packet! Command: PEER_INIT2, length: 17
+11 00 
+03                                              - Command: PEER_INIT2
+00 00 00 00                                     - Unknown: empty
+00 00 00 00                                     - Unknown, empty
+64 00 00 00                                     - Speed: 0x64
+01 00 00 00                                     - Count, increased by one after file was sent
+
+
+<b>Finally the file data! Client sends it in chunks of 2048 or less bytes. 
+This file consists only from 'A' chars and newlines(0x0d0a).</b>
+
+Incoming packet! Command: PEER_FILEDATA, length: 504
+f8 01
+06                                              - Command: PEER_FILEDATA
+41 41 41 41 41 41 41 41 41 41 41 41 41            ...AAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 0d 0a 41 41 41 41 41 41 41 41   AAAAAA..AAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 0d 0a 41 41 41   AAAAAAAAAAA..AAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+0d 0a 41 41 41 41 41 41 41 41 41 41 41 41 41 41   ..AAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 0d 0a 41 41 41 41 41 41 41 41 41   AAAAA..AAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41   AAAAAAAAAAAAAAAA
+41 41 41 41 41 41 41 41 41 41                     AAAAAAAAAA
+
+<b>After all files have been sent, we shutdown the server.</b>
+
+</pre>
+(C) Alex Demchenko<br>
+If you have some questions please mailto:<A href="mailto:alex@ritlabs.com"> alex@ritlabs.com</a> or
+check our <a href="http://www.cobans.net/forums">forums</a>.<br>
+
+</body>
+</html>

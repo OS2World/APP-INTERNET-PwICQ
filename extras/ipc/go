@@ -1,0 +1,13 @@
+#!/usr/bin/rexx
+
+ ok = RxFuncAdd( 'rxICQLoadFuncs', 'icqipc', 'rxICQLoadFuncs' )
+ say ok
+
+ say 'Load:'||rxICQLoadFuncs()
+ 
+ say 'Query:'||rxICQQueryBuild()
+ 
+ say 'SetMode:'||rxICQSetMode(0,'Busy') 
+ say 'Drop:'||rxICQDropFuncs()
+ 
+ say 'OSD:'||rxICQOSD(0,"OSD Rexx")

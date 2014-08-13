@@ -1,0 +1,140 @@
+/*
+ * gtkstatic.c - Static skinned control for GTK
+ */
+ 
+ #include <malloc.h>
+ #include <string.h>
+ #include <stdlib.h>
+
+ #include <pwicqgui.h>
+ #include <gdk-pixbuf/gdk-pixbuf.h>
+
+/*---[ Defines ]--------------------------------------------------------------*/
+
+ #define max(a,b) a > b ? a : b
+ #define min(a,b) a < b ? a : b
+
+/*---[ Structures ]-----------------------------------------------------------*/
+
+ #pragma pack(1)
+ 
+ typedef struct _icqbutton
+ {
+	ICQSTATIC st;
+	
+	hWindow   icon;
+	hWindow   label;
+	
+ } ICQBUTTON;
+
+ #pragma pack()
+
+/*---[ Constants ]------------------------------------------------------------*/
+ 
+ 
+/*---[ Prototipes ]-----------------------------------------------------------*/
+
+ static void EXPENTRY icqbutton_destroy(hWindow, ICQBUTTON *);
+
+ #ifdef SKINNED_GUI	
+ static void     resize(  GtkWidget *, GtkAllocation  *, ICQBUTTON *);
+ static gboolean expose(  GtkWidget *, GdkEventExpose *, ICQBUTTON *);
+#endif 
+
+/*---[ Implementation ]-------------------------------------------------------*/
+
+ hWindow EXPENTRY icqbutton_new(hWindow owner, USHORT id, const char *name, USHORT icon, const char *text)
+ {
+	hWindow   ret    = NULL;
+	ICQBUTTON *cfg   = (ICQBUTTON *) icqlabel_createDataBlock(owner, sizeof(ICQBUTTON), name);
+	
+	if(!cfg)
+	   return NULL;
+	
+	cfg->st.msg = icqButtonWindow;
+
+//    ret = gtk_button_new();
+    ret = gtk_label_new(text);
+	
+	if(!ret)
+	{
+	   cfg->st.sz = 0;
+	   free(cfg);
+	   return ret;
+	}
+	
+    gtk_object_set_user_data(GTK_OBJECT(ret), (gpointer) cfg);
+    gtk_signal_connect( GTK_OBJECT(ret),"destroy",GTK_SIGNAL_FUNC(icqbutton_destroy), cfg );
+    icqgui_setWindowID(ret, id);
+
+#ifdef SKINNED_GUI	
+	
+    icqlabel_setBackground(ret, gdk_pixbuf_new_from_file("button.gif",NULL));
+    icqlabel_setForegroundRGB(ret, 0xFFFF, 0xFFFF, 0xFFFF);
+	
+    gtk_signal_connect( GTK_OBJECT(ret), "size-allocate", GTK_SIGNAL_FUNC(resize), cfg );
+    gtk_signal_connect(GTK_OBJECT(ret),  "expose_event",  GTK_SIGNAL_FUNC(expose), cfg);
+
+#endif	
+	
+	return ret;
+ }
+
+ void EXPENTRY icqbutton_destroy( hWindow hwnd, ICQBUTTON *cfg)
+ {
+	
+	
+	
+	
+	icqlabel_destroy(hwnd,(ICQSTATIC *) cfg);
+ }
+
+ 
+ MRESULT _System icqButtonWindow(HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2)
+ {
+	return icqStaticWindow(hwnd,msg,mp1,mp2);
+ }
+
+#ifdef SKINNED_GUI	
+ 
+ static void resize(GtkWidget *hwnd, GtkAllocation *sz, ICQBUTTON *cfg)
+ {
+	CHKPoint();
+    icqlabel_createBackground(hwnd,(ICQSTATIC *) cfg,sz->width,sz->height);	
+	CHKPoint();
+ }
+
+ static gboolean expose(GtkWidget *hwnd, GdkEventExpose *event, ICQBUTTON *cfg)
+ {
+	CHKPoint();
+	DBGTracex(cfg);
+	DBGTracex(cfg->st.gc);
+	DBGTracex(cfg->st.bg);
+	
+	if(cfg->st.bg)
+	{
+	   DBGTracex(hwnd->window);
+	   DBGTracex(event->area.x);
+	   DBGTracex(event->area.y);
+	   DBGTracex(event->area.width);
+	   DBGTracex(event->area.height);
+	   
+       gdk_draw_pixbuf(	hwnd->window,
+						cfg->st.gc,
+						cfg->st.bg,
+						event->area.x,event->area.y,
+						event->area.x,event->area.y,
+						event->area.width,event->area.height,
+						GDK_RGB_DITHER_NORMAL,
+						0,
+						0 );
+	   
+	   CHKPoint();
+    }	   
+
+	CHKPoint();
+	return FALSE;
+ }
+
+#endif
+ 

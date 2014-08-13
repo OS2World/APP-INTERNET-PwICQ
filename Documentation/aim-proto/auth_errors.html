@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>
+	OSCAR Protocol: Section 3: Authorization: Auth Errors
+    </title>
+  </head>
+
+  <body bgcolor="#FFFFFF" link="#444444" vlink="#666666">
+    <table width="1" border="0" align="center">
+      <tr>
+	<td><img src="/images/blank.gif" height="1" width="540">
+      </tr>
+      <tr>
+	<td align="right">
+	  <img src="/faim/faim.gif" border="0" width="111" height="50"><br>
+	  <A href="/pst/"><img src="/pst/pst_small.gif" border="0"></a>
+	</td>
+      </tr>
+      <tr>
+	<td align="center">
+	  <b><font size="+1">AIM/Oscar Protocol Specification:<br>Section 3: Authorization: Authorization Errors</font></b>
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  <hr noshade>
+	  <table width="100%" border="0" align="center">
+	    <tr>
+	      <td width="1%" valign="top">
+		<img src="/images/blank.gif" width="5" height="1" border="0"><br>
+	      </td>
+	      <td width="1%" bgcolor="#BBBBBB">
+
+	      </td>
+	      <td width="1%">
+		<img src="/images/blank.gif" width="5" height="1" border="0">
+	      </td>
+	      <td width="98%">
+		<img src="/images/blank.gif" width="460" height="1" border="0"><br>
+		<b>Authorization Error [Source: Server]</b>
+		<p>
+		  This/these are sent back instead of the <a href="auth_response.html">Authorization Response</a> command in the case of authorization failure.
+		</p>
+		<table border="0" align="center">
+		  <tr><td colspan="3"><hr noshade></td></tr>
+		  <tr><td><u>Container</u></td><td><u>Data</u></td><td><u>TLV Type</u></td></tr>
+		  <tr><td>RAW</td><td>FLAP Header (channel 0x04)</td><td></td></tr>
+		  <tr><td>TLV</td><td>Screen Name</td><td>0x0001</td></tr>
+		  <tr><td>TLV</td><td>Error Message URL</td><Td>0x0004</td></tr>
+		  <tr><td>TLV</td><td>Error Code</td><td>0x0008</td></tr>
+		  <tr><td colspan="3"><hr noshade></td></tr>
+		</table>
+
+		<p></p>
+		<u>Currently Known Error Codes for TLV Type 0x0008:</u>
+		<p></p>
+		<table border="1" align="centeR">
+		  <tr><td>Error Code</td><td>Error Msg URL</td><td>Meaning</td></tr>
+		  <tr><td>0x0001</td><td><a href="http://www.aim.aol.com/errors/UNREGISTERED_SCREENNAME.html">http://www.aim.aol.com/errors/UNREGISTERED_SCREENNAME.html</a></td><td>Invalid Screen Name</td></tR>
+		  <tr><td>0x0005</td><td><A href="http://www.aim.aol.com/errors/MISMATCH_PASSWD.html">http://www.aim.aol.com/errors/MISMATCH_PASSWD.html</a></td><td>SN/Pasword Mismatch (Invalid Password)</td></tr>
+		</table>
+
+	      </td>
+	      
+	      <td width="1%">
+		<img src="/images/blank.gif" width="10" height="1" border="0">
+	      </td>
+	      <td width="1%" bgcolor="#BBBBBB">
+		&nbsp;
+	      </td>
+	      <td width="1%" valign="top">
+		<img src="/images/blank.gif" width="50" height="1" border="0"><br>
+		<a href="/pst/"><img src="/pst/bar_home.gif" width="50" height="15" border="0"></a><br>
+		<a href="/pst/software/"><img src="/pst/bar_software.gif" width="50" height="15" border="0"></a>
+	      </td>
+	    </tr>
+	  </table>
+	  <hr noshade>
+	  <Center>
+	    <address><a href="mailto:afritz@iname.com">Adam Fritzler</a></address>
+	      <!-- Created: Sat Jun 20 20:35:10 MST 1998 -->
+	    <!-- hhmts start -->
+Last modified: Fri Jul 24 20:18:23 MST 1998
+<!-- hhmts end -->	
+	  </center>
+	</td>
+      </tr>
+    </table>
+  </body>
+</html>

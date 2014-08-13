@@ -1,0 +1,98 @@
+/****************************************************************************
+** pwICQApplet meta object code from reading C++ file 'kdepanel.h'
+**
+** Created: Wed Jan 8 17:55:32 2003
+**      by: The Qt MOC ($Id:  qt/moc_yacc.cpp   3.0.5   edited Jul 8 12:26 $)
+**
+** WARNING! All changes made in this file will be lost!
+*****************************************************************************/
+
+#undef QT_NO_COMPAT
+#include "kdepanel.h"
+#include <qmetaobject.h>
+#include <qapplication.h>
+
+#include <private/qucomextra_p.h>
+#if !defined(Q_MOC_OUTPUT_REVISION) || (Q_MOC_OUTPUT_REVISION != 19)
+#error "This file was generated using the moc from 3.0.5. It"
+#error "cannot be used with the include files from this version of Qt."
+#error "(The moc has changed too much.)"
+#endif
+
+const char *pwICQApplet::className() const
+{
+    return "pwICQApplet";
+}
+
+QMetaObject *pwICQApplet::metaObj = 0;
+static QMetaObjectCleanUp cleanUp_pwICQApplet;
+
+#ifndef QT_NO_TRANSLATION
+QString pwICQApplet::tr( const char *s, const char *c )
+{
+    if ( qApp )
+	return qApp->translate( "pwICQApplet", s, c, QApplication::DefaultCodec );
+    else
+	return QString::fromLatin1( s );
+}
+#ifndef QT_NO_TRANSLATION_UTF8
+QString pwICQApplet::trUtf8( const char *s, const char *c )
+{
+    if ( qApp )
+	return qApp->translate( "pwICQApplet", s, c, QApplication::UnicodeUTF8 );
+    else
+	return QString::fromUtf8( s );
+}
+#endif // QT_NO_TRANSLATION_UTF8
+
+#endif // QT_NO_TRANSLATION
+
+QMetaObject* pwICQApplet::staticMetaObject()
+{
+    if ( metaObj )
+	return metaObj;
+    QMetaObject* parentObject = KPanelApplet::staticMetaObject();
+    static const QUMethod slot_0 = {"timer", 0, 0 };
+    static const QMetaData slot_tbl[] = {
+	{ "timer()", &slot_0, QMetaData::Private }
+    };
+    metaObj = QMetaObject::new_metaobject(
+	"pwICQApplet", parentObject,
+	slot_tbl, 1,
+	0, 0,
+#ifndef QT_NO_PROPERTIES
+	0, 0,
+	0, 0,
+#endif // QT_NO_PROPERTIES
+	0, 0 );
+    cleanUp_pwICQApplet.setMetaObject( metaObj );
+    return metaObj;
+}
+
+void* pwICQApplet::qt_cast( const char* clname )
+{
+    if ( !qstrcmp( clname, "pwICQApplet" ) ) return (pwICQApplet*)this;
+    return KPanelApplet::qt_cast( clname );
+}
+
+bool pwICQApplet::qt_invoke( int _id, QUObject* _o )
+{
+    switch ( _id - staticMetaObject()->slotOffset() ) {
+    case 0: timer(); break;
+    default:
+	return KPanelApplet::qt_invoke( _id, _o );
+    }
+    return TRUE;
+}
+
+bool pwICQApplet::qt_emit( int _id, QUObject* _o )
+{
+    return KPanelApplet::qt_emit(_id,_o);
+}
+#ifndef QT_NO_PROPERTIES
+
+bool pwICQApplet::qt_property( int _id, int _f, QVariant* _v)
+{
+    return KPanelApplet::qt_property( _id, _f, _v);
+}
+#endif // QT_NO_PROPERTIES

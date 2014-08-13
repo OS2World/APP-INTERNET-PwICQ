@@ -1,0 +1,457 @@
+--- 15/11/2003 05:14:08 Message from blue_note® (ICQ#2979821) ---
+
+aqui vai o log da execução do pwicq com o parametro --nodaemon. abraços...
+
+--- 15/11/2003 05:16:06 Message from blue_note® (ICQ#2979821) ---
+
+aqui vai o log da execução do pwicq com --nodaemon. abraços... 
+
+--- 15/11/2003 06:22:36 Message to blue_note® (ICQ#2979821) ---
+
+Tente: 
+
+pwicq.sh --uin=2979821 --password=sua_senha --save
+
+
+--- 15/11/2003 16:07:34 Message from blue_note® (ICQ#2979821) ---
+
+valeu!! estÃ¡ funcionando.. eheheh.. 
+
+--- 05/12/2003 18:57:00 Message from blue_note® (ICQ#2979821) ---
+
+olá!! estou no linux.. queria enviar os arquivos para vc ver porque os grupos aparecem como Unknown e porque um usuário retirado através do icq windows continua aparecendo..hhehe
+
+--- 06/12/2003 00:18:29 Message to blue_note® (ICQ#2979821) ---
+
+Vou te mandar as instruções sobre como ativar o log por e-mail depois. Estou meio atolado aqui (brinquedo novo é foda).
+
+
+--- 06/12/2003 00:18:50 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ tá valendo! que brinquedo novo? 
+
+
+
+--- 06/12/2003 00:20:07 Message to blue_note® (ICQ#2979821) ---
+
+Palm Zire. Com camera. (-:
+
+
+--- 06/12/2003 00:20:20 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ valeu!! um abraço.. 
+
+
+
+--- 09/12/2003 16:10:30 Message to blue_note® (ICQ#2979821) ---
+
+Tiu, abusando um pouco: O Penna perguntou se a correção da 20bbconfig.sh já foi enviada. 
+
+--- 09/12/2003 16:10:58 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ sorry!! ainda não.. estou de licensa saúde.. putz..  
+
+
+
+--- 09/12/2003 16:11:10 Message to blue_note® (ICQ#2979821) ---
+
+Ok. Tks.
+
+
+--- 09/12/2003 16:11:16 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ e tenho que gerar um rpm.. vou ver como, ok? 
+ 
+
+
+
+--- 09/12/2003 16:11:40 Message to blue_note® (ICQ#2979821) ---
+
+Sem problemas; ele disse ok.
+
+
+--- 09/12/2003 23:10:35 Message from blue_note® (ICQ#2979821) ---
+
+pode falar??
+
+--- 10/12/2003 09:46:04 Message to blue_note® (ICQ#2979821) ---
+
+Agora posso. Desculpe, estava longe do micro.
+
+
+--- 22/12/2003 00:31:40 Message from blue_note® (ICQ#2979821) ---
+
+tá ocupado?
+
+--- 22/12/2003 01:35:02 Message to blue_note® (ICQ#2979821) ---
+
+Estava dormindo; só levantei para dar uma olhada no Emule.
+
+
+--- 22/12/2003 01:35:40 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ tudo bem.. agora voltei para o windows.. amanhã falamos.. eu incluí um contado no windows e não apareceu no linux.. eheh 
+
+
+
+--- 22/12/2003 01:36:12 Message to blue_note® (ICQ#2979821) ---
+
+Estranho. Ele deveria ter recebido a lista do servidor.
+
+
+--- 22/12/2003 01:36:50 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ pois é.. nem não.. movi a lista antiga.. e reiniciei.. e ele entrou on-line e vazio.. a lista.. ehhe 
+
+
+
+--- 22/12/2003 01:37:12 Message to blue_note® (ICQ#2979821) ---
+
+Eita! Não recebeu nada do servidor.
+
+--- 22/12/2003 01:37:20 Message to blue_note® (ICQ#2979821) ---
+
+Podem ter mudado algo no protocolo.
+
+
+--- 22/12/2003 01:37:34 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ pois é.. e continua aquela questão dos grupos.. eu tenho o arquivo conf aqui..  
+
+
+
+--- 22/12/2003 01:37:49 Message to blue_note® (ICQ#2979821) ---
+
+Me mande por e-mail depois.
+
+
+--- 22/12/2003 01:38:04 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ vc não recebe por aqui..? 
+ 
+
+
+
+--- 22/12/2003 01:38:10 Message to blue_note® (ICQ#2979821) ---
+
+Nope.
+
+
+--- 22/12/2003 01:38:44 Message to blue_note® (ICQ#2979821) ---
+
+Devo reformar todo o código assim que arrumar tempo, por isso não terminei a parte de file-transfer.
+
+
+--- 22/12/2003 01:39:00 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ ah.. ok.. outra coisa.. mesmo com o iptables levantado e sem lib erar a porta do icq.. funciona!! eu não entendi..ehhe 
+
+
+
+--- 22/12/2003 01:39:23 Message to blue_note® (ICQ#2979821) ---
+
+File-transfer?
+
+
+--- 22/12/2003 01:40:16 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ não.. eu me refiro ao próprio icq.. a porta não é well known 
+
+
+
+--- 22/12/2003 01:40:34 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ well.. amanhã eu envio o conf.. ok? 
+
+
+
+--- 22/12/2003 01:40:37 Message to blue_note® (ICQ#2979821) ---
+
+Ele não precisa de porta listener para ativar.
+
+
+--- 22/12/2003 01:40:39 Message to blue_note® (ICQ#2979821) ---
+
+Ok.
+
+
+--- 22/12/2003 01:40:54 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ bye 
+ 
+
+
+
+--- 22/12/2003 01:41:01 Message to blue_note® (ICQ#2979821) ---
+
+bye
+
+
+--- 22/12/2003 16:11:10 Message from blue_note® (ICQ#2979821) ---
+
+oi.. quando puder me chame, ok?
+
+--- 22/12/2003 16:11:16 Message to blue_note® (ICQ#2979821) ---
+
+Ok.
+
+
+--- 22/12/2003 16:11:33 Message to blue_note® (ICQ#2979821) ---
+
+Do jeito que estou enrolado deve demorar um pouco.
+
+
+--- 22/12/2003 16:12:44 Message from blue_note® (ICQ#2979821) ---
+
+tá legal.. não dá sinal sonoro quando recebe uma mensagem? a sua chegou agora e não houve ó ó!! hehe
+
+--- 22/12/2003 16:13:15 Message to blue_note® (ICQ#2979821) ---
+
+Ahh! O pacote principal não inclui os esquemas de som. À noite te mando por e-mail.
+
+
+--- 22/12/2003 16:13:34 Message to blue_note® (ICQ#2979821) ---
+
+Prefere os sonzinhos originais ou uma voz digitalizada?
+
+
+--- 22/12/2003 16:14:50 Message from blue_note® (ICQ#2979821) ---
+
+well... depende da voz.. eheh quando vc estiver menos ocupado.. conversamos..não quero atrapalhar.. estou em casa, de licenca.. volto dia 24..
+
+--- 22/12/2003 16:14:58 Message to blue_note® (ICQ#2979821) ---
+
+Ok.
+
+
+--- 22/12/2003 16:16:32 Message from blue_note® (ICQ#2979821) ---
+
+ah! qual é o melhor e-mail para eu enviar os arquivos do pwicq..? a propósito, hoje quando reinicializei o Linux.. apareceu aquele contato que eu te falei.. 
+
+--- 22/12/2003 16:16:43 Message to blue_note® (ICQ#2979821) ---
+
+pwicq.devel@terra.com.br
+
+--- 22/12/2003 16:16:58 Message to blue_note® (ICQ#2979821) ---
+
+Já reparei. O plugin de interface gráfica está com falha na atualização.
+
+--- 22/12/2003 16:17:06 Message to blue_note® (ICQ#2979821) ---
+
+Estou fazendo um todo novo para a nova versão.
+
+
+--- 23/12/2003 23:55:31 Message from blue_note® (ICQ#2979821) ---
+
+e daí? blz? recebeu os arquivos?
+
+--- 24/12/2003 00:01:33 Message to blue_note® (ICQ#2979821) ---
+
+Recebi.
+
+
+--- 24/12/2003 00:02:46 Message from blue_note® (ICQ#2979821) ---
+
+ok.. aguardo, então.. 
+
+--- 24/12/2003 00:02:52 Message to blue_note® (ICQ#2979821) ---
+
+Ok.
+
+
+--- 27/12/2003 15:13:33 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ oba!! vc está por aí..? 
+
+
+
+--- 27/12/2003 17:43:22 Message to blue_note® (ICQ#2979821) ---
+
+Cheguei agora.
+
+
+--- 27/12/2003 17:44:06 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ blz.. eu instalei o fedora.. como não tinha mais o rpm... eu salvei todos os arquivos pwicq.. inclusive os links.. daí 
+
+
+
+--- 27/12/2003 17:44:20 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ depois de instalado eu copiei os arquivos e .. 
+
+
+
+--- 27/12/2003 17:44:26 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ funcionou! hehe 
+
+
+
+--- 27/12/2003 17:44:37 Message to blue_note® (ICQ#2979821) ---
+
+(((-:
+
+
+--- 27/12/2003 17:44:41 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ no teu site tem o rpm para incluir os sons.. etc.. 
+
+
+
+--- 27/12/2003 17:44:50 Message to blue_note® (ICQ#2979821) ---
+
+Meu site?
+
+
+--- 27/12/2003 17:45:28 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ sim.. no terra.. tem um link para pwicq.. 
+
+
+
+--- 27/12/2003 17:45:58 Message to blue_note® (ICQ#2979821) ---
+
+Nem lembrava mais desse link.
+
+--- 27/12/2003 17:46:20 Message to blue_note® (ICQ#2979821) ---
+
+Os arquivos lá devem ser bem antigos; funcionaram?
+
+
+--- 27/12/2003 17:46:54 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ http://planeta.terra.com.br/informatica/trevize/  eu não baixei nada de lá... tinha recebido o rpm de vc.. instalei.. agora como eu disse apenas salvei e refiz os links e funcionou.. 
+
+
+
+--- 27/12/2003 17:47:17 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ vc pode me mandar as features de sons ou outras? 
+
+
+
+--- 27/12/2003 17:47:36 Message to blue_note® (ICQ#2979821) ---
+
+Nem baixe. Os arquivos de lá são bem antigos. Mais à noite te mando os icq-remote, os arquivos de som e as instruções por e-mail.
+
+
+--- 27/12/2003 17:48:17 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ tá valendo.. tanks.. e as novidades? soube que o TDE está muito bom.. quero conhecer..  ainda casado? 
+
+
+
+--- 27/12/2003 17:48:54 Message to blue_note® (ICQ#2979821) ---
+
+O TDE está bem legalzinho, mais ou menos casado. Fora isso sem novidades.
+
+
+--- 27/12/2003 17:49:39 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ mais ou menos é ótimo!!! hehe morando junto, imagino.. boa sorte!! e Feliz Ano novo.. 
+o fato de ele ser escrito em pascal não o deixou lento.. me disseram..  
+
+
+
+--- 27/12/2003 17:50:16 Message to blue_note® (ICQ#2979821) ---
+
+Lento realmente não está. O Cadinho ainda está fazendo uns ajustes para melhorar a performance.
+
+
+--- 27/12/2003 17:52:05 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ tá valendo.. um abraço.. aguardo os arquivos.. utilizo cada vez menos o ruindows.. graças ao pwicq.. que, salvo algum outro clone que eu não conheça, é o melhor clone para linux.. parabéns... acredito que ele esteja bem difundido na comunidade..  
+
+
+
+--- 27/12/2003 17:53:21 Message to blue_note® (ICQ#2979821) ---
+
+Nem tanto, existem muitos clones; a maioria já está suportando múltiplos protocolos. Estou mudando o pwICQ para fazer a mesma coisa pois, infelizmente, o MSNMessenger está cada vez mais popular.
+
+
+--- 27/12/2003 17:54:15 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ eu utilizo icq, msmessenger e yahoomessenger.. mas apenas o icq e o yahoo no linux.. existe algum clone para o msmessenger ? 
+
+
+
+--- 27/12/2003 17:54:51 Message to blue_note® (ICQ#2979821) ---
+
+O Gaim (que vem com o Mandrake), pelo que me lembro, suporta todos eles.
+
+
+--- 27/12/2003 17:55:16 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ e funciona no fedora/redhat? 
+
+
+
+--- 27/12/2003 17:55:28 Message to blue_note® (ICQ#2979821) ---
+
+Isso eu não sei.
+
+
+--- 27/12/2003 17:55:54 Message from blue_note® (ICQ#2979821) ---
+
+
+
+ thanks.. Perry!! bye 
+
+
+
+--- 27/12/2003 17:56:33 Message to blue_note® (ICQ#2979821) ---
+
+Bye
+
+

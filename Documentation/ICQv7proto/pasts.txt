@@ -1,0 +1,8 @@
+300 = Elementary School
+301 = High School
+302 = College
+303 = University
+304 = Military
+305 = Past Work Place
+306 = Past Organization
+399 = Other

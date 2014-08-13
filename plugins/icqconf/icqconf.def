@@ -1,0 +1,12 @@
+LIBRARY      ICQCONF
+
+PROTMODE
+
+DATA         MULTIPLE READWRITE LOADONCALL NONSHARED
+CODE         LOADONCALL
+
+EXPORTS      icqconf_Configure
+             icqconf_ConfigPage
+
+
+

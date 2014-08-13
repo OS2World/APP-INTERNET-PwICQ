@@ -1,0 +1,14 @@
+LIBRARY      ICQUSRDB
+
+PROTMODE
+
+DATA         MULTIPLE READWRITE LOADONCALL NONSHARED
+CODE         LOADONCALL
+
+EXPORTS      icqusrdb_Configure
+             icqusrdb_Event
+             icqusrdb_Terminate
+
+
+
+

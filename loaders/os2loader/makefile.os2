@@ -1,0 +1,25 @@
+
+#---[ Dados do projeto ]---------------------------------------------------------------#
+
+#Nome do executavel final
+PROJECT     = pwICQ2
+
+#Tipo do executavel
+EXETYPE     = PM
+MAKEEXE     = 1
+USETHREAD   = 1
+RESOURCES   = pwicq.res
+
+# Lista de modulos
+SOURCES     = pwicq.c
+EXTRAINCL   = \data\ibmcpp\sources\icq2\include
+EXTRALIB    = \public\pwicq2\os2\lib\icqkrnl.lib
+
+#---[ Diretorios ]---------------------------------------------------------------------#
+
+EXEPATH     = w:\private\pwicq2
+RELEASEPATH = w:\public\pwicq2\os2\bin
+
+!include <pwMake.mak>
+
+

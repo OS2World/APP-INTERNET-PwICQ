@@ -1,0 +1,25 @@
+S000 Startup complete
+S001 Stopping
+S002 Server contacted
+S004 System online
+S005 System offline
+S008 External IP Address was changed
+S019 Searching
+S020 Search complete
+S021 Logon process complete
+U004 User is online
+U005 User is offline
+U008 User IP Address was changed
+U016 User information was updated
+M001 Normal message
+M004 URL message
+M002 Chat request
+M003 File request
+M006 Authorization request
+M007 Authorization refused
+M008 Authorized
+M009 System request
+M012 Added in contact-list
+M013 ICQ-Pager
+M014 E-Mail Express
+M019 Contact-list

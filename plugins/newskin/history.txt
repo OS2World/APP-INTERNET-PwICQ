@@ -1,0 +1,119 @@
+del classic.dll
+run
+less classic.rc
+run
+rl & exit
+less ..\icqskmgr\config.c
+..\icqskmgr\
+grep -i sknLoadBitmap *.c
+..\..\core\skintlkt\
+less bitmap.c
+bd
+..\icqskmgr\
+bd
+dir *.def
+less icqgui.def
+dir *.def
+less ..\..\include\icqdefs.h
+less ..\..\include\pwicqgui.h
+..\..\include\
+dir
+e os2win.h
+dir *.def
+bd
+rl
+cl
+m
+db
+rl
+db
+db
+run
+cl
+rl
+exit
+db
+run
+cl
+db
+run
+less \Temp\pwicq.dbg
+c 314/209
+c 16 / 8
+c 289 *  1.50239234
+c 274 *  1.50239234
+cl
+cl
+exit
+dir
+less gtkdialog.c
+exit
+..\icqconf\
+dir
+dir *.c
+less *.c
+exit
+grep -i Save *.c
+less os2button.c
+run
+less \Temp\pwicq.dbg
+m
+run
+grep WMICQ_SAVE *.c
+run
+rl
+exit
+..\icqskmgr\
+dir *.c
+less config.c
+less icqskmgr.rc
+exit
+grep -i icqskin_loadbitmap *.c
+grep CHILD *.c
+grep CHILD *.c | grep -i define
+less os2bitmap.c
+run
+rl
+exit
+cl
+db
+run
+e golib.cmd
+golib
+run
+m
+m
+less ..\..\core\kernel\log.c
+db
+exit
+grep -i WinRegister *.c
+exit
+run
+cl
+exit
+cl
+db
+run
+run
+run
+rl
+exit
+cl
+run
+run
+rl
+cl
+e makefile
+tail -f \logs\27241234.log
+cl
+m
+m
+run
+rl
+e makefile
+rl
+exit
+rl
+cl
+dir
+exit

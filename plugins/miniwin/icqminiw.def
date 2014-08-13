@@ -1,0 +1,9 @@
+LIBRARY      ICQMINIW
+DATA         MULTIPLE READWRITE PRELOAD NONSHARED
+
+EXPORTS      icqminiw_Configure
+             icqminiw_Start
+             icqminiw_Event
+
+
+

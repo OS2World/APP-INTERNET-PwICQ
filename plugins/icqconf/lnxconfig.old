@@ -1,0 +1,100 @@
+/*
+ * lnxconfig.c - Configuracao ICQV7 - Linux
+ */
+
+ #include <stdio.h>
+ 
+ #include "icqconf.h"
+
+/*---[ Constants ]---------------------------------------------------------------------------*/
+ 
+ 
+/*---[ Prototipes ]------------------------------------------------------------------------------------------*/
+
+ static int  _System openSysConfig(HICQ, ULONG, USHORT, ULONG);
+ static int  _System openUserInfo(HICQ, ULONG, USHORT, ULONG);
+
+ static int  _System sysConfig(HICQ, ULONG, USHORT, HWND, HWND, const DLGINSERT *, char *);
+ static int  _System userInfo(HICQ, ULONG, USHORT, HWND, HWND, const DLGINSERT *, char *);
+
+/*---[ Implementacao ]-----------------------------------------------------------------------*/
+
+/*
+ void EXPENTRY icqconf_ConfigPage(HICQ icq, void *dBlock, ULONG uin, USHORT type, HWND hwnd,  const DLGINSERT *dlg, char *buffer)
+ {
+    if(type != 1)
+       return;
+
+    dlg->insertTable(hwnd, CFGWIN_SECURITY, antiSpam_table,  &antiSpam,   "Spam\nSpam Protection");
+    dlg->insertTable(hwnd, CFGWIN_SECURITY, request_table,   &request,    "Authorizations\nAuthorization requests");
+    dlg->insertTable(hwnd, CFGWIN_OPTIONS,  mode_table,      &away,       "Mode\nMode options");
+    dlg->insertTable(hwnd, CFGWIN_USERS,    grpConfig_table, &groupNames, "Groups\nUser groups names");
+ 
+    CHKPoint();
+ }
+*/
+ int EXPENTRY icqconf_Start(HICQ icq, void *lixo, HWND hwnd)
+ {
+    CHKPoint();
+
+    icqWriteSysLog(icq,PROJECT,"System configurator plugin starting");
+
+    icqInsertMenuOption(icq, ICQMNU_SYSTEM, "Configure", 27, openSysConfig, 27);
+    icqInsertMenuOption(icq, ICQMNU_USER,   "User Info", 31, openUserInfo,  31);
+
+    return 0;
+ }
+
+ static int _System openSysConfig(HICQ icq, ULONG uin, USHORT type,ULONG dummy)
+ {
+    return icqOpenConfigDialog(icq, 0, 1, sysConfig);
+ }
+
+ static int _System openUserInfo(HICQ icq, ULONG uin, USHORT type,ULONG dummy)
+ {
+    return icqOpenConfigDialog(icq, uin, 0, userInfo);
+ }
+
+ static int _System sysConfig(HICQ icq, ULONG uin, USHORT type, HWND hwnd, HWND base, const DLGINSERT *dlg, char *buffer)
+ {
+    char                nick[80];
+
+    if(dlg->sz != sizeof(DLGINSERT))
+    {
+       icqWriteSysLog(icq,PROJECT,"Invalid dialog loader");
+       return -1;
+    }
+
+    /* Call plugins for pages */
+    dlg->insertTable(hwnd, CFGWIN_SECURITY, antiSpam_table,  &antiSpam,   "Spam\nSpam Protection");
+    dlg->insertTable(hwnd, CFGWIN_SECURITY, request_table,   &request,    "Authorizations\nAuthorization requests");
+    dlg->insertTable(hwnd, CFGWIN_OPTIONS,  mode_table,      &away,       "Mode\nMode options");
+    dlg->insertTable(hwnd, CFGWIN_USERS,    grpConfig_table, &groupNames, "Groups\nUser groups names");
+    
+    icqInsertConfigPage(icq, uin, type, hwnd, dlg, buffer);
+
+    icqLoadString(icq, "NickName", "John Doe", nick, 79);
+    sprintf(buffer,"%s's (ICQ# %ld) Configuration",nick,icqQueryUIN(icq));
+    
+    DBGMessage(buffer);
+    return 0;
+
+ }
+
+ static int _System userInfo(HICQ icq, ULONG uin, USHORT type, HWND hwnd, HWND base, const DLGINSERT *dlg, char *buffer)
+ {
+    if(dlg->sz != sizeof(DLGINSERT))
+    {
+       icqWriteSysLog(icq,PROJECT,"Invalid dialog loader");
+       return -1;
+    }
+
+    /* Call plugins for pages */
+    icqInsertConfigPage(icq, uin, type, hwnd, dlg, buffer);
+
+    sprintf(buffer,"%s's (ICQ# %ld) Information",icqQueryUserNick(icqQueryUserHandle(icq,uin)),uin);
+    DBGMessage(buffer);
+
+    return 0;
+ }
+

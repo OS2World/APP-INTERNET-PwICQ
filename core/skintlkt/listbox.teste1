@@ -1,0 +1,818 @@
+/*
+ * LISTBOX.C - Controle listbox
+ */
+
+#define INCL_WIN
+#define INCL_GPI
+#include <os2.h>
+
+#include <malloc.h>
+#include <string.h>
+
+#include "skin.h"
+
+/*---[ Definicoes ]---------------------------------------------------------------*/
+
+#define _ALLOC_STEP_    100
+#define UPDATE_TIME     50
+
+/*---[ Prototipos ]---------------------------------------------------------------*/
+
+static void     create(HWND, PCREATESTRUCT);
+static void     destroy(HWND);
+static void     paint(HWND);
+static void     sizePos(HWND,SHORT, SHORT, SHORT, SHORT);
+static void     reposic(HWND, USHORT, USHORT);
+static void     addItemHandle(HWND,ULONG);
+static void     doConnect(HWND, HWND, ULONG);
+static void     setTop(HWND,USHORT);
+static BOOL     btnDown(HWND,ULONG,ULONG);
+static BOOL     btnUp(HWND,ULONG,ULONG);
+static BOOL     mouseMove(HWND, USHORT, USHORT);
+static void     doTimer(HWND);
+static void     selectItem(HWND, LBDATA *, USHORT);
+static void     chkForMenu(HWND);
+static void     ajustBackground(HWND, PSWP);
+static MRESULT  queryHandle(HWND,USHORT);
+static HWND     assignMenu(HWND, USHORT, ULONG);
+static void     insertMenuItem(HWND,MPARAM,MPARAM);
+static void     clearList(HWND);
+static void     createBaseImage(HWND, LBDATA *, USHORT, USHORT);
+static void     paintImage(HPS, HWND, USHORT, USHORT);
+static void     windowChanged(HWND);
+static void     resize(HWND, USHORT, USHORT);
+
+
+/*---[ Constantes ]---------------------------------------------------------------*/
+
+extern const char *listboxWindowName = "pwLISTBOX.wnd";
+
+/*---[ Implementacao ]------------------------------------------------------------*/
+
+MRESULT EXPENTRY lbsProcedure(HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2)
+{
+   switch(msg)
+   {
+   case WM_CREATE:
+      create(hwnd,PVOIDFROMMP(mp2));
+      return WinDefWindowProc(hwnd, msg, mp1, mp2);
+
+   case WM_DESTROY:
+      destroy(hwnd);
+      return WinDefWindowProc(hwnd, msg, mp1, mp2);
+
+   case WM_PAINT:
+      paint(hwnd);
+      break;
+
+   case WM_TIMER:
+      doTimer(hwnd);
+      break;
+
+   case WM_BUTTON2DOWN:
+      if(btnDown(hwnd,LONGFROMMP(mp1),LBF_BUTTON2))
+         chkForMenu(hwnd);
+      break;
+
+   case WM_BUTTON2UP:
+      btnUp(hwnd,LONGFROMMP(mp1),LBF_BUTTON2);
+      break;
+
+   case WM_BUTTON1DOWN:
+      btnDown(hwnd,LONGFROMMP(mp1),0);
+      break;
+
+   case WM_BUTTON1UP:
+      btnUp(hwnd,LONGFROMMP(mp1),0);
+      break;
+
+    case WM_BUTTON1DBLCLK:      /* Double click - Avisa a mÆe */
+      btnUp(hwnd, 0, 0);
+      WinPostMsg(       WinQueryWindow(hwnd, QW_OWNER),
+                        WM_CONTROL,
+                        MPFROM2SHORT(WinQueryWindowUShort(hwnd,QWS_ID),LN_ENTER),
+                        MPFROMLONG(hwnd) );
+      break;
+
+   case WM_MOUSEMOVE:
+      mouseMove(hwnd, SHORT1FROMMP(mp1), SHORT2FROMMP(mp1));
+      break;
+
+   case LM_SETTOPINDEX:
+      setTop(hwnd,SHORT1FROMMP(mp1));
+      break;
+
+   case WMSKN_AJUSTSIZEPOS:
+      sizePos(hwnd,SHORT1FROMMP(mp1),SHORT2FROMMP(mp1),SHORT1FROMMP(mp2),SHORT2FROMMP(mp2));
+      break;
+
+   case WMSKN_AJUSTPOS:
+      reposic(hwnd,SHORT1FROMMP(mp1),SHORT2FROMMP(mp1));
+      break;
+
+   case WMSKN_CONNECT:  /* MP1=Handle */
+      doConnect(hwnd,LONGFROMMP(mp1),LONGFROMMP(mp2));
+      break;
+
+   case WMSKN_INSERTHANDLE:   /* MP1=Handle */
+      addItemHandle(hwnd,LONGFROMMP(mp1));
+      break;
+
+   case WM_WINDOWPOSCHANGED:
+      ajustBackground(hwnd,PVOIDFROMMP(mp1));
+      return WinDefWindowProc(hwnd, msg, mp1, mp2);
+
+   case WMSKN_ASSIGNMENU: /* MP1=Menu ID, MP2=Style */
+      return MRFROMLONG(assignMenu(hwnd,SHORT1FROMMP(mp1),LONGFROMMP(mp2)));
+
+   case WM_PRESPARAMCHANGED:
+      ajustPresParam(hwnd,LONGFROMMP(mp1));
+      break;
+
+   case WMSKN_INSERTMENUITEM: /* MP1=Text, MP2=ID */
+      insertMenuItem(hwnd,mp1,mp2);
+      break;
+
+   case WMSKN_QUERYMENU:
+      return (MRESULT) ((LBDATA *) WinQueryWindowPtr(hwnd,0))->hMenu;
+
+   case WMSKN_QUERYMENUFONT:
+      DBGMessage("Responder a pedido de fonte");
+      break;
+
+   case WMSKN_CLEAR:
+      clearList(hwnd);
+      break;
+
+   case WM_SIZE:
+      resize(hwnd, SHORT1FROMMP(mp2), SHORT2FROMMP(mp2));
+      break;
+
+   default:
+      return WinDefWindowProc(hwnd, msg, mp1, mp2);
+
+   }
+   return 0;
+}
+
+static void create(HWND hwnd, PCREATESTRUCT info)
+{
+   LBDATA       *cfg            = malloc(sizeof(LBDATA));
+
+   WinSetWindowPtr(hwnd,0,cfg);
+
+   if(!cfg)
+   {
+      WinPostMsg(hwnd,WM_CLOSE,0,0);
+      return;
+   }
+
+   memset(cfg,0,sizeof(LBDATA));
+   cfg->selected =
+   cfg->top      = LIT_NONE;
+}
+
+static void destroy(HWND hwnd)
+{
+   LBDATA       *cfg = WinQueryWindowPtr(hwnd,0);
+   int          f;
+
+   if(cfg->bg)
+      GpiDeleteBitmap(cfg->bg);
+
+   if(cfg->list)
+      free(cfg->list);
+
+   free(cfg);
+}
+
+static void paint(HWND hwnd)
+{
+   LBDATA       *cfg    = WinQueryWindowPtr(hwnd,0);
+   HPS          hps;
+   RECTL        rcl;
+   POINTL       p;
+   OWNERITEM    itn;
+   HWND         owner   = WinQueryWindow(hwnd, QW_OWNER);
+   USHORT       id      = WinQueryWindowUShort(hwnd,QWS_ID);
+   HSKIN        skn     = (HSKIN) WinSendMsg(owner,WMSKN_QUERYSKIN,0,0);
+   LONG         alTable[SKC_MAXCOLORS];
+   int          f;
+
+/*
+   hps = WinBeginPaint(hwnd,NULLHANDLE,&rcl);
+   WinQueryWindowRect(hwnd, &rcl);
+   paintImage(hps, rcl.xRight, rcl.yTop);
+   WinEndPaint(hps);
+*/
+
+   hps = WinBeginPaint(hwnd,NULLHANDLE,&rcl);
+
+   p.x = rcl.xLeft;
+   p.y = rcl.yBottom;
+
+   WinDrawBitmap(      hps,
+                       cfg->img,
+                       &rcl,
+                       &p,
+                       CLR_WHITE,
+                       CLR_BLACK,
+                       DBM_NORMAL);
+
+   if(cfg->selected != LIT_NONE)
+   {
+      /* Imprime o selecionado */
+      GpiQueryLogColorTable(hps, 0L, 0L, SKC_MAXCOLORS, alTable);
+      for(f=0;f<SKC_MAXCOLORS;f++)
+         alTable[f] = skn->color[f];
+      GpiCreateLogColorTable(hps,0L,LCOLF_CONSECRGB,0L,SKC_MAXCOLORS,alTable);
+
+      WinQueryWindowRect(hwnd, &rcl);
+
+      memset(&itn,0,sizeof(OWNERITEM));
+      itn.hwnd                 = hwnd;
+      itn.hps                  = hps;
+      itn.idItem               = cfg->selected;
+      itn.hItem                = (cfg->list + cfg->selected)->hItem;
+      itn.rclItem.xLeft        = rcl.xLeft;
+      itn.rclItem.xRight       = rcl.xRight;
+      itn.rclItem.yTop         = (cfg->list + cfg->selected)->yTop;
+      itn.rclItem.yBottom      = (cfg->list + cfg->selected)->yBottom;
+
+      itn.fsState |= 1;
+      WinFillRect(hps, &itn.rclItem, SKC_SELECTEDBACKGROUND);
+
+      WinSendMsg(owner,WM_DRAWITEM,MPFROMSHORT(id),MPFROMP(&itn));
+
+   }
+
+
+   WinEndPaint(hps);
+
+/*
+   LBDATA       *cfg    = WinQueryWindowPtr(hwnd,0);
+   HPS          hps;
+   SHORT        atual;
+   HWND         owner   = WinQueryWindow(hwnd, QW_OWNER);
+   USHORT       id      = WinQueryWindowUShort(hwnd,QWS_ID);
+   OWNERITEM    itn;
+   int          row;
+   POINTL       p;
+   int          f;
+   HSKIN        skn             = (HSKIN) WinSendMsg(WinQueryWindow(hwnd, QW_OWNER),WMSKN_QUERYSKIN,0,0);
+   LONG         alTable[SKC_MAXCOLORS];
+
+   cfg->flags &= ~LBF_REDRAW;
+
+   hps = WinBeginPaint(hwnd,NULLHANDLE,&rcl);
+
+
+   // Pinta os elementos da tela
+
+   if(cfg->top != LIT_NONE)
+   {
+      WinQueryWindowRect(hwnd, &rcl);
+      row = rcl.yTop;
+
+      GpiQueryLogColorTable(hps, 0L, 0L, SKC_MAXCOLORS, alTable);
+
+      for(f=0;f<SKC_MAXCOLORS;f++)
+         alTable[f] = skn->color[f];
+
+      GpiCreateLogColorTable(hps,0L,LCOLF_CONSECRGB,0L,SKC_MAXCOLORS,alTable);
+
+      for(atual = cfg->top;atual < cfg->itens && row > 0; atual++)
+      {
+         memset(&itn,0,sizeof(OWNERITEM));
+         itn.hwnd                 = hwnd;
+         itn.hps                  = hps;
+         itn.idItem               = atual;
+         itn.hItem                = (cfg->list + atual)->hItem;
+         itn.rclItem.xLeft        = rcl.xLeft;
+         itn.rclItem.xRight       = rcl.xRight;
+
+         (cfg->list+atual)->yTop  =
+         itn.rclItem.yTop         = row;
+
+         row -= queryItemSize(hps,owner,id,(const char *) itn.hItem,atual,NULL);
+
+         (cfg->list+atual)->yBottom  =
+         itn.rclItem.yBottom         = row;
+
+         row--;
+
+         if(atual == cfg->selected)
+         {
+            // Item esta selecionado, pinta uma tarja
+            itn.fsState |= 1;
+            WinFillRect(hps, &itn.rclItem, SKC_SELECTEDBACKGROUND);
+         }
+         else if(cfg->bg)
+         {
+            // Pinta o bitmap de fundo
+            p.x = itn.rclItem.xLeft;
+            p.y = itn.rclItem.yBottom;
+
+            WinDrawBitmap(      hps,
+                                cfg->bg,
+                                &itn.rclItem,
+                                &p,
+                                SKC_FOREGROUND,
+                                SKC_BACKGROUND,
+                                DBM_NORMAL);
+
+         }
+         else
+         {
+            // Pinta a cor de fundo
+            WinFillRect(hps, &itn.rclItem, SKC_BACKGROUND);
+         }
+
+         WinSendMsg(owner,WM_DRAWITEM,MPFROMSHORT(id),MPFROMP(&itn));
+      }
+
+      rcl.yTop = ++row;
+      if(cfg->bg)
+      {
+         // Pinta o bitmap de fundo
+         p.x = rcl.xLeft;
+         p.y = rcl.yBottom;
+
+         WinDrawBitmap(      hps,
+                             cfg->bg,
+                             &rcl,
+                             &p,
+                             SKC_FOREGROUND,
+                             SKC_BACKGROUND,
+                             DBM_NORMAL);
+
+      }
+      else
+      {
+         // Pinta a cor de fundo
+         WinFillRect(hps, &rcl, SKC_BACKGROUND);
+      }
+
+   }
+   WinEndPaint(hps);
+   */
+
+
+}
+
+static void sizePos(HWND hwnd,SHORT x, SHORT y, SHORT cx, SHORT cy)
+{
+   LBDATA *cfg = WinQueryWindowPtr(hwnd,0);
+
+   DBGTrace(cx);
+   DBGTrace(cy);
+
+   cfg->x  = x;
+   cfg->y  = y;
+   cfg->cx = cx;
+   cfg->cy = cy;
+}
+
+static void reposic(HWND hwnd,USHORT mCx,USHORT mCy)
+{
+   LBDATA    *cfg = WinQueryWindowPtr(hwnd,0);
+   SHORT     x,y,cx,cy;
+
+   if(!(cfg->cx || cfg->cy))
+   {
+      WinShowWindow(hwnd,FALSE);
+      return;
+   }
+
+   x  = cfg->x  < 0 ? (mCx + cfg->x) - cfg->cx  : cfg->x;
+   y  = cfg->y  < 0 ? (mCy + cfg->y) - cfg->cy  : cfg->y;
+
+   cx = cfg->cx < 0 ? mCx + cfg->cx : cfg->cx;
+   cy = cfg->cy < 0 ? mCy + cfg->cy : cfg->cy;
+
+   DBGTrace(mCy);
+   DBGTrace(cfg->cy);
+
+   WinSetWindowPos(     hwnd,
+                        0,
+                        x,y,
+                        cx,cy,
+                        SWP_MOVE|SWP_SIZE|SWP_SHOW );
+
+
+}
+
+static void clearList(HWND hwnd)
+{
+   LBDATA  *cfg = WinQueryWindowPtr(hwnd,0);
+
+   if(!cfg->list)
+      return;
+
+   cfg->itens = 0;
+
+   windowChanged(hwnd);
+
+}
+
+static void addItemHandle(HWND hwnd, ULONG hdl)
+{
+   LBDATA  *cfg = WinQueryWindowPtr(hwnd,0);
+   ITNDATA *i;
+
+   if(!cfg->list)
+   {
+      DBGMessage("Alocar nova tabela de dados");
+      cfg->tSize = _ALLOC_STEP_;
+      cfg->list  = malloc( _ALLOC_STEP_ * sizeof(ITNDATA));
+   }
+   else if(cfg->itens >= cfg->tSize)
+   {
+      DBGMessage("Aumentar o tamanho da tabela de dados");
+      cfg->tSize += _ALLOC_STEP_;
+      cfg->list   = realloc(cfg->list,cfg->tSize * sizeof(ITNDATA));
+   }
+
+   if(!cfg->list)
+      return;
+
+   i = (cfg->list + cfg->itens);
+
+   i->hItem     = hdl;
+
+   i->yTop     =
+   i->yBottom  = 0;
+
+   if(cfg->hConnect)
+      WinPostMsg(cfg->hConnect,WMSKN_SETLIMITS,0,MPFROMLONG(cfg->itens));
+
+   cfg->itens++;
+
+   if(cfg->top == LIT_NONE)
+   {
+      cfg->top = 0;
+      if(cfg->hConnect)
+         WinPostMsg(cfg->hConnect,WMSKN_SETVALUE,0,MPFROMLONG(cfg->top));
+   }
+
+   windowChanged(hwnd);
+
+}
+
+static void doConnect(HWND hwnd, HWND to, ULONG msg)
+{
+   LBDATA *cfg = WinQueryWindowPtr(hwnd,0);
+   cfg->hConnect = to;
+   cfg->mConnect = msg;
+}
+
+static void setTop(HWND hwnd,USHORT top)
+{
+   LBDATA  *cfg = WinQueryWindowPtr(hwnd,0);
+
+   if(top < cfg->itens)
+   {
+      cfg->top = top;
+      windowChanged(hwnd);
+   }
+}
+
+static BOOL btnDown(HWND hwnd, ULONG ps, ULONG masc)
+{
+   LBDATA  *cfg = WinQueryWindowPtr(hwnd,0);
+   POINTS  *p   = (POINTS *) & ps;
+
+   cfg->flags |= (LBF_BUTTONDOWN|masc);
+
+   WinSetCapture(HWND_DESKTOP,hwnd);
+   WinStartTimer(WinQueryAnchorBlock(hwnd), hwnd, 1, UPDATE_TIME);
+   return mouseMove(hwnd, p->x, p->y);
+}
+
+static BOOL btnUp(HWND hwnd, ULONG p, ULONG masc)
+{
+   LBDATA  *cfg = WinQueryWindowPtr(hwnd,0);
+   BOOL    ret  = (cfg->flags & masc) != 0;
+   WinSetCapture(HWND_DESKTOP,NULLHANDLE);
+   WinStopTimer(WinQueryAnchorBlock(hwnd), hwnd, 1);
+
+   cfg->flags &= ~(LBF_BUTTONDOWN|masc);
+
+   windowChanged(hwnd);
+
+   return ret;
+}
+
+static void doTimer(HWND hwnd)
+{
+   LBDATA       *cfg    = WinQueryWindowPtr(hwnd,0);
+   if( (cfg->flags|LBF_REDRAW) != 0)
+      windowChanged(hwnd);
+}
+
+static BOOL mouseMove(HWND hwnd, USHORT x, USHORT y)
+{
+   LBDATA       *cfg    = WinQueryWindowPtr(hwnd,0);
+   SHORT        atual;
+
+   if(!(cfg->flags&LBF_BUTTONDOWN))
+      return FALSE;
+
+   if(!cfg->list)
+      return FALSE;
+
+   for(atual = cfg->top;atual < cfg->itens; atual++)
+   {
+      if( y <= (cfg->list + atual)->yTop && y >= (cfg->list + atual)->yBottom)
+      {
+         selectItem(hwnd,cfg,atual);
+         return TRUE;
+      }
+   }
+   return FALSE;
+}
+
+static void selectItem(HWND hwnd, LBDATA *cfg, USHORT atual)
+{
+  if(atual != cfg->selected)
+  {
+     cfg->flags    |= LBF_REDRAW;
+     cfg->selected  = atual;
+     if(!(cfg->flags&LBF_BUTTONDOWN))
+        WinInvalidateRect(hwnd, 0, TRUE);
+  }
+}
+
+static void chkForMenu(HWND hwnd)
+{
+   /* Se existir um menu associado, ativa-o */
+   LBDATA       *cfg    = WinQueryWindowPtr(hwnd,0);
+
+   if(cfg->hMenu)
+      WinPostMsg(cfg->hMenu,WMSKN_SHOWMENU,0,0);
+
+}
+
+static void ajustBackground(HWND hwnd, PSWP swp)
+{
+   LBDATA *cfg  = WinQueryWindowPtr(hwnd,0);
+   createControlBackground(hwnd, swp, &cfg->bg, NULL);
+}
+
+int queryItemSize(HPS hps, HWND owner, USHORT id, const char *text, short atual, USHORT *cols)
+{
+   MRESULT      sizes;
+   POINTL       aptl[TXTBOX_COUNT];
+   int          ret;
+
+   sizes = WinSendMsg(owner,WM_MEASUREITEM,MPFROMSHORT(id),MPFROMSHORT(atual));
+
+   if(sizes)
+   {
+      ret = SHORT1FROMMR(sizes);
+      if(cols)
+         *cols = SHORT2FROMMR(sizes);
+   }
+   else
+   {
+      GpiQueryTextBox(    hps,
+                          strlen(text),
+                          (char *) text,
+                          TXTBOX_COUNT,
+                          aptl);
+      ret = (aptl[TXTBOX_TOPRIGHT].y - aptl[TXTBOX_BOTTOMRIGHT].y);
+
+      if(cols)
+         *cols = (aptl[TXTBOX_TOPRIGHT].x - aptl[TXTBOX_TOPLEFT].x);
+   }
+   return ret;
+}
+
+static HWND assignMenu(HWND hwnd, USHORT id, ULONG style)
+{
+   LBDATA *cfg  = WinQueryWindowPtr(hwnd,0);
+
+   DBGTracex(cfg);
+
+   if(cfg->hMenu)
+      return NULLHANDLE;
+   cfg->hMenu = CreatePopupMenu(WinQueryWindow(hwnd, QW_OWNER), id, style);
+   DBGTracex(cfg->hMenu);
+   return cfg->hMenu;
+}
+
+static void insertMenuItem(HWND hwnd, MPARAM mp1, MPARAM mp2)
+{
+   LBDATA *cfg  = WinQueryWindowPtr(hwnd,0);
+
+   if(cfg->hMenu)
+      WinSendMsg(cfg->hMenu,WMSKN_INSERTMENUITEM,mp1,mp2);
+}
+
+void ajustPresParam(HWND hwnd, ULONG parm)
+{
+   char         buffer[40];
+
+   switch(parm)
+   {
+   case PP_FOREGROUNDCOLOR:
+      return;
+
+   case PP_BACKGROUNDCOLOR:
+      return;
+
+   case PP_FONTHANDLE:
+      DBGMessage("********************* MUDOU O HANDLE DA FONTE");
+      return;
+
+   case PP_FONTNAMESIZE:
+      *buffer = 0;
+      WinQueryPresParam(      hwnd,
+                              parm,
+                              0,
+                              NULL,
+                              40,
+                              buffer,
+                              0);
+
+      DBGMessage(buffer);
+
+      if(*buffer)
+      {
+         WinSendMsg(    WinQueryWindow(hwnd, QW_OWNER),
+                        WMSKN_FONTCHANGED,
+                        MPFROMSHORT(WinQueryWindowUShort(hwnd,QWS_ID)),
+                        MPFROMP(buffer) );
+      }
+      break;
+
+   default:
+      return;
+
+   }
+   windowChanged(hwnd);
+
+}
+
+static void paintImage(HPS hps, HWND hwnd, USHORT cx, USHORT cy)
+{
+   LBDATA       *cfg    = WinQueryWindowPtr(hwnd,0);
+   HWND         owner   = WinQueryWindow(hwnd, QW_OWNER);
+   USHORT       id      = WinQueryWindowUShort(hwnd,QWS_ID);
+
+   HSKIN        skn     = (HSKIN) WinSendMsg(owner,WMSKN_QUERYSKIN,0,0);
+
+   LONG         alTable[SKC_MAXCOLORS];
+   int          f;
+   int          row     = cy;
+   POINTL       p;
+   SHORT        atual;
+   OWNERITEM    itn;
+
+   /* Ajusta palettes */
+   GpiQueryLogColorTable(hps, 0L, 0L, SKC_MAXCOLORS, alTable);
+   for(f=0;f<SKC_MAXCOLORS;f++)
+      alTable[f] = skn->color[f];
+   GpiCreateLogColorTable(hps,0L,LCOLF_CONSECRGB,0L,SKC_MAXCOLORS,alTable);
+
+   if(cfg->top != LIT_NONE)
+   {
+      for(atual = cfg->top;atual < cfg->itens && row > 0; atual++)
+      {
+         memset(&itn,0,sizeof(OWNERITEM));
+         itn.hwnd                 = hwnd;
+         itn.hps                  = hps;
+         itn.idItem               = atual;
+         itn.hItem                = (cfg->list + atual)->hItem;
+         itn.rclItem.xLeft        = 0;
+         itn.rclItem.xRight       = cx;
+
+         (cfg->list+atual)->yTop  =
+         itn.rclItem.yTop         = row;
+
+         row -= queryItemSize(hps,owner,id,(const char *) itn.hItem,atual,NULL);
+
+         (cfg->list+atual)->yBottom  =
+         itn.rclItem.yBottom         = row;
+
+         if(cfg->bg)
+         {
+            // Pinta o bitmap de fundo
+            p.x = itn.rclItem.xLeft;
+            p.y = itn.rclItem.yBottom;
+
+            WinDrawBitmap(      hps,
+                                cfg->bg,
+                                &itn.rclItem,
+                                &p,
+                                SKC_FOREGROUND,
+                                SKC_BACKGROUND,
+                                DBM_NORMAL);
+
+         }
+         else
+         {
+            // Pinta a cor de fundo
+            WinFillRect(hps, &itn.rclItem, SKC_BACKGROUND);
+         }
+
+         WinSendMsg(owner,WM_DRAWITEM,MPFROMSHORT(id),MPFROMP(&itn));
+
+      }
+   }
+
+   p.y = itn.rclItem.yBottom  =
+   p.x = itn.rclItem.xLeft    = 0;
+
+   itn.rclItem.xRight         = cx;
+   itn.rclItem.yTop           = row;
+
+   if(cfg->bg)
+   {
+      // Pinta o bitmap de fundo
+
+      WinDrawBitmap(      hps,
+                          cfg->bg,
+                          &itn.rclItem,
+                          &p,
+                          SKC_FOREGROUND,
+                          SKC_BACKGROUND,
+                          DBM_NORMAL);
+
+   }
+   else
+   {
+      // Pinta a cor de fundo
+      WinFillRect(hps, &itn.rclItem, SKC_BACKGROUND);
+   }
+
+}
+
+static void windowChanged(HWND hwnd)
+{
+   RECTL rcl;
+   WinQueryWindowRect(hwnd, &rcl);
+   createBaseImage(hwnd, WinQueryWindowPtr(hwnd,0), rcl.xRight, rcl.yTop);
+   WinInvalidateRect(hwnd, 0, TRUE);
+}
+
+static void resize(HWND hwnd, USHORT cx, USHORT cy)
+{
+   LBDATA               *cfg    = WinQueryWindowPtr(hwnd,0);
+   if(cfg->img)
+      GpiDeleteBitmap(cfg->img);
+   cfg->img = NULLHANDLE;
+   createBaseImage(hwnd, cfg, cx, cy);
+}
+
+static void createBaseImage(HWND hwnd, LBDATA *cfg, USHORT cx, USHORT cy)
+{
+   /* Reconstruo o bitmap de trabalho */
+
+   HDC                  hdc;
+   SIZEL                sizl    = { 0, 0 };  /* use same page size as device */
+   DEVOPENSTRUC         dop     = {0L, "DISPLAY", NULL, 0L, 0L, 0L, 0L, 0L, 0L};
+   HAB                  hab     = WinQueryAnchorBlock(hwnd);
+   BITMAPINFOHEADER2    bmih;
+   HPS                  hps;
+   ULONG		Lcid;
+
+   char                 fName[10];
+   FATTRS               font;
+
+   hps = WinGetPS(hwnd);
+   GpiQueryLogicalFont(hps, 0,(PSTR8) fName,&font,sizeof(FATTRS));
+   WinReleasePS(hps);
+
+   hdc = DevOpenDC(hab, OD_MEMORY, "*", 5L, (PDEVOPENDATA)&dop, NULLHANDLE);
+   hps = GpiCreatePS(hab, hdc, &sizl, PU_PELS | GPIT_MICRO | GPIA_ASSOC);
+
+   if(!cfg->img)
+   {
+      /* Nao tem bitmap criado, cria um novo */
+      memset(&bmih,0, sizeof(BITMAPINFOHEADER2));
+      bmih.cbFix        = sizeof(bmih);
+      bmih.cx           = cx;
+      bmih.cy           = cy;
+      bmih.cPlanes      = 1;
+      bmih.cBitCount    = 24;
+      cfg->img          = GpiCreateBitmap(    hps, &bmih, 0L, NULL, NULL);
+   }
+
+   GpiSetBitmap(hps, cfg->img);
+
+   GpiCreateLogFont(hps, NULL, 1L, &font);
+   GpiSetCharSet(hps, Lcid);
+
+   paintImage(hps,hwnd,cx,cy);
+
+   GpiSetCharSet(hps, 0L);          /* release the font before deleting */
+   GpiDeleteSetId(hps, 1L);         /* delete the logical font          */
+
+   GpiSetBitmap(hps, NULLHANDLE);
+
+   GpiDestroyPS(hps);
+   // DevCloseDC(hdc);
+
+}
+

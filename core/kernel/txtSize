@@ -1,0 +1,9 @@
+event.c:       icq->cntlFlags |= ICQFC_CLEAR;
+msg.c:    icq->cntlFlags &= ~ICQFC_CLEAR;
+query.c:    return icq->cntlFlags & ICQFC_CLEAR;
+setvals.c:       icq->cntlFlags &= ~ICQFC_CLEAR;
+timer.c:    if(icq->autoSaveTimer++ > 2 && (icq->cntlFlags & ICQFC_CLEAR) && !icq->searchs )
+timer.c:                                               && (icq->cntlFlags & ICQFC_CLEAR);
+uquery.c:    icq->cntlFlags &= ~ICQFC_CLEAR;
+user.c:                                (ULONG) icq->cntlFlags & (ICQFC_LOGONCOMPLETE|ICQFC_CLEAR),
+user.c:                                (ULONG) ICQFC_LOGONCOMPLETE|ICQFC_CLEAR,

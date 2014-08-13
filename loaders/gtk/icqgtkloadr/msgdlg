@@ -1,0 +1,146 @@
+/*
+ * Processamento do dialogo de mensagem
+ */
+
+ #include <string.h>
+ #include <malloc.h>
+  
+ #include "icqgtk.h"
+ 
+/*---[ Defines ]--------------------------------------------------------------------------------------------*/
+
+ #define ICQMSGC_CLOSE	    0	/* Close button */
+ #define ICQMSGC_STATICUIN	1    /* ICQ# text    */
+ #define ICQMSGC_UIN          2    /* User uin     */
+ #define ICQMSGC_STATICNICK   3    /* Nick         */
+ #define ICQMSGC_NICKNAME     4    /* Nickname     */
+ #define ICQMSGC_STATICNAME   5    /* Name         */
+ #define ICQMSGC_NAME         6 
+ #define ICQMSGC_STATICEMAIL  7 
+ #define ICQMSGC_EMAIL        8 
+ #define ICQMSGC_TEXT		 9	/* Text area	*/
+
+ #define QTD_WIDGETS		 10
+
+ #pragma pack(1)
+ 
+ struct cfg
+ {
+    USHORT   	sz;
+    ULONG		uin;
+    USHORT   	type;
+    GtkWidget    *main;
+    GtkWidget	*cntl[QTD_WIDGETS];
+
+ };
+
+/*---[ Prototipes ]-----------------------------------------------------------------------------------------*/
+
+ static void destroy( GtkWidget *, struct cfg *);
+
+/*---[ Implement ]------------------------------------------------------------------------------------------*/
+
+ static const USHORT textBoxes[] = { ICQMSGC_UIN, ICQMSGC_NICKNAME, ICQMSGC_NAME, ICQMSGC_EMAIL, 0 };
+    
+/*---[ Implement ]------------------------------------------------------------------------------------------*/
+
+ int icqgtk_openMessageWindow(HICQ icq, ULONG uin, USHORT type, HMSG msg)
+ {
+    struct cfg   *wnd;
+    GtkWidget    *temp;
+    GtkWidget    *box;
+    const USHORT *itn;
+    
+    if(!uin)
+       return -1;
+
+    wnd = malloc(sizeof(struct cfg));
+    
+    if(!wnd)
+    {
+       icqWriteSysLog(icq,PROJECT,"Memory allcation error when opening message window");
+       icqAbend(icq,ICQMSG_MEMORYERROR);
+       return -1;
+    }
+    
+    wnd->sz   = sizeof(struct cfg);
+    wnd->uin  = uin;
+    wnd->type = type;
+           
+    DBGMessage("Abrir caixa de mensagem");
+
+    wnd->main = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    box       = gtk_vbox_new(FALSE,0);
+
+    gtk_signal_connect(GTK_OBJECT(wnd->main), "destroy", GTK_SIGNAL_FUNC(destroy), wnd);
+
+    /* Constroi campos estaticos */
+    wnd->cntl[ICQMSGC_STATICUIN]   = gtk_label_new("ICQ#");
+    wnd->cntl[ICQMSGC_STATICNICK]  = gtk_label_new("Nick:");
+    wnd->cntl[ICQMSGC_STATICNAME]  = gtk_label_new("Name:");
+    wnd->cntl[ICQMSGC_STATICEMAIL] = gtk_label_new("E-Mail:");
+    
+    /* Constroi campos de dados */
+    for(itn = textBoxes;*itn;itn++)
+    {
+       temp = wnd->cntl[*itn] = gtk_entry_new();
+       gtk_entry_set_editable(GTK_ENTRY(temp),FALSE);
+    }
+    
+    
+/*    
+    wnd->cntl[ICQMSGC_UIN]         = gtk_entry_new_with_max_length(10);
+    wnd->cntl[ICQMSGC_NICKNAME]    = gtk_entry_new_with_max_length(80);
+    wnd->cntl[ICQMSGC_NAME]        = gtk_entry_new_with_max_length(0xFF);
+    wnd->cntl[ICQMSGC_EMAIL]       = gtk_entry_new_with_max_length(0xFF);
+*/    
+
+/*
+    wnd->cntl[ICQMSGC_EMAIL]       = gtk_button_new_with_label("E-Mail");
+    wnd->cntl[ICQMSGC_UIN]         = gtk_button_new_with_label("UIN");
+    wnd->cntl[ICQMSGC_NICKNAME]    = gtk_button_new_with_label("NickName");
+    wnd->cntl[ICQMSGC_NAME]        = gtk_button_new_with_label("Name");
+    wnd->cntl[ICQMSGC_EMAIL]       = gtk_button_new_with_label("E-Mail");
+*/    
+    /* Constroi a parte superior da janela */
+    temp = gtk_table_new(2,4,FALSE);
+
+    gtk_table_attach(GTK_TABLE(temp), wnd->cntl[ICQMSGC_STATICUIN], 0, 1, 0, 1, 0, 0, 2, 2);
+    gtk_table_attach(GTK_TABLE(temp), wnd->cntl[ICQMSGC_UIN], 1, 2, 0, 1,GTK_EXPAND|GTK_SHRINK|GTK_FILL,0, 2, 2);
+
+    gtk_table_attach(GTK_TABLE(temp), wnd->cntl[ICQMSGC_STATICNAME], 2, 3, 0, 1, 0, 0, 2, 2);
+    gtk_table_attach(GTK_TABLE(temp), wnd->cntl[ICQMSGC_NAME], 3, 4, 0, 1,GTK_EXPAND|GTK_SHRINK|GTK_FILL,0, 2, 2);
+    
+    gtk_table_attach(GTK_TABLE(temp), wnd->cntl[ICQMSGC_STATICNICK], 0, 1, 1, 2, 0, 0, 2, 2);
+    gtk_table_attach(GTK_TABLE(temp), wnd->cntl[ICQMSGC_NICKNAME], 1, 2, 1, 2,GTK_EXPAND|GTK_SHRINK|GTK_FILL,0, 2, 2);
+
+    gtk_table_attach(GTK_TABLE(temp), wnd->cntl[ICQMSGC_STATICEMAIL], 2, 3, 1, 2, 0, 0, 2, 2);
+    gtk_table_attach(GTK_TABLE(temp), wnd->cntl[ICQMSGC_EMAIL], 3, 4, 1, 2,GTK_EXPAND|GTK_SHRINK|GTK_FILL,0, 2, 2);
+    gtk_container_add (GTK_CONTAINER(box), temp);
+
+    wnd->cntl[ICQMSGC_TEXT] = gtk_text_new(NULL,NULL);
+    gtk_text_set_editable(GTK_TEXT(wnd->cntl[ICQMSGC_TEXT]),TRUE);
+
+    gtk_container_add (GTK_CONTAINER(box), wnd->cntl[ICQMSGC_TEXT]);
+
+//    wnd->cntl[ICQMSGC_CLOSE] = gtk_button_new_with_label("Close");
+        
+        
+    gtk_container_add (GTK_CONTAINER(wnd->main), box);
+    gtk_window_set_default_size(GTK_WINDOW(wnd->main),366,250);
+    gtk_widget_show_all(wnd->main);
+    return 0;
+ }
+
+ static void destroy( GtkWidget *widget, struct cfg *wnd)
+ {
+    DBGMessage("Janela de mensagems destruida");
+    
+    if(wnd->sz != sizeof(struct cfg))
+       return;
+
+    
+    memset(wnd,0,sizeof(struct cfg));    
+    free(wnd);
+    DBGMessage("Clean-up da janela de mensagems completo");
+ }

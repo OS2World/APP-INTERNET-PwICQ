@@ -1,0 +1,209 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>
+	OSCAR Protocol: Section 9: Miscelanea
+    </title>
+  </head>
+
+  <body bgcolor="#FFFFFF" link="#444444" vlink="#666666">
+    <table width="1" border="0" align="center">
+      <tr>
+	<td><img src="/images/blank.gif" height="1" width="540">
+      </tr>
+      <tr>
+	<td align="right">
+	  <img src="/faim/faim.gif" border="0" width="111" height="50"><br>
+	  <A href="/pst/"><img src="/pst/pst_small.gif" border="0"></a>
+	</td>
+      </tr>
+      <tr>
+	<td align="center">
+	  <b><font size="+1">AIM/Oscar Protocol Specification: Section 9: Miscelanea</font></b>
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  <hr noshade>
+	  <table width="100%" border="0" align="center">
+	    <tr>
+	      <td width="1%" valign="top">
+		<img src="/images/blank.gif" width="5" height="1" border="0"><br>
+	      </td>
+	      <td width="1%" bgcolor="#BBBBBB">
+
+	      </td>
+	      <td width="1%">
+		<img src="/images/blank.gif" width="5" height="1" border="0">
+	      </td>
+	      <td width="98%">
+		<img src="/images/blank.gif" width="460" height="1" border="0"><br>
+
+		<font size="+1"><b>9.0 Miscelanea</b></font>
+		<p>
+		  There's a few "features" that just don't fall under a larger category.
+		</p>
+		<b>9.1 Inviting a Friend to Join AIM</b>
+		<p>
+		  Well, AIM has this really stupid feature to automatically send an invitation to a "friend" to join AIM.  You just give it an email address and a short message, and it's sends it for you.
+		</p>
+		<center><B>Fig 9.1.1 Invite a Friend Command</b></center>
+		<table border="2" align="centeR">
+		  <tr><td>Position</td><td>Length</td><td>Data</td></tr>
+		  <tr><td>1</td><td>Word</td><td>0x0006</td></tr>
+		  <tr><Td>3</td><td>Word</td><td>0x0003</td></tr>
+		  <tr><Td>5</tD><td>Word</td><td>0x0000</td></tr>
+		  <tr><td>7</td><td>DWord</td><td>Request ID</td></tr>
+		  <tr><td>11</td><td>Word</td><Td>0x0011</td></tr>
+		  <tr><td>13</td><td>Word</td><td>0x0010</td></tr>
+		  <tr><Td>15</td><td>Word</td><td>EMail Address Length</td></tr>
+		  <Tr><Td>17</td><td>ASCII String</tD><td>EMail Address (unterminated)</td></tr>
+		  <tr><td>18</td><td>Word</td><td>0x0015</td></tr>
+		  <tr><Td>20</td><td>Word</td><td>Message Length</td></tr>
+		  <tr><td>22</td><td>ASCII String</td><td>Message (unterminated)</td></tr>
+		</table>
+		<p>
+		  In response, the server sends a "Invitation Successful" command to the client.
+		</p>
+		<center><B>Fig 9.1.2 Invitation Successful</b></center>
+		<table border="2" align="centeR">
+		  <tr><td>Position</td><td>Length</td><td>Data</td></tr>
+		  <tr><td>1</td><td>Word</td><td>0x0006</td></tr>
+		  <tr><Td>3</td><td>Word</td><td>0x0003</td></tr>
+		  <tr><Td>5</tD><td>Word</td><td>0x0000</td></tr>
+		  <tr><td>7</td><td>DWord</td><td>Request ID</td></tr>
+		</table>
+		<p></p>
+		<b>9.2 Changing Your Password</b>
+		<p>
+		  This looks a little complicated.  You have to open a connection back to the authorizer again, and then negotiate the whole process there.  It's a total of 15 or so commands.  Maybe later.
+		</p>
+
+
+		<p></p>
+		<b>9.3 The "user info" block</b>
+		    <p>
+            <p>
+            <p>
+            <p>
+            <p>
+            <p>Since this fits into quite a few different areas of AIM, it's current 
+              home is here in the miscellaneous section.
+            <p>
+            <p>Basically, many times throughout the life of your AIM session you'll 
+              have to pass around and parse this user info block, which consists 
+              of a few basic elements that represent an online user and his/her 
+              status. This shows up in ICBMs, online buddy notifications, search 
+              responses, and more. If you see &quot;user info&quot; referenced 
+              anywhere throughout this protocol, this is what that means.
+            <center>
+              <b>Fig 9.3.1 &quot;User Info&quot; Block </b> 
+            </center>
+            <table border="2" align="centeR" width="380">
+              <tr> 
+                <td>Position</td>
+                <td>Length</td>
+                <td>Data</td>
+              </tr>
+              <tr> 
+                <td>1</td>
+                <td>Byte</td>
+                <td>SN length</td>
+              </tr>
+              <tr> 
+                <td>2</td>
+                <td>ASCII String</td>
+                <td>Screen Name</td>
+              </tr>
+              <tr> 
+                <td>3</td>
+                <td>Word</td>
+                <td>User's warning level</td>
+              </tr>
+              <tr> 
+                <td>5</td>
+                <td>Word</td>
+                <td>Number of TLVs to follow</td>
+              </tr>
+              <tr> 
+                <td>7</td>
+                <td>RAW</td>
+                <td>TLVs</td>
+              </tr>
+            </table>
+            <p>Where TLVs can be of the following types:</p>
+            <table border="0" align="centeR" width="229">
+              <tr> 
+                <td colspan="2"> 
+                  <hr noshade>
+                </td>
+              </tr>
+              <tr> 
+                <td width="59"><u>TLV </u></td>
+                <td width="155"><u>Data</u></td>
+              </tr>
+              <tr> 
+                <td width="59">0x0001</td>
+                <td width="155">User Class</td>
+              </tr>
+              <tr> 
+                <td width="59">0x0004</td>
+                <td width="155">Idle time</td>
+              </tr>
+              <tr> 
+                <td width="59">0x000f</td>
+                <td width="155">Session length (AIM)</td>
+              </tr>
+              <tr> 
+                <td width="59">0x0010</td>
+                <td width="155">Session length (AOL)</td>
+              </tr>
+              <tr> 
+                <td width="59">0x0002</td>
+                <td width="155">Member since (time_t)</td>
+              </tr>
+              <tr> 
+                <td width="59">0x0003</td>
+                <td width="155">Online since (time_t)</td>
+              </tr>
+              <tr> 
+                <td width="59">0x000d</td>
+                <td width="155">Capability block *</td>
+              </tr>
+              <tr> 
+                <td colspan="2"> 
+                  <hr noshade>
+                </td>
+              </tr>
+            </table>
+			<p>* See <a href="http://deepthought.auk.cx/faim/protocol/setuserinfo.html">here</a> for a description of the capability block.</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+            <p> 
+          </td>
+
+	      <td width="1%">&nbsp;</td>
+	      <td width="1%" bgcolor="#BBBBBB">&nbsp;
+		
+	      </td>
+	      <td width="1%" valign="top">
+		<img src="/images/blank.gif" width="50" height="1" border="0"><br>
+		<a href="/pst/"><img src="/pst/bar_home.gif" width="50" height="15" border="0"></a><br>
+		<a href="/pst/software/"><img src="/pst/bar_software.gif" width="50" height="15" border="0"></a>
+	      </td>
+	    </tr>
+	  </table>
+	  <hr noshade>
+	  <Center>
+	    <address><a href="mailto:afritz@iname.com">Adam Fritzler</a></address>
+		<address><a href="mailto:smw@ceruleanstudios.com">Scott Werndorfer</a></address>
+	      <!-- Created: Sat Jun 20 20:35:10 MST 1998 -->
+	    <!-- hhmts start -->
+Last modified: Wed Jun 21 19:33:31 EST 2000
+<!-- hhmts end -->	
+	  </center>
+	</td>
+      </tr>
+    </table>
+  </body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>
+	OSCAR Protocol: Section 6: Gathering Member Information
+    </title>
+  </head>
+
+  <body bgcolor="#FFFFFF" link="#444444" vlink="#666666">
+    <table width="1" border="0" align="center">
+      <tr>
+	<td><img src="/images/blank.gif" height="1" width="540">
+      </tr>
+      <tr>
+	<td align="right">
+	  <img src="/faim/faim.gif" border="0" width="111" height="50"><br>
+	  <A href="/pst/"><img src="/pst/pst_small.gif" border="0"></a>
+	</td>
+      </tr>
+      <tr>
+	<td align="center">
+	  <b><font size="+1">AIM/Oscar Protocol Specification: Section 6: Gathering Member Information</font></b>
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  <hr noshade>
+	  <table width="100%" border="0" align="center">
+	    <tr>
+	      <td width="1%" valign="top">
+		<img src="/images/blank.gif" width="5" height="1" border="0"><br>
+	      </td>
+	      <td width="1%" bgcolor="#BBBBBB">
+
+	      </td>
+	      <td width="1%">
+		<img src="/images/blank.gif" width="5" height="1" border="0">
+	      </td>
+	      <td width="98%">
+		<img src="/images/blank.gif" width="460" height="1" border="0"><br>
+
+
+		<font size="+1"><b>6.0 Gathering Member Information</b></font>
+		<p>
+		  Although not really very useful, several nuggets of information can be obtained about other AIM and AOL users through the OSCAR BOS.
+		</p>
+		<p>
+		  The lifetime of the information AIM BOS can provide you with is extremely limited.  Basically, you can only access a user's information while they are online.  The AIM servers do not store any information about users if they are not logged onto the service.  Please be aware of this.
+		</p>
+		<b>6.1 Gathering the Basics</b>
+		<p>
+		  Information that is very simple to gather includes:
+		</p>
+		<ul>
+		  <li>Member Class</li>
+		  <li>Warning Level</li>
+		  <li>Idle Time</li>
+		  <li>Time of Signon</li>
+		  <li>Date when Member began their AOL/AIM account</li>
+		</ul>
+		<p>
+		  These five things can be obtained simply by adding that screen name to your buddy list and waiting until they come online.  The "oncoming buddy" command documented above provides the transport for this information.  If you want information about a user and don't want to add them to your buddy list, please see the next subsection.
+		</p>
+		<b>6.2 Getting a Personal Profile</b>
+		<p>
+		  There's a specific command that the client issues to the server in order to request all available information about a user.  This is the "Request Member Information" command and is documented in the following table.  This is fairly self-explanatory command.
+		</p>
+		<center><b>Fig 6.2.1 Request Member Information Command</b></center>
+		<table border="2" align="center">
+		  <tr><td>Position</td><td>Length</td><td>Data</td></tr>
+		  <tr><td>1</td><td>Word</td><td>0x0002</td></tr>
+		  <tr><td>3</td><td>Word</td><td>0x0005</td></tr>
+		  <tr><td>5</td><Td>Word</td><td>0x0000</td></tr>
+		  <tr><td>7</td><td>DWord</td><td>Request ID</td></tR>
+		  <tr><td>11</td><td>Word</td>
+                <td>Requested Information *</td>
+              </tr>
+		  <tr><Td>13</td><Td>Byte</td><td>SN Length</td></tr>
+		  <tr><td>14</td><td>ASCII String</td><td>Screen Name (not terminated)</td></tr>
+		</table>
+		    <p> After the client sends that, the server sends back either the "User 
+              Information Response" command, or the "Invalid User Information 
+              Request". The latter almost always means that the user you requested 
+              information for is not logged on. </p>
+            <p>* Note that you can request one of two things here (as far as we 
+              know right now) -- 0x0001 will return the users profile, and 0x0003 
+              will return the users away message (if any). What you actually get 
+              in both cases is either the 0x0001 and 0x0002 TLVs (that are set 
+              when you send up your profile/away message) or the 0x0003 and 0x0004 
+              TLVs. Check the 0x0002/0x0004 SNAC for more information on this.</p>
+            <p>** Something else to note: it appears that requesting a datum of 
+              0x0005 will <i>not </i>return the users capability block. I've also 
+              attempted to send up a TLV with type 0x0007 to the server during 
+              the login process, but requesting it back through this mechanism 
+              didn't yield any results, although AIM took the 0x0007 TLV ok.</p>
+            <center><b>Fig 6.2.2 User Information Response Command</b></center>
+		<p>This table has been moved to <A href="userinfo_resp.html">here</a>.
+		<p></p>
+		<center><b>Fig 6.2.3 Invald User Information Request Command</b></center>
+		<table border="2" align="center">
+		  <tr><td>Position</td><td>Length</td><td>Data</td></tr>
+		  <tr><Td>1</td><td>Word</td><td>0x0002</td></tr>
+		  <tr><td>3</td><td>Word</td><td>0x0001</td></tr>
+		  <tr><td>5</td><td>DWord</td><td>ID of the Request that failed</td></tr>
+		  <tr><td>9</td><td>Word</td><td>0x0004</td></tr>
+		</table>
+		<p>
+		  Request IDs: You must pick a request ID to send up in the reqest so that you can identify the response to the request later.  Normally, the request response will not contain any of the information from the origial request and therefore will be useless if you don't know what it's in response to!  They're kind of like sequence numbers, but they're not as strict.  Reqest IDs are always 32-bit DWords.
+		</p>
+		<b>6.3 Finding People</b>
+		<p>
+		  The OSCAR BOS (basic services) allows a few rudimentrary methods of locating other AIM and AOL users.  
+		</p>
+		<u>6.3.1 Finding by EMail Address</u>
+		<p>
+		  A "find SN by email address" request is facilitated by the "Request Screen Name by Address" command in next table. 
+		</p>
+		<center><B>Fig 6.3.1.1 Request Screen Name by Address</b></center>
+		<table border="2" align="centeR">
+		  <tr><td>Position</td><td>Length</td><td>Data</td></tr>
+		  <tr><td>1</td><td>Word</td><td>0x000a</td></tr>
+		  <tr><td>3</td><td>Word</td><td>0x0002</tD></tr>
+		  <tr><td>5</td><td>Word</td><td>0x0000</td></tR>
+		  <tr><td>7</td><td>DWord</td><td>Request ID</td></tr>
+		  <tr><Td>11</td><td>ASCII String</td><td>Email Address (unterminated)</td></tr>
+		</table>
+		<p>
+		  Please notice the lack of a length byte/word prefixed to the email address.  It's kind of strange for this derivation in behavior, but AOL can do what they want.
+		</p>
+		<p>
+		  The server's response to that is the "Search by Address Response" command, explaned in the next table.  Please note that there may be several screen names per email address.
+		</p>
+		<center><B>Fig 6.3.1.2 Search by Address Response</b></center>
+		<table border="2" align="centeR">
+		  <tr><td>Position</td><td>Length</td><td>Data</td></tr>
+		  <tr><td>1</td><td>Word</td><td>0x000a</td></tr>
+		  <tr><Td>3</td><td>Word</td><td>0x0003</td></tr>
+		  <tr><Td>5</tD><td>Word</td><td>0x0000</td></tr>
+		  <tr><td>7</td><td>DWord</td><td>Request ID</td></tr>
+		  <tr><td>11*</td><td>Word</td><Td>0x0001</td></tr>
+		  <tr><td>13*</td><td>Word</td><td>SN Length</td></tr>
+		  <Tr><Td>15*</td><td>ASCII String</tD><td>SN (unterminated)</td></tr>
+		  <tr><td colspan="3">* Field repeats for every listed screen name.</td></tr>
+		</table>
+		<p>
+		  And if no screen names are found, we get the "Search by Address Response Fail" command below.
+		</p>
+		<center><B>Fig 6.3.1.3 Search by Address Fail</b></center>
+		<table border="2" align="centeR">
+		  <tr><td>Position</td><td>Length</td><td>Data</td></tr>
+		  <tr><td>1</td><td>Word</td><td>0x000a</td></tr>
+		  <tr><Td>3</td><td>Word</td><td>0x0001</td></tr>
+		  <tr><Td>5</tD><td>Word</td><td>0x0000</td></tr>
+		  <tr><td>7</td><td>DWord</td><td>Request ID</td></tr>
+		  <tr><td>11</td><td>Word</td><Td>0x0014</td></tr>
+		</table>
+		<p></p>
+		<u>6.3.2 Finding by Name</u>
+		<p>
+		  It would appear that AIM no longer has the feature of being able to find by name.  That now takes you to the address: <A href="http://www.aol.com/netfind/whitepages.html">http://www.aol.com/netfind/whitepages.html</a>.  I sure thought it used to do this....
+		</p>
+
+
+
+	      </td>
+
+	      <td width="1%">
+		<img src="/images/blank.gif" width="10" height="1" border="0">
+	      </td>
+	      <td width="1%" bgcolor="#BBBBBB">&nbsp;
+		
+	      </td>
+	      <td width="1%" valign="top">
+		<img src="/images/blank.gif" width="50" height="1" border="0"><br>
+		<a href="/pst/"><img src="/pst/bar_home.gif" width="50" height="15" border="0"></a><br>
+		<a href="/pst/software/"><img src="/pst/bar_software.gif" width="50" height="15" border="0"></a>
+	      </td>
+	    </tr>
+	  </table>
+	  <hr noshade>
+	  <Center>
+	    <address><a href="mailto:afritz@iname.com">Adam Fritzler</a></address>
+		<address><a href="mailto:smw@ceruleanstudios.com">Scott Werndorfer</a></address>
+        <address></address>
+        <address></address>
+        <address></address>
+	      <!-- Created: Sat Jun 20 20:35:10 MST 1998 -->
+	    <!-- hhmts start -->
+Last modified: Wed Jun 21 19:15:03 EST 2000
+<!-- hhmts end -->	
+	  </center>
+	</td>
+      </tr>
+    </table>
+  </body>
+</html>

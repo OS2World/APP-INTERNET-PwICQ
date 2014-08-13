@@ -1,0 +1,102 @@
+exit
+rl
+exit
+dir *.c
+\data\ibmcpp\sources\icq2\core\os2win\
+dir
+less icqwin.rc
+e icqwin.rc
+exit
+rl
+\logs\27241234.log
+exit
+rl
+exit
+rl
+exit
+rl
+cl
+m
+rl
+exit
+rl
+m
+rl
+exit
+rl
+exit
+rl
+exit
+dir
+e \data\scripts\icqpkt2.cmd
+..\
+dir
+dir linux
+rl
+dir
+os2loader\
+rl
+exit
+exit
+rl & exit
+rl
+m
+dir \Public\pwicq\os2\lib
+rl
+m
+rl
+exit
+run
+e go.cmd
+less ..\..\plugins\icqskmgr\go.cmd
+type go.cmd
+less \Temp\pwicq.dbg
+del \Temp\pwicq.dbg
+type go.cmd
+run
+rl
+exit
+run
+m
+less go.cmd
+less \logs\27241234.dbg
+run
+run
+type go.cmd
+del \Temp\pwicq.dbg
+run
+less \Temp\pwicq.dbg
+less \logs\27241234.log
+type go.cmd
+less \Temp\pwicq.dbg
+dir
+e go.cmd
+less ..\..\plugins\newskin\go.cmd
+run
+e ..\..\plugins\newskin\go.cmd
+e go.cmd
+dir ..\..\config
+go
+dir *.ini
+del pwicq.ini
+run
+bd
+run
+less ..\..\core\os2win\go.cmd
+run
+less \Temp\pwicq.log
+e go.cmd
+less ..\..\core\kernel\os2plug.c
+copy pwICQ2.exe \Private\pwicq2
+type \logs\27241234.dbg
+m
+e \data\scripts\pwicq.cmd
+less pwicq.c
+less \logs\scripts.log
+exit
+rl
+dir
+exit
+rl & exit
+rl
+exit

@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>
+      OSCAR Protocol: Section 5: Buddy List Management
+    </title>
+  </head>
+
+  <body bgcolor="#FFFFFF" link="#444444" vlink="#666666">
+    <table width="1" border="0" align="center">
+      <tr>
+	<td><img src="/images/blank.gif" height="1" width="540">
+      </tr>
+      <tr>
+	<td align="right">
+	  <img src="/faim/faim.gif" border="0" width="111" height="50"><br>
+	  <A href="/pst/"><img src="/pst/pst_small.gif" border="0"></a>
+	</td>
+      </tr>
+      <tr>
+	<td align="center">
+	  <b><font size="+1">AIM/Oscar Protocol Specification: Section 5: Buddy List Management</font></b>
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  <hr noshade>
+	  <table width="100%" border="0" align="center">
+	    <tr>
+	      <td width="1%" valign="top">
+		<img src="/images/blank.gif" width="5" height="1" border="0"><br>
+	      </td>
+	      <td width="1%" bgcolor="#BBBBBB">
+
+	      </td>
+	      <td width="1%">
+		<img src="/images/blank.gif" width="5" height="1" border="0">
+	      </td>
+	      <td width="98%">
+		<img src="/images/blank.gif" width="460" height="1" border="0"><br>
+			<font size="+1"><b>5.0 Buddy List Management</b></font>
+		<p>
+		  One of the main AIM features is this function called the "Buddy List".  It's analogous to the "Contacts" in ICQ terminology.  Basically, at login, you send a list of screen names (supposedly, they're suppose to be the names of your friends, but that's certainly not a requirement) to the message server.  These names get watched for login/logoff events, and you will get notified when these things happen.
+		</p>
+		<p>
+		  The client has no requirements on how it needs to handle these things.  You could easily send up an empty buddy list and ignore the feature entirely, but it's there, so you might as well use it.  The AIM client has it's own client-side divisions of "groups".  You classify your buddies into groups and it lists them on the buddy list window in that order.  If they're on the list, they're online.  If they're not, they're not.  These divisions are truely client-side and the server only sees one unified list, that the AIM client sorts out when it gets notifications.
+		</p>
+		<p>
+		  You get notified only on enter (oncoming)  and exit (offgoing) of buddies, plus the initial "who's on" list after you send up your buddy list.
+		</p>
+		<b>5.1 Oncoming Buddies</b>
+		<p>
+		  The "oncoming buddy" command can occur at three different times during the lifecycle of an AIM session.  The first, is at the end of the login process, just after the AIM message server is notified of the contents of your buddy list (Phase 3D, Command HI).  The second is if/when one of the buddies in that list comes online who wasnt' before, and the third occurs at a regular interval while the connection is otherwise idle.  This third case is used for updating your buddy list to make sure you didn't miss anything before.  The command syntax for all three cases is exactly the same:
+		</p>
+		<center><u>Fig 5.1.1 Oncoming Buddy SNAC</u></center>
+		<table border="2" align="center">
+		  <tr><td>Position</td><td>Length</td><td>Data</td></tr>
+		  <tr><Td>1</td><td>Word</td><td>0x0003</td></tr>
+		  <tr><td>3</td><td>Word</td><td>0x000b</td></tr>
+		  <tr><Td>5</td><td>Word</td><td>0x0000</td></tr>
+		  <tr><td>7</td><td>DWord</td><td>32-bits of seeminly gibberish</td></tr>
+		  <tr><Td>11</td><td>Byte</td><td>Oncoming Screen Name Length</td></tr>
+		  <tr><td>12</td><td>ASCII String</td><td>Oncoming Screen Name (NOT null terminated)</td></tr>
+		  <tr><td>13</td><td>Word</td><td>Unsigned Int containing current Warning Level of Oncoming SN</td></tr>
+		  <tr><td>15</td><td>Word</td><td>Class (0x0004 for Free, 0x0003 for AOL)</td></tr>
+		  <tr><td>17</td><td>Word</td><Td>0x0001</td></tr>
+		  <tr><Td>19</td><td>Word</td><td>0x0002</td></tr>
+		  <tr><Td>21</td><td>Word</td><td>Class Part Two (0x0010 for Free, 0x0004 for AOL)</td></tr>
+		  <tr><td>23</td><td>Word</td><td>0x0002</td></tr>
+		  <Tr><td>25</td><Td>Word</td><td>0x0004</td></tr>
+		  <tr><td>27</td><td>DWord</td><td>Unsigned Long (32bit) containing "Member Since" date</td></tr>
+		  <tr><td>31</td><td>Word</td><td>0x0003</td></tr>
+		  <tr><td>33</td><td>Word</td><td>0x0004</td></tr>
+		  <tr><td>35</td><td>DWord</td><td>Unsigned Long (32bit) containing "On Since" date</td></tr>
+		  <tr><td>39*</td><td>Word</td><td>0x0004</td></tr>
+		  <tr><td>41*</td><td>Word</td><td>0x0002</td></tr>
+		  <tr><td>43*</td><td>Word</td><td>0x0000</td></tr>
+		  <tr><td colspan="3">*Only existant for members of the "Free" or "Trial" classes</td></tr>
+		</table>
+		<p>
+		  A note about classes:  Every AIM Screen Name is associated with a class.  AOL members (who are really just using the AOLIM?AIM Bridge) are in the "AOL" class.  Members who are using the AIM-only service are under the "Free" class.  And, "Free" members who have had thier account less than thirty days or so, are in the "Trial" class.
+		</p>
+		<p>
+		  For those who don't know what "UNIX time_t format" is, it's the format used to represent times as unsigned long's in UNIX and some DOS-based libc's.  I't simply the number of seconds elapsed from the 01 January 1970 00:00:00 UTC.  (This is often referred to as "the UNIX epoch".)  Both of the times in this command (at positions 27 and 35) are stored in this format (and yes, these will fail because of the y2.048k bug).
+		</p>
+		<p>
+		  Note, that there's also an "Idle for" field in this command somewhere.  It may very well be the last word of the command (since I don't think you can get the idle time of an AOL member anyway).  Since I've found no good way to "be idle", I can't really figure out exactly where it is.
+		</p>
+
+
+	      </td>
+
+	      <td width="1%">
+		<img src="/images/blank.gif" width="10" height="1" border="0">
+	      </td>
+	      <td width="1%" bgcolor="#BBBBBB">
+		&nbsp;
+	      </td>
+	      <td width="1%" valign="top">
+		<img src="/images/blank.gif" width="50" height="1" border="0"><br>
+		<a href="/pst/"><img src="/pst/bar_home.gif" width="50" height="15" border="0"></a><br>
+		<a href="/pst/software/"><img src="/pst/bar_software.gif" width="50" height="15" border="0"></a>
+	      </td>
+	    </tr>
+	  </table>
+	  <hr noshade>
+	  <Center>
+	    <address><a href="mailto:afritz@iname.com">Adam Fritzler</a></address>
+	      <!-- Created: Sat Jun 20 20:35:10 MST 1998 -->
+	    <!-- hhmts start -->
+Last modified: Fri Jul 24 14:16:28 MST 1998
+<!-- hhmts end -->	
+	  </center>
+	</td>
+      </tr>
+    </table>
+  </body>
+</html>

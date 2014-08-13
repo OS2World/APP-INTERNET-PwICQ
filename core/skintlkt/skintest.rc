@@ -1,0 +1,14 @@
+#ifndef __BORLANDC__
+   #define INCL_WIN
+   #define INCL_NLS
+   #include "os2.h"
+#endif
+
+ACCELTABLE 1000
+BEGIN
+    VK_F5,     1000,           AF_VIRTUALKEY
+    VK_F10,    1001,           AF_VIRTUALKEY
+END
+
+
+

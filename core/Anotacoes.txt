@@ -1,0 +1,14 @@
+Sequencia:
+
+        > CMD_LOGIN
+        < SRV_ACK
+        < SRV_LOGIN_REPLY
+        > CMD_ACK
+        > CMD_CONTACT_LIST
+        > SRV_MULTI_PACKET
+                ENDCONTACTLIST_STATUS
+                END_OFFLINE_MESSAGES
+        < CMD_ACK
+
+Pacote de keep-alive:
+

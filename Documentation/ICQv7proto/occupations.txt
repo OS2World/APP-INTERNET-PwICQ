@@ -1,0 +1,17 @@
+1  = Academic
+2  = Administrative
+3  = Art/Entertainment
+4  = College Student
+5  = Computers
+6  = Community & Social
+7  = Education
+8  = Engineering
+9  = Financial Services
+10 = Government
+11 = High School Student
+12 = Home
+13 = ICQ - Providing Help
+14 = Law
+15 = Managerial
+16 = Manufacturing
+17 = Medical/Health

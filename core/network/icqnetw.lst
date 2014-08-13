@@ -1,0 +1,101 @@
+icqAcceptConnct_...............................................icqAcceptConnct_
+icqBindSocket_...................................................icqBindSocket_
+icqCloseSocket_.................................................icqCloseSocket_
+icqConnectHost_.................................................icqConnectHost_
+icqConnectSock_.................................................icqConnectSock_
+icqConnect_.........................................................icqConnect_
+icqEnableBroadcast_.........................................icqEnableBroadcast_
+icqFormatIP_.......................................................icqFormatIP_
+icqGetHostByName_.............................................icqGetHostByName_
+icqGetHostID_.....................................................icqGetHostID_
+icqGetIPAdress_.................................................icqGetIPAdress_
+icqGetPort_.........................................................icqGetPort_
+icqGetSockError_...............................................icqGetSockError_
+icqListen_...........................................................icqListen_
+icqOpenTCP_.........................................................icqOpenTCP_
+icqOpenUDP_.........................................................icqOpenUDP_
+icqRecvFrom_.......................................................icqRecvFrom_
+icqRecv_...............................................................icqRecv_
+icqSendTo_...........................................................icqSendTo_
+icqSend_...............................................................icqSend_
+icqShutdownSocket_...........................................icqShutdownSocket_
+icqWriteNetworkErrorLog_...............................icqWriteNetworkErrorLog_
+icqnetw_ConfigPage_.........................................icqnetw_ConfigPage_
+icqnetw_Configure_...........................................icqnetw_Configure_
+icqnetw_Start_...................................................icqnetw_Start_
+ 
+icqShutdownSocket_      Offset=00000200H
+    icqShutdownSocket_
+ 
+icqWriteNetworkErrorLog_ Offset=00000400H
+    icqWriteNetworkErrorLog_
+ 
+icqFormatIP_            Offset=00000600H
+    icqFormatIP_
+ 
+icqListen_              Offset=00000800H
+    icqListen_
+ 
+icqAcceptConnct_        Offset=00000a00H
+    icqAcceptConnct_
+ 
+icqGetIPAdress_         Offset=00000c00H
+    icqGetIPAdress_
+ 
+icqGetPort_             Offset=00000e00H
+    icqGetPort_
+ 
+icqRecv_                Offset=00001000H
+    icqRecv_
+ 
+icqSend_                Offset=00001200H
+    icqSend_
+ 
+icqRecvFrom_            Offset=00001400H
+    icqRecvFrom_
+ 
+icqSendTo_              Offset=00001600H
+    icqSendTo_
+ 
+icqGetHostID_           Offset=00001800H
+    icqGetHostID_
+ 
+icqGetHostByName_       Offset=00001a00H
+    icqGetHostByName_
+ 
+icqGetSockError_        Offset=00001c00H
+    icqGetSockError_
+ 
+icqConnectSock_         Offset=00001e00H
+    icqConnectSock_
+ 
+icqCloseSocket_         Offset=00002000H
+    icqCloseSocket_
+ 
+icqOpenTCP_             Offset=00002200H
+    icqOpenTCP_
+ 
+icqOpenUDP_             Offset=00002400H
+    icqOpenUDP_
+ 
+icqBindSocket_          Offset=00002600H
+    icqBindSocket_
+ 
+icqnetw_ConfigPage_     Offset=00002800H
+    icqnetw_ConfigPage_
+ 
+icqnetw_Start_          Offset=00002a00H
+    icqnetw_Start_
+ 
+icqnetw_Configure_      Offset=00002c00H
+    icqnetw_Configure_
+ 
+icqEnableBroadcast_     Offset=00002e00H
+    icqEnableBroadcast_
+ 
+icqConnect_             Offset=00003000H
+    icqConnect_
+ 
+icqConnectHost_         Offset=00003200H
+    icqConnectHost_
+ 

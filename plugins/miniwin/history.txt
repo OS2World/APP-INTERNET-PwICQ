@@ -1,0 +1,76 @@
+exit
+dir \data\ibmcpp\sources\icq2
+dir \data\ibmcpp\sources\icq2\images
+dir \Private\pwicq2
+dir \Public\pwicq2\os2\bin
+dir \Public\pwicq2\os2\bin\skins
+dir \Public\pwicq2\os2\bin\skins\default
+copy \Public\pwicq2\os2\bin\skins\default\icons.gif
+open icons.gif
+dir *.bmp
+dir *.gif
+del icons.gif
+copy ..\pmdc\pmdc.rc miniwin.rc
+e miniwin.rc
+cl
+less miniwin.rc
+open icons.bmp
+rexxtry say 816/16
+rexxtry say 51*16
+run
+run
+open icons.bmp
+run
+cl
+run
+run
+dir \Public\pwicq2\os2\bin\plugins
+dir \Public\pwicq2\os2
+run
+run
+run
+run
+dir ..\pmdc
+dir ..\pmdc\icqwin
+..\pmdc\icqwin\
+dir
+less winplg.c
+bd
+..\..\core\kernel\
+grep -i modeicon *.c | grep EXPENTRY
+grep -i mode *.c | grep EXPENTRY
+run
+cl
+bd
+run
+less ..\pmdc\icqwin\icqwdg.c
+run
+rl
+dir w:\public\pwicq2\os2
+rl
+dir
+exit
+dir
+run
+run
+less ..\..\core\kernel\msg.c
+run
+rl
+dir \Private\pwicq2\plugins
+dir \Private\pwicq2\plugins\*.dll
+exit
+rl
+exit
+rl
+exit
+rl
+exit
+open icons.bmp
+copy ..\..\core\os2win\icons.bmp
+open icons.bmp
+m
+grep BITMAP_COUNTER *
+c 53 * 16
+rl
+exit
+rl & exit

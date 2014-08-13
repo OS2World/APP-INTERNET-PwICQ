@@ -1,0 +1,200 @@
+--- 12/02/2004 02:19:13 Message from Neo (ICQ#64409163) ---
+
+Caro Perry
+Porque não consigo adicionar mais pessoas na minha lista de contato? Quando peço essa opção no menu do pwICQ, nada acontece. Nenhuma janela aparece... Sabe o que é isso?
+
+--- 12/02/2004 09:34:10 Message to Neo (ICQ#64409163) ---
+
+Qual versão/Sistema operacional?
+
+--- 14/02/2004 19:58:05 Message from Neo (ICQ#64409163) ---
+
+OS/2 WARP 4.52 PT, Br
+
+--- 14/02/2004 19:58:29 Message to Neo (ICQ#64409163) ---
+
+Qual era a pergunta mesmo?
+
+--- 14/02/2004 19:59:58 Message from Neo (ICQ#64409163) ---
+
+Não consigo usar o ADD new user, por exemplo... lembra?
+
+--- 14/02/2004 20:00:19 Message to Neo (ICQ#64409163) ---
+
+Qual versão do pwICQ? A última versão está sem a janela de add user.
+
+--- 14/02/2004 20:00:42 Message from Neo (ICQ#64409163) ---
+
+hummm então é isso....
+
+--- 04/04/2004 11:28:47 Message from Neo (ICQ#64409163) ---
+
+Daí, Perry, posso te mandar um arquivo? Algo em torno de uns 400 kB, aceita?
+
+--- 04/04/2004 14:12:27 Message to Neo (ICQ#64409163) ---
+
+Por e-mail ou ftp?
+
+
+--- 04/04/2004 14:13:45 Message from Neo (ICQ#64409163) ---
+
+Por pwICQ.... pode ser??
+
+--- 04/04/2004 14:20:29 Message from Neo (ICQ#64409163) ---
+
+Porque alguém que usa o ICQ do win, me vê sempre como away???
+Eu estou no pwICQ. Sabe o porque disso?
+
+--- 04/04/2004 14:57:11 Message to Neo (ICQ#64409163) ---
+
+Nope. Aqui a máquina windows vê o meu status normalmente.
+
+
+--- 04/04/2004 15:04:31 Message from Neo (ICQ#64409163) ---
+
+A pessoa a quem me refiro é minha namorada. Reinstalei o win98 pra ela ontem e o ICQ. ela me reclamou da mesmo coisa. Me ve online sempre, mas quando começa a falar comigo eu fico em away.
+Esquisito, não?
+
+--- 04/04/2004 15:08:01 Message from Neo (ICQ#64409163) ---
+
+E porque os dados das pessoas não são atualizados, tipo idade, apelido, etc...?
+
+--- 04/04/2004 15:09:15 Message from Neo (ICQ#64409163) ---
+
+Por exemplo, Vc ainda tem 27 anos? Pra mim está com 27 anos....
+
+--- 04/04/2004 15:09:41 Message from Neo (ICQ#64409163) ---
+
+E pra Vc eu estou online normal, mesmo quando teclamos?
+
+--- 04/04/2004 15:27:04 Message to Neo (ICQ#64409163) ---
+
+Acho que sei a causa para o away; remova o plugin icqv8p.dll; aqui eu não uso ele.
+
+--- 04/04/2004 15:27:45 Message to Neo (ICQ#64409163) ---
+
+Os dados de usuário vem do servidor; não lembro se cheguei a implementar as caixas que permitem editá-los no último build liberado.
+
+
+--- 04/04/2004 15:44:13 Message from Neo (ICQ#64409163) ---
+
+Removi o plugin, vou ver de dará certo! Obrigado mais uma vez... 
+e sobre o arquivo, eu poderia te mandar?
+
+--- 04/04/2004 15:51:14 Message to Neo (ICQ#64409163) ---
+
+Pode, claro. Mas meu FTP está fechado agora; só funciona por e-mail.
+
+
+--- 04/04/2004 15:51:37 Message from Neo (ICQ#64409163) ---
+
+Hum... epelo ICQ não dá, né?? Tentei e não funcionaou...
+
+--- 04/04/2004 15:53:01 Message to Neo (ICQ#64409163) ---
+
+Não. O módulo que faz transferência de arquivo é justamente o icqv8p.dll (-:
+
+
+--- 04/04/2004 15:53:25 Message from Neo (ICQ#64409163) ---
+
+Hum... então temos um bug? 
+
+--- 04/04/2004 15:53:55 Message to Neo (ICQ#64409163) ---
+
+É possível; o v8p não chegou a ser terminado.
+
+
+--- 04/04/2004 15:56:07 Message from Neo (ICQ#64409163) ---
+
+Bom, mas deixe-me ser objetivo pois Vc deve estar ocupado.
+Quero te mandar um mp3, que é uma propaganda da empresa em que trabalho.
+A Eletrosul é um estatal federal e que esteve impedida pelo governo passado e gerar energia elétrica. agora ela já pode fazê-lo novamente. Por conta disso há algumas peças publicitárias (este mp3 é uma delas) que falam disso.
+Como este fato me deixou muito contente, estou divulgando isso. Aceita? Algo em torno de 500kb.
+
+--- 04/04/2004 15:56:40 Message from Neo (ICQ#64409163) ---
+
+corrigindo, "....de gerar energia elétrica..."
+
+--- 04/04/2004 17:13:21 Message to Neo (ICQ#64409163) ---
+
+Pode mandar.
+
+--- 04/04/2004 17:13:39 Message from Neo (ICQ#64409163) ---
+
+Qual e-mail??
+
+--- 04/04/2004 17:17:59 Message to Neo (ICQ#64409163) ---
+
+perry.werneck@terra.com.br
+
+--- 14/05/2004 00:06:00 Message from Neo (ICQ#64409163) ---
+
+Perry
+Porque quando tento conversar com outras pessoas (as quais eu já conversava antes), o pwICQ simplesmente fecha gerando um popuplog de erro?
+
+--- 14/05/2004 00:06:38 Message from Neo (ICQ#64409163) ---
+
+Eu as vejo online e elas também me vêem, mas não conseguimos nos falar.
+
+--- 14/05/2004 13:26:55 Message to Neo (ICQ#64409163) ---
+
+O ICQ dessas pessoas foi atualizado? Se foi tente remover ou renomear o modulo icqv8p.dll e veja se funciona.
+
+--- 14/05/2004 21:26:53 Message from Neo (ICQ#64409163) ---
+
+Sim, o dessas pessoas foi atualizado.
+O da minha namorada, por exemplo, não foi e com ela não tenho tido problemas.
+Vc acha que pode ser isso? E que funcionalidade vou perder retirando esta DLL?
+
+--- 14/05/2004 22:03:17 Message to Neo (ICQ#64409163) ---
+
+Esse problema já foi reportado. Aparentemente algo mudou na parte de conexão direta. Ao tirar esse módulo você perde a parte de conexão direta e transferência de arquivos, todas as mensagems passam a seguir via servidor.
+
+
+--- 15/05/2004 15:54:44 Message from Neo (ICQ#64409163) ---
+
+E Vc estaria trabalhando para solucionar este problema?
+Obrigado pela atenção!
+Bom final de semana!
+
+--- 15/05/2004 17:57:23 Message to Neo (ICQ#64409163) ---
+
+Não. Eu parei esse projeto ja a algum tempo.
+
+--- 15/05/2004 20:21:59 Message from Neo (ICQ#64409163) ---
+
+Mas, se me lembro bem, Vc disse que iria continuar para uso pessoal.
+Eu pergunto se Vc está fazendo isso, e se Vc se incomodaria de me repassar alguma versão mais nova...
+
+--- 15/05/2004 21:05:40 Message to Neo (ICQ#64409163) ---
+
+Realmente estou trabalhando numa versao fechada, porem, deve levar um bom tempo ate ficar usavel.
+
+
+--- 15/05/2004 21:07:10 Message from Neo (ICQ#64409163) ---
+
+Na verdade já é um "apelo" rsrsrs, mas é óbvio que eu gostaria de usar o seu programa....
+Se quiser/puder com "carinho" nisso, fico muito contente. ;-)
+
+--- 15/05/2004 21:08:55 Message from Neo (ICQ#64409163) ---
+
+Oppps..... eu quis dizer
+"Se quiser/puder pensar com "carinho"!! rsrsrs
+
+--- 15/05/2004 21:13:25 Message from Neo (ICQ#64409163) ---
+
+Sabe, sem querer "puxar o saco", o programa é tão leve e funciona tão redondinho.......
+
+--- 15/05/2004 21:25:28 Message to Neo (ICQ#64409163) ---
+
+Infelizmente ele tambem me trouxe muitas dores de cabeca.
+
+--- 15/05/2004 21:25:52 Message from Neo (ICQ#64409163) ---
+
+É, entendo....
+
+--- 28/05/2004 23:33:22 Message from Neo (ICQ#64409163) ---
+
+Dai cara!!
+Estou aqui na cassa do Djoni.
+

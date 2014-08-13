@@ -1,0 +1,17 @@
+LIBRARY      ICQV8 INITINSTANCE TERMINSTANCE
+
+PROTMODE
+
+DATA         MULTIPLE READWRITE LOADONCALL NONSHARED
+CODE         LOADONCALL
+
+EXPORTS      icqv8_Configure
+             icqv8_Start
+	     icqv8_Timer
+             icqv8_Terminate
+             icqv8_Interpret
+             icqv8_ConfigPage
+	     icqv8_SearchPage
+
+
+

@@ -1,0 +1,7 @@
+db
+kernel\
+db
+dir *.dll
+move icqkrnl.dll \Private\pwicq2\icqkrnl.dll
+cl
+exit

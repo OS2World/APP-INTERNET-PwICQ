@@ -1,0 +1,93 @@
+/*
+ * DDE.C - Processa uma requisicao DDE
+ */
+
+ #define INCL_WIN
+ #include <os2.h>
+
+ #include <stdio.h>
+ #include <malloc.h>
+ #include <string.h>
+
+ #include "icqskmgr.h"
+
+/*---[ Prototipos ]---------------------------------------------------------------------------------*/
+
+
+/*---[ Statics ]------------------------------------------------------------------------------------*/
+
+ CONVCONTEXT context;
+
+/*---[ Implementacao ]------------------------------------------------------------------------------*/
+
+ void ddeOpenURL(HWND hwnd, ICQWNDINFO *cfg, const char *application, const char *topic, const char *request)
+ {
+//    char      *request        = "http://www.os2brasil.com.br,,0x0,0x0";
+//    char      *request        = "http://www.os2brasil.com.br,,0xFFFFFFFF,0x0";
+//    char      *application    = "MOZILLA";
+//    char      *topic          = "WWW_OpenURL";
+
+    PDDESTRUCT  dde;
+    PID         pid;
+    TID         tid;
+
+    cfg->ddeServer = NULLHANDLE;
+
+    CHKPoint();
+
+    memset(&context,0,sizeof(CONVCONTEXT));
+    context.cb = sizeof(CONVCONTEXT);
+
+    DBGMessage(application);
+    DBGMessage(topic);
+
+    WinDdeInitiate(hwnd, (PSZ) application, (PSZ) topic, &context);
+
+    if(!cfg->ddeServer)
+    {
+       icqWriteSysLog(cfg->icq,PROJECT,"Can't initiate DDE");
+       return;
+    }
+
+    DBGTracex(cfg->ddeServer);
+
+    if(DosAllocSharedMem((PVOID) &dde, NULL, sizeof(DDESTRUCT)+1000, PAG_COMMIT|PAG_READ|PAG_WRITE|OBJ_GIVEABLE))
+    {
+       icqWriteSysLog(cfg->icq,PROJECT,"Memory allocation error in DDE processor");
+       icqAbend(cfg->icq,0);
+    }
+    else
+    {
+       /* Posso processar a requisicao DDE */
+
+       memset(dde,0,sizeof(DDESTRUCT)+1000);
+
+       WinQueryWindowProcess(cfg->ddeServer, &pid, &tid);
+       DBGTrace(pid);
+       DBGTrace(tid);
+       DosGiveSharedMem(&dde, pid, PAG_READ | PAG_WRITE);
+
+       dde->fsStatus            = 0;                    // DDE_FACKREQ;            // Status
+       dde->usFormat            = DDEFMT_TEXT;          // Text format
+       dde->offszItemName       = sizeof(DDESTRUCT);
+       dde->offabData           = strlen(request) + 1;
+       dde->cbData              = 500;
+
+       strcpy( (char *) (dde+1), request);
+
+       WinDdePostMsg(cfg->ddeServer,hwnd,WM_DDE_REQUEST,dde,0);
+
+       WinDdePostMsg(cfg->ddeServer,hwnd,WM_DDE_TERMINATE,NULL,DDEPM_RETRY);
+    }
+ }
+
+ void ddeInitiateAck(HWND hwnd, ICQWNDINFO *cfg, HWND server, PDDEINIT dde)
+ {
+    cfg->ddeServer = server;
+ }
+
+ void ddeData(HWND hwnd, ICQWNDINFO *cfg, PDDESTRUCT dde)
+ {
+    CHKPoint();
+ }
+

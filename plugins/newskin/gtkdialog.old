@@ -1,0 +1,135 @@
+/*
+ * gtkbutton.c - GTK Implementation of pwICQGUI Button system
+ */
+
+ #include <pwicqgui.h>
+ #include <malloc.h>
+ #include <string.h>
+ #include <dlfcn.h>
+ 
+ #include <pwicqrc.h>
+
+/*---[ Structures ]-----------------------------------------------------------*/
+
+
+/*---[ Constants ]------------------------------------------------------------*/
+ 
+ 
+/*---[ Prototipes ]-----------------------------------------------------------*/
+
+
+/*---[ Implementation ]-------------------------------------------------------*/
+
+ static const struct icqResourceDescriptor *getDescriptor(HICQ icq, HMODULE hMod)
+ {
+	const struct icqResourceDescriptor * (*getResource)(void) = NULL; 
+	DBGTracex(hMod);
+	
+	dlerror();
+	getResource = dlsym(hMod, "icqresource_getDescriptor");
+	
+	if(dlerror())
+	   return NULL;
+
+    return getResource();
+ }	
+
+ int icqskin_loadString(HICQ icq, HMODULE hMod, USHORT id, char *buffer, int sz)
+ {
+	const struct icqResourceDescriptor *rc = getDescriptor(icq,hMod);
+    const struct icqStringTable        *st;	   
+	int                                f;
+	
+	DBGTracex(rc);
+	
+	if(!rc)
+	   return -1;
+	
+    if(rc->sz != sizeof(struct icqResourceDescriptor))
+	   return 1;
+	
+	st = rc->stringTable;
+	
+	for(f=0;f<rc->stringCount;f++)
+	{
+	   if(st[f].id == id)
+	   {
+		  DBGPrint("String lida: %s",st[f].str);
+		  if(buffer)
+			 strncpy(buffer,st[f].str,sz);
+		  return strlen(st[f].str);
+	   }
+	}
+	
+	if(buffer)
+	   *buffer = 0;
+	
+    return 0;	
+ }
+ 
+ void icqskin_setDialogManager(hWindow hwnd, const struct dlgmgr *mgr)
+ {
+	
+ }
+
+ hWindow icqskin_loadDialog(HICQ icq, hWindow owner, HMODULE hMod, USHORT id, const DLGMGR *mgr)
+ {
+	const struct icqResourceDescriptor *rc  = getDescriptor(icq,hMod);
+    const struct icqDialogTable        *tbl;
+    const struct icqDialogDescriptor   *dlg;
+	int                                f;
+	
+	hWindow                            ret;
+	   
+	if(!rc)
+	   return 0;
+
+	tbl = rc->dialogTable;
+	
+	if(!tbl)
+	   return 0;
+	
+	CHKPoint();
+	
+	for(f=0;f<rc->dialogCount && tbl[f].id != id;f++);
+	   
+	if(f >= rc->dialogCount)
+	   return 0;
+	
+	tbl += f;
+	
+	DBGTrace(tbl->id);
+
+    dlg = tbl->descriptor;
+	
+	for(f=0;f<tbl->el;f++)
+	{
+	   DBGTracex(dlg->className);
+	   DBGTrace(dlg->id);
+	   DBGTrace(dlg->x);
+	   DBGTrace(dlg->y);
+	   DBGTrace(dlg->cx);
+	   DBGTrace(dlg->cy);
+	   
+/*	   
+ struct icqDialogDescriptor
+ {
+    const char                  *title;
+    unsigned short	            id;
+	unsigned long               className;
+    unsigned short	            x;
+    unsigned short	            y;
+    unsigned short	            cx;
+    unsigned short	            cy;
+	unsigned long               flags;
+ };
+*/	   
+	   
+
+	   dlg++;
+	}
+	
+	return 0;
+ }
+ 
+ 

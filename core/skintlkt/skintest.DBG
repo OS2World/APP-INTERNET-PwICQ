@@ -1,0 +1,61 @@
+skmain.c(43):	Criar botao
+skmain.c(43):	Criar botao
+skmain.c(43):	Criar botao
+skmain.c(58):	Criar slider
+skmain.c(59):	cmd->pos = 1000
+skmain.c(43):	Criar botao
+skmain.c(43):	Criar botao
+skmain.c(74):	Criar listbox
+skmain.c(75):	cmd->pos = 1003
+skmain.c(43):	Criar botao
+skmain.c(43):	Criar botao
+skmain.c(43):	Criar botao
+skmain.c(91):	pszText = 00000000
+skmain.c(96):	cfg = 00271500
+listbox.c(692):	cfg = 00271820
+create.c(65):	frame = 80000368
+create.c(66):	ret = 80000369
+menu.c(133):	Configurar o menu
+listbox.c(697):	cfg->hMenu = 80000369
+btnclass.c(576):	cfg = 00271870
+create.c(65):	frame = 8000036a
+create.c(66):	ret = 8000036b
+menu.c(133):	Configurar o menu
+btnclass.c(582):	cfg->hMenu = 8000036b
+btnclass.c(576):	cfg = 002718d0
+create.c(65):	frame = 8000036c
+create.c(66):	ret = 8000036d
+menu.c(133):	Configurar o menu
+btnclass.c(582):	cfg->hMenu = 8000036d
+create.c(36):	frame = 80000168
+create.c(37):	ret = 8000026f
+load.c(45):	swp.cx = 0
+load.c(46):	swp.cy = 0
+load.c(290):	load		(Mar 30 2003 14:06:03)
+load.c(292):	load		(Mar 30 2003 14:06:03)
+load.c(516):	hwnd = 80000273
+load.c(53):	swp.cx = 0
+load.c(54):	swp.cy = 0
+load.c(68):	swp.cx = 0
+load.c(69):	swp.cy = 0
+load.c(79):	cfg->minSize.x = 120
+load.c(80):	cfg->minSize.y = 137
+load.c(81):	cfg->maxSize.x = 65535
+load.c(82):	cfg->maxSize.y = 65535
+load.c(84):	swp.cx = 120
+load.c(85):	swp.cy = 137
+listbox.c(509):	Alocar nova tabela de dados
+menu.c(283):	Alocar nova tabela de dados
+menu.c(283):	Alocar nova tabela de dados
+menu.c(283):	Alocar nova tabela de dados
+menu.c(307):	f = 8
+menu.c(320):	cfg->itens = 8
+menu.c(323):	f = 8
+menu.c(323):	f = 7
+menu.c(323):	f = 6
+menu.c(323):	f = 5
+menu.c(323):	f = 4
+menu.c(323):	f = 3
+menu.c(323):	f = 2
+menu.c(323):	f = 1
+listbox.c(826):	Reordenar a lista

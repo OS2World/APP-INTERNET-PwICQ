@@ -1,0 +1,637 @@
+/*
+ * os2msgwin.c - OS/2 Message Window
+ */
+
+
+ #pragma strings(readonly)
+
+ #include <string.h>
+ #include <malloc.h>
+
+ #define INCL_GPIPRIMITIVES
+ #include <pwicqgui.h>
+
+/*---[ Defines ]------------------------------------------------------------------------------------------*/
+
+ #define MSGID_NAMEBOX MSG_WINDOW_COMPONENTS
+ #define MSGID_TEXTBOX MSG_WINDOW_COMPONENTS+1
+
+ #define CHILD_WINDOW(h,i) WinWindowFromID(h,DLG_ELEMENT_ID+i)
+
+/*---[ Structures ]---------------------------------------------------------------------------------------*/
+
+typedef struct _record
+{
+  RECORDCORE  	recordCore;
+  ULONG         flags;
+  HPOINTER      icon;
+  PSZ			msgText;
+  char          text[1];
+} RECORD, *PRECORD;
+
+
+/*---[ Constants ]----------------------------------------------------------------------------------------*/
+
+ const char *icqMessageWindowClass = "pwICQMessageWindow";
+
+ #pragma pack(1)
+
+ static const struct _child
+ {
+    const char *name;
+    USHORT     id;
+    const char *wClass;
+    const char *wText;
+    const char *font;
+    ULONG      wStyle;
+ } childList[] =
+ {
+
+    { "Static",      MSGID_NICK,        WC_STATIC,    "Nick:",  "8.Helv",      SS_TEXT|DT_LEFT|DT_VCENTER                                              },
+    { "Field",       MSGID_NICKENTRY,   WC_STATIC,    "",       "8.Helv.Bold", SS_TEXT|DT_LEFT|DT_VCENTER                                              },
+    { "Static",      MSGID_NAME,        WC_STATIC,    "Name:",  "8.Helv",      SS_TEXT|DT_LEFT|DT_VCENTER                                              },
+    { "Field",       MSGID_NAMEENTRY,   WC_STATIC,    "",       "8.Helv.Bold", SS_TEXT|DT_LEFT|DT_VCENTER                                              },
+
+    { "Edit",        MSGID_EDITBOX,     WC_MLE,       "",       "8.Helv",      MLS_BORDER|MLS_WORDWRAP|MLS_VSCROLL|MLS_IGNORETAB|WS_VISIBLE|WS_TABSTOP },
+    { "History",     MSGID_HISTORY,     WC_CONTAINER, "",       "8.Helv",      WS_VISIBLE|WS_TABSTOP|CCS_READONLY                                      },
+
+
+    { "CloseButton", MSGID_CLOSEBUTTON, ICQ_BUTTON,   "~Close", "8.Helv",      0                                                                       },
+    { "SendButton",  MSGID_SENDBUTTON,  ICQ_BUTTON,   "~Send",  "8.Helv",      0                                                                       },
+    { "AddButton",   MSGID_ADDBUTTON,   ICQ_BUTTON,   "~Add",   "8.Helv",      0                                                                       },
+
+    { "AboutButton", MSGID_ABOUTBUTTON, ICQ_BUTTON,   "",       "8.Helv",      BS_NOBORDER                                                             },
+    { "InfoButton",  MSGID_INFOBUTTON,  ICQ_BUTTON,   "",       "8.Helv",      BS_NOBORDER                                                             },
+
+    { "UserMode",    MSGID_USERMODE,    ICQ_STATIC,   "",       "",            SS_ICON                                                                 },
+
+    { "Textbox",     MSGID_TEXTBOX,     WC_STATIC,    "",       "8.Helv",      SS_GROUPBOX|DT_LEFT|DT_VCENTER                                          },
+    { "Namebox",     MSGID_NAMEBOX,     WC_STATIC,    "",       "8.Helv",      SS_GROUPBOX|DT_LEFT|DT_VCENTER                                          }
+
+
+
+ };
+
+
+ static const USHORT userBox[] =   {	MSGID_NICK,
+   										MSGID_NICKENTRY,
+   										MSGID_NAME,
+   										MSGID_NAMEENTRY,
+   										MSGID_USERMODE
+   							       };
+
+ static const USHORT buttonBar[] = { 	MSGID_CLOSEBUTTON,
+                                        MSGID_SENDBUTTON,
+                                        MSGID_ADDBUTTON
+   							        };
+
+
+ #pragma pack()
+
+/*---[ Prototipes ]---------------------------------------------------------------------------------------*/
+
+ static void   configure(HWND);
+ static void   resize(HWND, short, short);
+ static USHORT setControlPos(HWND, USHORT, USHORT, USHORT);
+ static void   loadSkin(HWND,const char *,SKINFILESECTION *);
+ static int    action(HWND, USHORT, USHORT);
+ static void   destroy(HWND);
+
+/*---[ Implementation ]-----------------------------------------------------------------------------------*/
+
+ hWindow icqskin_createMsgWindow(HICQ icq)
+ {
+    ULONG     ulFrameFlags = FCF_TITLEBAR|FCF_SIZEBORDER|FCF_MINMAX|FCF_TASKLIST|FCF_SYSMENU|FCF_NOMOVEWITHOWNER|FCF_ACCELTABLE;
+    HWND      frame;
+    HWND      ret;
+
+    frame = WinCreateStdWindow(   HWND_DESKTOP,
+    						      0,
+  							      &ulFrameFlags,
+    							  (PSZ) icqMessageWindowClass,
+    							  (PSZ) "pwICQ Message",
+    							  WS_VISIBLE,
+    							  (HMODULE) module,
+    							  1000,
+    							  &ret
+    						  );
+    							
+    if(!ret)
+       return ret;
+
+    WinSetWindowPtr(frame,QWL_USER,WinQueryWindowPtr(ret,0));
+
+    return ret;
+ }
+
+
+ MRESULT EXPENTRY icqMessageWindow(HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2)
+ {
+    switch(msg)
+    {
+    case WM_CREATE:
+       icqskin_cfgWindow(hwnd,ICQMSGDIALOG);
+       break;
+
+    case WMICQ_CONFIGURE:
+       icqFrameWindow(hwnd, msg, mp1, mp2);
+       configure(hwnd);
+     break;
+
+    case WMICQ_LOADSKIN:
+       CHKPoint();
+       icqFrameWindow(hwnd, msg, mp1, mp2);
+       CHKPoint();
+       loadSkin(hwnd,(const char *) mp1, (SKINFILESECTION *) mp2);
+       CHKPoint();
+       break;
+
+    case WM_COMMAND:
+       if(action(hwnd,SHORT1FROMMP(mp1), SHORT1FROMMP(mp2)))
+          return icqFrameWindow(hwnd, msg, mp1, mp2);
+       break;
+
+    case WM_SIZE:
+       resize(hwnd,SHORT1FROMMP(mp2),SHORT2FROMMP(mp2));
+       return icqFrameWindow(hwnd, msg, mp1, mp2);
+
+    case WM_DESTROY:
+       destroy(hwnd);
+       return icqFrameWindow(hwnd, msg, mp1, mp2);
+
+    default:
+       return icqFrameWindow(hwnd, msg, mp1, mp2);
+
+    }
+
+    return 0;
+ }
+
+ static void destroy(HWND hwnd)
+ {
+    ICQMSGDIALOG *cfg = WinQueryWindowPtr(hwnd,0);
+
+    icqskin_terminateMessageEditor(cfg->fr.icq, hwnd);
+
+    DBGTracex(cfg->msgIn);
+
+    if(cfg->msgIn)
+       WinDestroyPointer(cfg->msgIn);
+
+    if(cfg->msgOut)
+       WinDestroyPointer(cfg->msgOut);
+
+ }
+
+ static void configure(HWND hwnd)
+ {
+    int                 f;
+    HWND                h;
+    CNRINFO             cnrinfo;
+    PFIELDINFO          pFieldInfo,
+                        firstFieldInfo;
+    FIELDINFOINSERT     fieldInfoInsert;
+    ICQMSGDIALOG        *cfg    			= WinQueryWindowPtr(hwnd,0);
+
+    const struct _child *def    = childList;
+
+    DBGMessage("Creating child windows");
+
+    cfg->msgIn  = WinLoadPointer(HWND_DESKTOP, module, 10);
+    cfg->msgOut = WinLoadPointer(HWND_DESKTOP, module, 11);
+
+    for(f=0;f < (sizeof(childList)/sizeof(struct _child));f++)
+    {
+       h = WinCreateWindow(   hwnd,                     /* Parent window             */
+                              (PSZ) def->wClass,        /* Class name                */
+                              (PSZ) def->wText,         /* Window text               */
+                              def->wStyle|WS_VISIBLE,   /* Window style              */
+                               0, 0,                    /* Position (x,y)            */
+                              10,10,                    /* Size (width,height)       */
+                              hwnd,                     /* Owner window              */
+                              HWND_BOTTOM,              /* Sibling window            */
+                              DLG_ELEMENT_ID+def->id,   /* Window id                 */
+                              NULL,                     /* Control data              */
+                              NULL);                    /* Pres parameters           */
+       icqskin_setButtonName(h,def->name);
+       def++;
+    }
+
+    /* Configure container window */
+
+    h = CHILD_WINDOW(hwnd,MSGID_HISTORY);
+    WinSetWindowPtr(h,QWL_USER,cfg);
+
+    DBGTracex(h);
+
+    memset(&cnrinfo,0,sizeof(cnrinfo));
+    cnrinfo.cb                = sizeof( CNRINFO );
+    cnrinfo.flWindowAttr      = CV_DETAIL|CV_MINI; // CV_TEXT; // |CA_TREELINE CV_TREE| |CA_CONTAINERTITLE; // |CA_TITLESEPARATOR;
+    cnrinfo.cxTreeIndent      = 1;
+    cnrinfo.cxTreeLine        = -1;
+    cnrinfo.slBitmapOrIcon.cx =
+    cnrinfo.slBitmapOrIcon.cy = 18;
+
+    cnrinfo.pszCnrTitle       = "";
+
+    WinSendMsg(h, CM_SETCNRINFO, MPFROMP( &cnrinfo ),MPFROMLONG(CMA_FLWINDOWATTR|CMA_CXTREEINDENT|CMA_SLBITMAPORICON)); //); |CMA_CNRTITLE)); // |CMA_LINESPACING));
+
+    if(!WinSendMsg(h, CM_SETCNRINFO, &cnrinfo, MPFROMLONG(CMA_FLWINDOWATTR|CMA_CNRTITLE)))
+    {
+       DBGMessage("Error in container configuration");
+       DBGTrace(WinGetLastError(WinQueryAnchorBlock(h)));
+       WinPostMsg(hwnd,WM_CLOSE,0,0);
+    }
+    else
+    {
+       firstFieldInfo         =
+       pFieldInfo             = WinSendMsg(h, CM_ALLOCDETAILFIELDINFO, MPFROMLONG(2), NULL);
+
+       DBGTracex(pFieldInfo);
+
+       pFieldInfo->cb         = sizeof(FIELDINFO);
+       pFieldInfo->flData     = CFA_BITMAPORICON  | CFA_TOP | CFA_CENTER; // | CFA_SEPARATOR;
+       pFieldInfo->flTitle    = CFA_CENTER;
+       pFieldInfo->pTitleData = (PVOID) "";
+       pFieldInfo->offStruct  = FIELDOFFSET(RECORD,icon);
+
+       pFieldInfo             = pFieldInfo->pNextFieldInfo;
+       pFieldInfo->cb         = sizeof(FIELDINFO);
+       pFieldInfo->flData     = CFA_STRING | CFA_LEFT; // | CFA_SEPARATOR;
+       pFieldInfo->flTitle    = CFA_LEFT;
+       pFieldInfo->pTitleData = (PVOID) "";
+       pFieldInfo->offStruct  = FIELDOFFSET(RECORD,msgText);
+
+       memset(&fieldInfoInsert,0,sizeof(FIELDINFOINSERT));
+       fieldInfoInsert.cb                   = (ULONG)(sizeof(FIELDINFOINSERT));
+       fieldInfoInsert.pFieldInfoOrder      = (PFIELDINFO)CMA_FIRST;
+       fieldInfoInsert.cFieldInfoInsert     = 2;
+       fieldInfoInsert.fInvalidateFieldInfo = TRUE;
+
+       if(!WinSendMsg(h, CM_INSERTDETAILFIELDINFO,firstFieldInfo,&fieldInfoInsert))
+       {
+          DBGMessage("******** CM_INSERTDETAILFIELDINFO has failed!");
+          DBGTrace(WinGetLastError(WinQueryAnchorBlock(h)));
+          WinPostMsg(hwnd,WM_CLOSE,0,0);
+       }
+    }
+
+    /* Set button icons */
+    icqskin_setButtonIcon(CHILD_WINDOW(hwnd,MSGID_ABOUTBUTTON), ICQICON_ABOUT);
+    icqskin_setButtonIcon(CHILD_WINDOW(hwnd,MSGID_INFOBUTTON),  ICQICON_USERINFO);
+    icqskin_setButtonIcon(CHILD_WINDOW(hwnd,MSGID_USERMODE),    ICQICON_OFFLINE);
+
+    DBGMessage("Child creation complete");
+
+//    icqskin_insertMessageHistory(hwnd, 0, "Teste\nnhioi oibgoibgo goibogibogi\ngob ogbi");
+
+ }
+
+ static USHORT setControlPos(HWND hwnd, USHORT x, USHORT y, USHORT ySize)
+ {
+    char   buffer[0x0100];
+    POINTL aptl[TXTBOX_COUNT];
+    HPS    hps;
+
+    ULONG  flag        = SWP_SIZE;
+
+    WinQueryWindowText(hwnd,0xFF,buffer);
+    *(buffer+0xFF) = 0;
+
+    hps = WinGetPS(hwnd);
+
+    GpiQueryTextBox(      hps,
+                          strlen(buffer),
+                          (char *) buffer,
+                          TXTBOX_COUNT,
+                          aptl);
+    WinReleasePS(hps);
+
+    if(x != 0xFFFF && y != 0xFFFF)
+       flag |= SWP_MOVE|SWP_SHOW;
+
+    WinSetWindowPos(hwnd, 0, x, y, aptl[TXTBOX_TOPRIGHT].x, ySize, flag);
+
+    return x+aptl[TXTBOX_TOPRIGHT].x;
+
+ }
+
+ static USHORT getControlSize(HWND hwnd)
+ {
+    char   buffer[0x0100];
+    POINTL aptl[TXTBOX_COUNT];
+
+    HPS    hps         =  WinGetPS(hwnd);
+
+    WinQueryWindowText(hwnd,0xFF,buffer);
+    *(buffer+0xFF) = 0;
+
+    hps = WinGetPS(hwnd);
+
+    GpiQueryTextBox(      hps,
+                          strlen(buffer),
+                          (char *) buffer,
+                          TXTBOX_COUNT,
+                          aptl);
+    WinReleasePS(hps);
+
+    return (aptl[TXTBOX_TOPRIGHT].y - aptl[TXTBOX_BOTTOMRIGHT].y)+2;
+ }
+
+ static void resize(HWND hwnd, short cx, short cy)
+ {
+    int                 f;
+    int                 ySize;
+    int				    iconSize;
+    int  				lineSize = 8;
+    USHORT			    xSize;
+    USHORT			    top;
+    USHORT				y;
+    int                 pos;
+    HWND				h;
+
+#ifdef DEBUG
+    SWP                 swp;
+#endif
+
+    /* Calculate the size for the user box */
+
+    iconSize =
+    ySize    = (int) icqskin_querySizes(CHILD_WINDOW(hwnd,MSGID_ABOUTBUTTON),0,0);
+
+    DBGTrace(iconSize);
+
+    for(f=0;f < (sizeof(userBox)/sizeof(USHORT)); f++)
+    {
+       pos = getControlSize(CHILD_WINDOW(hwnd,userBox[f]));
+       if(pos > ySize)
+          ySize = pos;
+    }
+    lineSize = ySize;
+    DBGTrace(ySize);
+
+    top = y = (cy-(ySize+8));
+    WinSetWindowPos(CHILD_WINDOW(hwnd,MSGID_NAMEBOX), 0, 0, y, cx, ySize+12, SWP_SIZE|SWP_MOVE|SWP_SHOW);
+
+    y   += 3; // ySize/2;
+
+    WinSetWindowPos(CHILD_WINDOW(hwnd,MSGID_USERMODE), 0, 3, y, iconSize, iconSize, SWP_SIZE|SWP_MOVE|SWP_SHOW);
+
+    pos  = setControlPos(CHILD_WINDOW(hwnd,MSGID_NICK),6+ySize, y, ySize);
+    WinSetWindowPos(CHILD_WINDOW(hwnd,MSGID_NICKENTRY), 0, pos+4, y, (cx/2)-(pos+8), ySize, SWP_SIZE|SWP_MOVE|SWP_SHOW);
+
+    pos  = setControlPos(CHILD_WINDOW(hwnd,MSGID_NAME),cx/2,y,ySize);
+
+    f    = cx-((iconSize*2)+6);
+    WinSetWindowPos(CHILD_WINDOW(hwnd,MSGID_NAMEENTRY), 0, pos+4, y, f-(pos+6), ySize, SWP_SIZE|SWP_MOVE|SWP_SHOW);
+
+    f   += 1;
+    WinSetWindowPos(CHILD_WINDOW(hwnd,MSGID_ABOUTBUTTON), 0, f, y, iconSize, iconSize, SWP_SIZE|SWP_MOVE|SWP_SHOW);
+
+    f   += iconSize+1;
+    WinSetWindowPos(CHILD_WINDOW(hwnd,MSGID_INFOBUTTON), 0, f, y, iconSize, iconSize, SWP_SIZE|SWP_MOVE|SWP_SHOW);
+
+    /* Button bar */
+    ySize = 0;
+    for(f=0;f < (sizeof(buttonBar)/sizeof(USHORT)); f++)
+    {
+       icqskin_querySizes(CHILD_WINDOW(hwnd,buttonBar[f]),0,&y);
+       if(y > ySize)
+          ySize = y;
+    }
+
+    pos = cx;
+
+    for(f=0;f < (sizeof(buttonBar)/sizeof(USHORT)); f++)
+    {
+       h = CHILD_WINDOW(hwnd,buttonBar[f]);
+       if(WinIsWindowVisible(h))
+       {
+          xSize  = (USHORT) icqskin_querySizes(h,0,0);
+          pos   -= xSize;
+          WinSetWindowPos(h, 0, pos, 0, xSize, ySize, SWP_SIZE|SWP_MOVE);
+          pos   -= 4;
+       }
+    }
+
+    /* Text box */
+    pos = ySize+2;
+    WinSetWindowPos(CHILD_WINDOW(hwnd,MSGID_TEXTBOX), 0, 0, pos, cx, (top-pos)+2, SWP_SIZE|SWP_MOVE|SWP_SHOW);
+
+    /* Edit area */
+    pos += 6;
+    top -= 10;
+
+    h = CHILD_WINDOW(hwnd,MSGID_HISTORY);
+
+    if(WinIsWindowVisible(h))
+    {
+       DBGTracex(h);
+       ySize = (top-pos) / 3;
+       WinSetWindowPos(h, 0, 4, pos+ySize, cx-8, top-(pos+ySize), SWP_SIZE|SWP_MOVE|SWP_SHOW);
+       top = (pos+ySize)-4;
+    }
+
+#ifdef DEBUG
+    WinQueryWindowPos(h, &swp);
+    DBGTrace(swp.x);
+    DBGTrace(swp.y);
+    DBGTrace(swp.cx);
+    DBGTrace(swp.cy);
+#endif
+
+    WinSetWindowPos(CHILD_WINDOW(hwnd,MSGID_EDITBOX), 0, 4, pos, cx-8, top-pos, SWP_SIZE|SWP_MOVE|SWP_SHOW);
+
+ }
+
+ static void loadSkin(HWND hwnd, const char *name, SKINFILESECTION *fl)
+ {
+    ICQFRAME            *cfg    = WinQueryWindowPtr(hwnd,0);
+    SKINDATA            *skn;
+    int                 f;
+    HWND                h;
+    ULONG				bg      = 0x00D1D1D1;
+    ULONG				fg      = 0x00000040;
+    ULONG				wrk;
+    const struct _child *def    = childList;
+    char			    buffer[0x0100];
+    const char 			*ptr;
+
+    CHKPoint();
+
+    h = CHILD_WINDOW(hwnd,MSGID_HISTORY);
+    bg = CLR_WHITE;
+    WinSetPresParam(h,PP_BACKGROUNDCOLORINDEX,sizeof(bg),&bg);
+    fg = CLR_BLACK;
+    WinSetPresParam(h,PP_FOREGROUNDCOLORINDEX,sizeof(fg),&fg);
+
+    CHKPoint();
+
+    if(cfg)
+    {
+       bg = cfg->pal[ICQCLR_BACKGROUND];
+       fg = cfg->pal[ICQCLR_FOREGROUND];
+    }
+
+    for(f=0;f < (sizeof(childList)/sizeof(struct _child));f++)
+    {
+       h = CHILD_WINDOW(hwnd,def->id);
+       icqskin_setICQHandle(h,cfg->icq);
+
+       if(!icqskin_loadSkin(h,name,fl))
+       {
+          // Element font
+
+          sprintf(buffer,"%s.Font",def->name);
+
+          ptr = icqskin_getSkinFileEntry(fl, name, buffer);
+
+          if(ptr)
+          {
+             DBGMessage(ptr);
+             icqskin_setButtonFont(h,ptr);
+          }
+          else
+          {
+             icqskin_setButtonFont(h,def->font);
+          }
+
+          // Foreground color
+
+          sprintf(buffer,"%s.Foreground",def->name);
+          ptr = icqskin_getSkinFileEntry(fl, name, buffer);
+
+          if(!ptr)
+             ptr = icqskin_getSkinFileEntry(fl, name, "Foreground");
+
+          if(ptr)
+          {
+             wrk = icqskin_ladPalleteFromString(ptr);
+             WinSetPresParam(h,PP_FOREGROUNDCOLOR,sizeof(ULONG),&wrk);
+          }
+          else
+          {
+             WinSetPresParam(h,PP_FOREGROUNDCOLOR,sizeof(ULONG),&bg);
+          }
+
+          // Background color
+
+          sprintf(buffer,"%s.Background",def->name);
+          ptr = icqskin_getSkinFileEntry(fl, name, buffer);
+
+          if(!ptr)
+             ptr = icqskin_getSkinFileEntry(fl, name, "Background");
+
+          if(ptr)
+          {
+             wrk = icqskin_ladPalleteFromString(ptr);
+             WinSetPresParam(h,PP_BACKGROUNDCOLOR,sizeof(ULONG),&wrk);
+          }
+          else
+          {
+             WinSetPresParam(h,PP_BACKGROUNDCOLOR,sizeof(ULONG),&bg);
+          }
+
+       }
+       def++;
+    }
+
+ }
+
+ static int action(HWND hwnd, USHORT id, USHORT type)
+ {
+    if(type != CMDSRC_ACCELERATOR)
+       return -1;
+
+    DBGMessage("Message window keyboard accelerator");
+    DBGTrace(id);
+
+    hwnd = WinWindowFromID(hwnd,id);
+    DBGTracex(hwnd);
+
+    if(hwnd)
+       WinPostMsg(hwnd,WMICQ_CLICKED,0,0);
+
+    return 0;
+ }
+
+ int icqskin_logErrorInfo(HICQ icq, hWindow hwnd, BOOL close, char *msg)
+ {
+    char      buffer[0x0100];
+    PERRINFO  perriErrorInfo  = WinGetErrorInfo(WinQueryAnchorBlock(hwnd));
+
+    if(perriErrorInfo)
+    {
+       DBGTracex(perriErrorInfo->offaoffszMsg);
+
+       sprintf(buffer,"%s (rc=%d/0x%04x)",perriErrorInfo->idError,perriErrorInfo->idError);
+       DBGMessage(buffer);
+
+       if(icq)
+       {
+          icqWriteSysLog(icq,PROJECT,buffer);
+       }
+
+       WinFreeErrorInfo(perriErrorInfo);
+    }
+
+    if(close)
+       WinPostMsg(hwnd,WM_CLOSE,0,0);
+
+    return -1;
+ }
+
+ int icqskin_insertMessageHistory(HWND hwnd, ULONG flags, const char *text)
+ {
+    ICQMSGDIALOG    *cfg           = WinQueryWindowPtr(hwnd,0);
+    ULONG		    bytes          = sizeof(RECORD)+strlen(text);
+    HWND 		    h 		       = CHILD_WINDOW(hwnd,MSGID_HISTORY);
+    PRECORD		    rec;
+    RECORDINSERT    recordInsert;
+
+    DBGTracex(h);
+
+    rec = WinSendMsg(h,CM_ALLOCRECORD,MPFROMLONG(bytes),MPFROMSHORT(1));
+    DBGTracex(rec);
+
+    if(!rec)
+      return icqskin_logErrorInfo(((ICQFRAME *) WinQueryWindowPtr(hwnd,0))->icq,hwnd,TRUE,"CM_ALLOCRECORD has failed");
+
+    memset(rec,0,sizeof(RECORD));
+
+    rec->recordCore.cb              = sizeof(RECORDCORE);
+
+    strcpy(rec->text,text);
+
+    rec->recordCore.pszText 	    =
+    rec->recordCore.pszIcon 	    =
+    rec->recordCore.pszName 	    =
+    rec->msgText                    = rec->text;
+
+    rec->flags                      = flags;
+
+    rec->icon                       =
+    rec->recordCore.hptrIcon        = cfg->msgIn;
+
+    DBGMessage("----------------------------------------------------------------");
+    DBGMessage(rec->text);
+    DBGMessage("----------------------------------------------------------------");
+
+
+    memset(&recordInsert,0,sizeof(RECORDINSERT));
+    recordInsert.cb 			    = sizeof(RECORDINSERT);
+    recordInsert.pRecordParent		= NULL;
+    recordInsert.pRecordOrder 		= (PRECORDCORE)CMA_END;
+    recordInsert.zOrder    		    = CMA_TOP;
+    recordInsert.cRecordsInsert 	= 1;
+    recordInsert.fInvalidateRecord 	= TRUE;
+
+    if(!WinSendMsg(h, CM_INSERTRECORD, (PRECORDCORE) rec, &recordInsert))
+       return icqskin_logErrorInfo(((ICQFRAME *) WinQueryWindowPtr(hwnd,0))->icq,hwnd,TRUE,"CM_INSERTRECORD has failed");
+
+    return 0;
+
+ }
+
+
+

@@ -1,0 +1,101 @@
+dir
+cl
+exit
+less ..\..\core\kernel\log.c
+less os2file.c
+e go.cmd
+run
+del \Private\Received\x
+run
+cd ..
+grep -r .LONGNAME *
+less icqulog\icqulog.c
+run
+bd
+run
+run
+run
+cl
+rl
+exit
+db
+run
+run
+run
+run
+rl
+exit
+rl
+exit
+rl
+exit
+dir ..\..\config\*.dat
+less ..\..\core\kernel\config.c
+..\..\config\
+open pwicq.ini
+bd
+rl
+exit
+exit
+less \logs\27241234.log
+grep icqv8_recvPeer *.c
+less tcptools.c
+less ..\..\core\network\os2net.c
+dir
+cl
+dir
+exit
+e go.cmd
+less session.c
+run
+less \Temp\pwicq.log
+grep PEERFLAG_READY *.c
+run
+less peer.h
+run
+cl
+cl
+exit
+run
+cl
+exit
+run
+run
+run
+less \Temp\pwICQ.dbg
+grep -i icqwritesysrc *.c
+less peer.h
+run
+run
+run
+rl
+exit
+exit
+grep icqv8_sendMessage *.c
+cl
+rl
+exit
+850
+-i "By Server request" *.c
+grep -i "By Server request" *.c
+exit
+rl & exit
+cl
+exit
+less s:\POPUPLOG.OS2
+dir \Private\pwicq2\plugins
+less \Private\pwicq2\plugins\icqv8p.map
+grep icqv8_connect *.c
+less \logs\27241234.log
+grep icqv8_connect *.c
+grep PEERSESSION *.c
+grep PEERSESSION *.h
+dir *.h
+less peer.h
+run
+rl
+exit
+db
+db
+rl
+exit

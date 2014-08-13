@@ -1,0 +1,107 @@
+;
+; OS/2 Socket errors message file
+;
+; s:\os2tk45\bin\mkmsgf.exe sck.message sck.msg
+;
+SCK
+SCK0001E: Not owner
+SCK0002E: No such file or directory
+SCK0003E: No such process
+SCK0004E: Interrupted system call
+SCK0005E: Input/output error
+SCK0006E: No such device or address
+SCK0007E: Argument list too long
+SCK0008E: Exec format error
+SCK0009E: Bad file number
+SCK0010E: No child processes
+SCK0011E: Resource deadlock avoided
+SCK0012E: Cannot allocate memory
+SCK0013E: Permission denied
+SCK0014E: Bad address
+SCK0015E: Block device required
+SCK0016E: Device busy
+SCK0017E: File exists
+SCK0018E: Cross-device link
+SCK0019E: Operation not supported by device
+SCK0020E: Not a directory
+SCK0021E: Is a directory
+SCK0022E: Invalid argument
+SCK0023E: Too many open files in system
+SCK0024E: Too many open files
+SCK0025E: Inappropriate ioctl for device
+SCK0026E: Text file busy
+SCK0027E: File too large
+SCK0028E: No space left on device
+SCK0029E: Illegal seek
+SCK0030E: Read-only file system
+SCK0031E: Too many links
+SCK0032E: Broken pipe
+SCK0033E: Numerical argument out of domain
+SCK0034E: Result too large
+SCK0035E: Operation would block
+SCK0036E: Operation now in progress
+SCK0037E: Operation already in progress
+SCK0038E: Socket operation on non-socket
+SCK0039E: Destination address required
+SCK0040E: Message too long
+SCK0041E: Protocol wrong type for socket
+SCK0042E: Protocol not available
+SCK0043E: Protocol not supported
+SCK0044E: Socket type not supported
+SCK0045E: Operation not supported on socket
+SCK0046E: Protocol family not supported
+SCK0047E: Address family not supported by protocol family
+SCK0048E: Address already in use
+SCK0049E: Can't assign requested address
+SCK0050E: Network is down
+SCK0051E: Network is unreachable
+SCK0052E: Network dropped connection on reset
+SCK0053E: Software caused connection abort
+SCK0054E: Connection reset by peer
+SCK0055E: No buffer space available
+SCK0056E: Socket is already connected
+SCK0057E: Socket is not connected
+SCK0058E: Can't send after socket shutdown
+SCK0059E: Too many references: can't splice
+SCK0060E: Connection timed out
+SCK0061E: Connection refused
+SCK0062E: Too many levels of symbolic links
+SCK0063E: File name too long
+SCK0064E: Host is down
+SCK0065E: No route to host
+SCK0066E: Directory not empty
+SCK0067E: Too many processes
+SCK0068E: Too many users
+SCK0069E: Disc quota exceeded
+SCK0070E: Stale NFS file handle
+SCK0071E: Too many levels of remote in path
+SCK0072E: RPC struct is bad
+SCK0073E: RPC version wrong
+SCK0074E: RPC prog. not avail
+SCK0075E: Program version wrong
+SCK0076E: Bad procedure for program
+SCK0077E: No locks available
+SCK0078E: Function not implemented
+SCK0079E: Inappropriate file type or format
+SCK0080E: Authentication error
+SCK0081E: Need authenticator
+SCK0082?:
+SCK0083?:
+SCK0084?:
+SCK0085?:
+SCK0086?:
+SCK0087?:
+SCK0088?:
+SCK0089?:
+SCK0090?:
+SCK0091?:
+SCK0092?:
+SCK0093?:
+SCK0094?:
+SCK0095?:
+SCK0096?:
+SCK0097?:
+SCK0098?:
+SCK0099?:
+SCK0100E: OS2 Error
+

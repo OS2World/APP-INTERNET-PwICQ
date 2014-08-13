@@ -1,0 +1,7 @@
+#define INCL_WIN
+#define INCL_NLS
+#include "os2.h"
+
+BITMAP 100 icons.bmp
+
+

@@ -1,0 +1,105 @@
+..\newskin\
+less makefile
+less ..\..\include\pwicqgui.h
+cl
+bd
+cl
+cl
+rl
+cc
+cc
+exit
+rl
+rl
+exit
+rl
+cl
+m
+db
+rl
+rl
+grep -i miscOptions *.c
+rrl
+rl
+exit
+rl
+dir
+less go.cmd
+db
+run
+less \Temp\pwicq.log
+m
+run
+run
+run
+rl
+exit
+rl
+dir
+exit
+less ..\..\include\icqdefs.h
+select /od less (\temp\*)
+select /od less (\temp\grou*)
+run
+rl
+dir
+less *.c
+m
+cl
+run
+rl & exit
+less ..\..\core\kernel\config.c
+..\..\core\os2win\
+grep -i listboxinsert *.c
+bd
+less groups.c
+rl
+exit
+rl
+exit
+rl
+rl & exit
+rl
+exit
+cl
+less ..\..\include\icqdefs.h
+grep miscOptions *.c
+grep usBasic *.c
+grep usrBasic *.c
+less ..\..\include\icqdefs.h
+rl
+exit
+run
+run
+less \Temp\pwicq.log
+del \Temp\pwicq.log
+e go.cmd
+set | grep -i icqconf
+run
+less \Temp\pwicq.log
+run
+rl
+dir
+exit
+grep cfgcpg *.c
+..\..\core\kernel\
+grep icqSetRemoteCodePage *.c
+less os2query.c
+less \logs\27241234.log
+exit
+dir cfg*.c
+copy cfgcpg.c cfgcpg.old
+less cfgcpg.old
+less ..\..\include\icqdefs.h
+less cfgcpg.old
+run
+run
+dir *.old
+less os2config.old
+rl
+exit
+run
+rl
+m
+rl
+exit

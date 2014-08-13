@@ -1,0 +1,19 @@
+/*
+ * MSGDLG.H - Message window control-IDs
+ */
+
+ #define IDC_NICKNAME    106
+ #define IDC_EMAIL       107
+ #define IDC_ICQNUMBER   108
+ #define IDC_NAME        109
+ #define IDC_MESSAGE     111
+ #define IDC_URL         121
+ #define IDC_ADD         113
+ #define IDC_AUTHORIZE   114
+ #define IDC_REPLY       115
+ #define IDC_SEND        116
+ #define IDC_URGENT      117
+ #define IDC_AUTOOPEN    118
+ #define IDC_READNEXT    120
+ #define IDC_CLOSE       119
+

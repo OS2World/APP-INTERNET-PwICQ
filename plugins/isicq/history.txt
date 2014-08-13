@@ -1,0 +1,85 @@
+dir ..\..\include
+grep -i icqqueryuin *.c
+less ..\icqmsg\msg.c
+less send.c
+grep -i broadcast *.c
+less main.c
+grep ishare_hello *.c
+less send.c
+less ishared.h
+less pwicqlib.c
+less pwicqplg.c
+grep -i datablock *.c
+less ishared.h
+grep packetSequence *.c
+less send.c
+cl
+grep -i packetsequence *.c
+run
+less \Temp\pwicq.log
+grep ISHARE_UDP_MESSAGE *.c
+grep HELLO *.c
+grep HELLO *.h
+grep -i pwicq *.c  | grep -i ifdef
+cl
+db
+run
+less send.c
+less ..\..\core\kernel\msg.c
+cd ..
+grep -r icqInsertMessage *
+less ..\core\kernel\msg.c
+bd
+run
+rl
+exit
+db
+run
+less send.c
+grep ishare_send *.c
+less search.c
+run
+rl
+exit
+cl
+less ..\icqmsg\msg.c
+rl
+rl
+exit
+rl
+exit
+rl
+exit
+rl & exit
+less ..\..\include\icqdefs.h
+..\icqmsg\
+less msg.c
+bd
+rl & exit
+less ..\..\include\icqdefs.h
+..\..\core\
+grep -i url *.c | grep EXPENTRY
+kernel\
+less os2core.def
+grep icqQueryURL *.c
+less query.c
+bd
+rl
+dir
+exit
+rl & exit
+exit
+rl
+exit
+rl
+exit
+rl
+exit
+grep -i icqwritesyslog *.c
+less pwicqmsg.c
+less ishared.h
+less ..\..\core\kernel\msg.c
+rl
+exit
+rl
+exit

@@ -1,0 +1,81 @@
+db
+db
+copy icqv8.dll \Private\pwicq2\plugins
+tail -f \logs\27241234.dbg
+grep -i dumptlv *.c
+grep icqv8_goodbye *.c
+less channel4.c
+db
+rl
+exit
+less \logs\27241234.log
+exit
+run
+rl & exit
+dec2hex 21
+grep -i isonline *.c
+less tools.c
+less \logs\27241234.log
+rl & exit
+exit
+less \logs\27241234.log
+less ..\..\core\kernel\os2core.def
+less ..\..\core\kernel\setvals.c
+..\..\core\kernel\
+grep -i icqwarning *.c
+less log.c
+bd
+run
+rl & exit
+e go.cmd
+run
+hex2dec 0f
+run
+run
+run
+e go.cmd
+rl & exit
+850
+grep -i "Status message" *.c
+grep USRV8_SENDSTATUSMSG *.c
+less ..\..\include\icqdefs.h
+rl & exit
+grep icqv8_sendMessage *.c
+grep icqv8_sendSystemMessage *.c
+rl
+ext
+exit
+e \data\scripts\cdbkp.cmd
+rl
+dir
+exit
+grep confirmed *.c
+less ..\..\include\icqdefs.h
+rl
+exit
+rl & exit
+less ..\icqconf\spmcfg.c
+less ..\icqconf\icqconf.c
+rl
+exit
+less ..\icqconf\spmcfg.c
+less ..\..\include\icqdefs.h
+rl
+exit
+run
+less go.cmd
+rl
+exit
+less  ..\..\include\icqdefs.h
+e icqv8.rc
+run
+e go.cmd
+run
+run
+cd ..\..\config
+open pwicq.ini
+run
+bd
+run
+rl
+exit

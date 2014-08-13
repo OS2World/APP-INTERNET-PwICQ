@@ -1,0 +1,113 @@
+dir
+del *.exe
+less queuecmd.c
+rl
+db
+run
+run
+bye
+run
+m
+run
+run
+cl
+dir
+del *.exe
+rl
+dir *.cmd
+type testa.cmd
+e testa.cmd
+testa
+m
+exit
+dir
+rl
+testa
+exit
+less ..\..\plugins\icqv8p\exec.c
+run
+grep INTVALUE *.c
+grep INTVALUE *.h
+e icqipc.def
+rl
+exit
+less load.c
+less testa.cmd
+e testa.cmd
+testa.cmd
+e icqipc.def
+exit
+less ..\..\plugins\icqv8p\exec.c
+rl
+exit
+grep rxICQSetPeerInfo *.c
+exit
+e icqipc.def
+dir *.c
+less os2queue.c
+grep ICQSHAREMEM *.c
+less lnxqueue.c
+run
+run
+run
+exit
+run
+m
+rl
+exit
+rl
+e testa.cmd
+testa
+rl
+cl
+exit
+exit
+e icqipc.def
+echo > w:\temp\x
+dir
+run
+run
+run
+run
+run
+e icqipc.def
+run
+cipy icqipc.exe \Temp
+copy icqipc.exe \Temp
+\temp\icqipc
+rl
+m
+run
+run
+cl
+rl
+exit
+less rxapi.h
+less ..\..\core\network\lnxnet.c
+less testa.cmd
+grep icqIPCSetPeerInfo *.c
+dir *.cmd
+e testa.cmd
+host localhost
+e \data\etc\hosts
+host localhost
+del s:\bin\DLL\icqipc.dll
+less ..\..\core\network\makefile
+dir *.
+type testa.cmd
+testa
+cmd.exe
+dir *.dll
+db
+rl
+testa.cmd
+exit
+rl & exit
+rl
+dir *.c
+less queuecmd.c
+rl
+dir
+exit
+exit
+exit

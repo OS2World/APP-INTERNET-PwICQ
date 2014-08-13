@@ -1,0 +1,46 @@
+* Conex„o rejeitada...
+
+Em V7:
+
+04/26/2003 19:21:04 icqkrnl    Unexpected close packet received (40 bytes)
+00 01 00 08 32 37 32 34 31 32 33 34 00 08 00 02   ....27241234....
+00 18 00 04 00 12 68 74 74 70 3a 2f 2f 77 77 77   ......http://www
+2e 61 6f 6c 2e 63 6f 6d                           .aol.com
+
+Em V8:
+
+04/26/2003 19:16:07 icqkrnl    Unexpected TLV 8 received in hello packet (2 bytes)
+00 18                                             ..
+04/26/2003 19:16:07 icqkrnl    Unexpected TLV 4 received in hello packet (18 bytes)
+68 74 74 70 3a 2f 2f 77 77 77 2e 61 6f 6c 2e 63   http://www.aol.c
+6f 6d                                             om
+
+Error 983.3
+
+You have been connecting and disconnecting too frequently.
+Wait a few minutes and try again.
+
+
+* Pedido de file-transfer via servidor:
+
+ 03/13/2003 21:22:35 icqkrnl    Unexpected header values in SMS Message (79 bytes)
+ 00 29 00 f0 2d 12 d9 30 91 d3 11 8d d7 00 10 4b   .).-.Ÿ0ë”.ç◊..K
+ 06 46 2e 00 00 04 00 00 00 46 69 6c 65 00 00 01   .F.......File...
+ 00 00 00 00 00 00 00 00 00 00 00 00 1f 00 00 00   ................
+ 05 00 00 00 74 65 73 74 65 00 00 00 00 08 00 61   ....teste......a
+ 61 61 2e 6a 70 67 00 d2 70 03 00 00 00 00 00      aa.jpg.“p......
+
+ 03/13/2003 21:22:35 icqkrnl    Unexpected message size in SMS Message (79 bytes)
+ 00 29 00 f0 2d 12 d9 30 91 d3 11 8d d7 00 10 4b   .).-.Ÿ0ë”.ç◊..K
+ 06 46 2e 00 00 04 00 00 00 46 69 6c 65 00 00 01   .F.......File...
+ 00 00 00 00 00 00 00 00 00 00 00 00 1f 00 00 00   ................
+ 05 00 00 00 74 65 73 74 65 00 00 00 00 08 00 61   ....teste......a
+ 61 61 2e 6a 70 67 00 d2 70 03 00 00 00 00 00      aa.jpg.“p......
+
+
+ 00 29 00 f0 2d 12 d9 30 91 d3 11 8d d7 00 10 4b
+ 06 46 2e 00 00 04 00 00 00 46 69 6c 65 00 00 01
+ 00 00 00 00 00 00 00 00 00 00 00 00 1f 00 00 00
+ 05 00 00 00 74 65 73 74 65 00 00 00 00 08 00 61
+ 61 61 2e 6a 70 67 00 d2 70 03 00 00 00 00 00
+

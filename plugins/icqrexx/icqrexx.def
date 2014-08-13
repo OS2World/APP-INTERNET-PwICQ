@@ -1,0 +1,18 @@
+;========================================================================
+; ICQSOUND.DEF - Definicoes para o modulo Multimidia do pwICQ2
+;========================================================================
+
+LIBRARY      ICQREXX
+
+PROTMODE
+DATA         MULTIPLE NONSHARED READWRITE LOADONCALL
+CODE         MOVEABLE DISCARDABLE LOADONCALL EXECUTEONLY
+
+
+EXPORTS      icqrexx_Configure
+             icqrexx_Event
+             icqrexx_ConfigPage
+             icqrexx_startHelper
+             icqrexx_expandSystemMacros
+	     icqrexx_expandUserMacros
+

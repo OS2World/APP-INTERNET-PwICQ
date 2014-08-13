@@ -1,0 +1,193 @@
+Frame 10 (90 on wire, 90 captured)
+    Arrival Time: Nov  2, 2001 23:47:41.398719
+    Time delta from previous packet: 0.000000 seconds
+    Time relative to first packet: 11.149559 seconds
+    Frame Number: 10
+    Packet Length: 90 bytes
+    Capture Length: 90 bytes
+Ethernet II
+    Destination: 00:c0:49:40:9f:fe (US_40:9f:fe)
+    Source: 00:a0:c9:0a:ee:6e (Intel_0a:ee:6e)
+    Type: IP (0x0800)
+Internet Protocol, Src Addr: 172.17.31.230 (172.17.31.230), Dst Addr: 64.12.26.65 (64.12.26.65)
+    Version: 4
+    Header length: 20 bytes
+    Differentiated Services Field: 0x00 (DSCP 0x00: Default; ECN: 0x00)
+        0000 00.. = Differentiated Services Codepoint: Default (0x00)
+        .... ..0. = ECN-Capable Transport (ECT): 0
+        .... ...0 = ECN-CE: 0
+    Total Length: 76
+    Identification: 0x7f01
+    Flags: 0x04
+        .1.. = Don't fragment: Set
+        ..0. = More fragments: Not set
+    Fragment offset: 0
+    Time to live: 128
+    Protocol: TCP (0x06)
+    Header checksum: 0x5566 (correct)
+    Source: 172.17.31.230 (172.17.31.230)
+    Destination: 64.12.26.65 (64.12.26.65)
+Transmission Control Protocol, Src Port: 1043 (1043), Dst Port: aol (5190), Seq: 149311, Ack: 2807918384
+    Source port: 1043 (1043)
+    Destination port: aol (5190)
+    Sequence number: 149311
+    Next sequence number: 149347
+    Acknowledgement number: 2807918384
+    Header length: 20 bytes
+    Flags: 0x0018 (PSH, ACK)
+        0... .... = Congestion Window Reduced (CWR): Not set
+        .0.. .... = ECN-Echo: Not set
+        ..0. .... = Urgent: Not set
+        ...1 .... = Acknowledgment: Set
+        .... 1... = Push: Set
+        .... .0.. = Reset: Not set
+        .... ..0. = Syn: Not set
+        .... ...0 = Fin: Not set
+    Window size: 8148
+    Checksum: 0x3876 (correct)
+AOL Instant Messenger
+    Command Start: 0x2a
+    Channel ID: 0x02
+    Sequence Number: 24580
+    Data Field Length: 30
+    FNAC
+        FNAC Family ID: 0x0015
+        FNAC Subtype ID: 0x0002
+
+0000  00 c0 49 40 9f fe 00 a0 c9 0a ee 6e 08 00 45 00   ..I@.......n..E.
+0010  00 4c 7f 01 40 00 80 06 55 66 ac 11 1f e6 40 0c   .L..@...Uf....@.
+0020  1a 41 04 13 14 46 00 02 47 3f a7 5d 6f 30 50 18   .A...F..G?.]o0P.
+0030  1f d4 38 76 00 00 2a 02 60 04 00 1e 00 15 00 02   ..8v..*.`.......
+0040  00 00 00 0a 00 02 00 01 00 10 0e 00 88 df 53 00   ..............S.
+0050  d0 07 13 00 b2 04 12 ab 9f 01                     ..........
+
+        2a
+        02
+        60 04
+        00 1e
+
+        00 15
+        00 02
+        00 00
+        00 0a 00 02
+
+        00 01
+        00 10
+
+        0e 00           (LE) bytes remaining, useless
+        88 df 53 00     my uin
+        d0 07           Query user info
+        13 00           Request ID
+        b2 04           Sub-type
+        12 ab 9f 01     Uin I'm requesting
+
+
+
+
+Frame 11 (784 on wire, 784 captured)
+    Arrival Time: Nov  2, 2001 23:47:41.740032
+    Time delta from previous packet: 0.341313 seconds
+    Time relative to first packet: 11.490872 seconds
+    Frame Number: 11
+    Packet Length: 784 bytes
+    Capture Length: 784 bytes
+Ethernet II
+    Destination: 00:a0:c9:0a:ee:6e (Intel_0a:ee:6e)
+    Source: 00:c0:49:40:9f:fe (US_40:9f:fe)
+    Type: IP (0x0800)
+Internet Protocol, Src Addr: 64.12.26.65 (64.12.26.65), Dst Addr: 172.17.31.230 (172.17.31.230)
+    Version: 4
+    Header length: 20 bytes
+    Differentiated Services Field: 0x00 (DSCP 0x00: Default; ECN: 0x00)
+        0000 00.. = Differentiated Services Codepoint: Default (0x00)
+        .... ..0. = ECN-Capable Transport (ECT): 0
+        .... ...0 = ECN-CE: 0
+    Total Length: 770
+    Identification: 0x6b71
+    Flags: 0x04
+        .1.. = Don't fragment: Set
+        ..0. = More fragments: Not set
+    Fragment offset: 0
+    Time to live: 40
+    Protocol: TCP (0x06)
+    Header checksum: 0xbe40 (correct)
+    Source: 64.12.26.65 (64.12.26.65)
+    Destination: 172.17.31.230 (172.17.31.230)
+Transmission Control Protocol, Src Port: aol (5190), Dst Port: 1043 (1043), Seq: 2807918384, Ack: 149347
+    Source port: aol (5190)
+    Destination port: 1043 (1043)
+    Sequence number: 2807918384
+    Next sequence number: 2807919114
+    Acknowledgement number: 149347
+    Header length: 20 bytes
+    Flags: 0x0018 (PSH, ACK)
+        0... .... = Congestion Window Reduced (CWR): Not set
+        .0.. .... = ECN-Echo: Not set
+        ..0. .... = Urgent: Not set
+        ...1 .... = Acknowledgment: Set
+        .... 1... = Push: Set
+        .... .0.. = Reset: Not set
+        .... ..0. = Syn: Not set
+        .... ...0 = Fin: Not set
+    Window size: 16384
+    Checksum: 0x3368 (correct)
+AOL Instant Messenger
+    Command Start: 0x2a
+    Channel ID: 0x02
+    Sequence Number: 58571
+    Data Field Length: 171
+    FNAC
+        FNAC Family ID: 0x0015
+        FNAC Subtype ID: 0x0003
+
+0000  00 a0 c9 0a ee 6e 00 c0 49 40 9f fe 08 00 45 00   .....n..I@....E.
+0010  03 02 6b 71 40 00 28 06 be 40 40 0c 1a 41 ac 11   ..kq@.(..@@..A..
+0020  1f e6 14 46 04 13 a7 5d 6f 30 00 02 47 63 50 18   ...F...]o0..GcP.
+0030  40 00 33 68 00 00 2a 02 e4 cb 00 ab 00 15 00 03   @.3h..*.........
+0040  00 01 00 0a 00 02 00 01 00 9d 9b 00 88 df 53 00   ..............S.
+0050  da 07 13 00 c8 00 0a 08 00 54 72 65 76 69 7a 65   .........Trevize
+0060  00 06 00 47 6f 6c 61 6e 00 08 00 54 72 65 76 69   ...Golan...Trevi
+0070  7a 65 00 13 00 74 72 65 76 69 7a 65 40 7a 61 7a   ze...trevize@zaz
+0080  2e 63 6f 6d 2e 62 72 00 09 00 42 72 61 73 69 6c   .com.br...Brasil
+0090  69 61 00 03 00 44 46 00 10 00 2b 35 35 2d 36 31   ia...DF...+55-61
+00a0  2d 33 78 78 2d 78 78 78 78 00 0e 00 4e 6f 74 20   -3xx-xxxx...Not
+00b0  61 76 61 69 6c 61 62 6c 65 00 0b 00 49 6e 20 6d   available...In m
+00c0  79 20 68 6f 6d 65 00 10 00 2b 35 35 2d 36 31 2d   y home...+55-61-
+00d0  39 78 78 2d 78 78 78 78 00 06 00 37 30 30 30 30   9xx-xxxx...70000
+00e0  00 37 00 01 00 01 00 2a 02 e4 cc 00 5a 00 15 00   .7.....*....Z...
+00f0  03 00 01 00 0a 00 02 00 01 00 4c 4a 00 88 df 53   ..........LJ...S
+0100  00 da 07 13 00 dc 00 0a 22 00 02 31 00 68 74 74   ........"..1.htt
+0110  70 3a 2f 2f 70 6c 61 6e 65 74 61 2e 74 65 72 72   p://planeta.terr
+0120  61 2e 63 6f 6d 2e 62 72 2f 69 6e 66 6f 72 6d 61   a.com.br/informa
+0130  74 69 63 61 2f 74 72 65 76 69 7a 65 2f 00 af 07   tica/trevize/...
+0140  01 17 24 00 00 00 00 2a 02 e4 cd 00 1c 00 15 00   ..$....*........
+0150  03 00 01 00 0a 00 02 00 01 00 0e 0c 00 88 df 53   ...............S
+0160  00 da 07 13 00 eb 00 0a 00 2a 02 e4 ce 00 1d 00   .........*......
+0170  15 00 03 00 01 00 0a 00 02 00 01 00 0f 0d 00 88   ................
+0180  df 53 00 da 07 13 00 0e 01 0a 00 00 2a 02 e4 cf   .S..........*...
+0190  00 b6 00 15 00 03 00 01 00 0a 00 02 00 01 00 a8   ................
+01a0  a6 00 88 df 53 00 da 07 13 00 d2 00 0a 09 00 42   ....S..........B
+01b0  72 61 73 69 6c 69 61 00 03 00 44 46 00 10 00 2b   rasilia...DF...+
+01c0  35 35 2d 36 31 2d 78 78 78 2d 78 78 78 78 00 10   55-61-xxx-xxxx..
+01d0  00 2b 35 35 2d 36 31 2d 79 79 79 2d 79 79 79 79   .+55-61-yyy-yyyy
+01e0  00 0b 00 49 6e 20 6d 79 20 68 6f 6d 65 00 06 00   ...In my home...
+01f0  37 30 30 30 30 00 37 00 17 00 4e 65 6f 43 6f 6d   70000.7...NeoCom
+0200  6d 20 64 6f 20 42 72 61 73 69 6c 20 4c 74 64 61   m do Brasil Ltda
+0210  00 0c 00 44 65 76 65 6c 6f 70 6d 65 6e 74 00 09   ...Development..
+0220  00 44 69 72 65 63 74 6f 72 00 19 00 1a 00 68 74   .Director.....ht
+0230  74 70 3a 2f 2f 77 77 77 2e 6e 65 6f 63 6f 6d 6d   tp://www.neocomm
+0240  2e 63 6f 6d 2e 62 72 00 2a 02 e4 d0 00 1e 00 15   .com.br.*.......
+0250  00 03 00 01 00 0a 00 02 00 01 00 10 0e 00 88 df   ................
+0260  53 00 da 07 13 00 e6 00 0a 01 00 00 2a 02 e4 d1   S...........*...
+0270  00 5d 00 15 00 03 00 01 00 0a 00 02 00 01 00 4f   .].............O
+0280  4d 00 88 df 53 00 da 07 13 00 f0 00 0a 04 64 00   M...S.........d.
+0290  0f 00 42 6c 75 65 73 2c 50 6f 70 2d 52 6f 63 6b   ..Blues,Pop-Rock
+02a0  00 70 00 07 00 53 63 69 2d 46 69 00 68 00 1a 00   .p...Sci-Fi.h...
+02b0  44 65 76 65 6c 6f 70 69 6e 67 2c 20 43 2c 20 4a   Developing, C, J
+02c0  61 76 61 2c 20 4f 53 2f 32 00 00 00 01 00 00 2a   ava, OS/2......*
+02d0  02 e4 d2 00 3b 00 15 00 03 00 00 00 0a 00 02 00   ....;...........
+02e0  01 00 2d 2b 00 88 df 53 00 da 07 13 00 fa 00 0a   ..-+...S........
+02f0  03 00 00 01 00 00 00 00 01 00 00 00 00 01 00 00   ................
+0300  03 00 00 01 00 00 00 00 01 00 00 00 00 01 00 00   ................
+
+

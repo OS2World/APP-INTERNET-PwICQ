@@ -1,0 +1,11 @@
+LIBRARY      ICQPIPE
+DATA         MULTIPLE READWRITE PRELOAD NONSHARED
+DESCRIPTION  'pwICQ PipeWriter Plugin'
+
+EXPORTS      icqpipe_Configure
+             icqpipe_Start
+             icqpipe_Event
+             icqpipe_ConfigPage
+
+
+

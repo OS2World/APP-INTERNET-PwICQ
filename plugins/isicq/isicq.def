@@ -1,0 +1,16 @@
+LIBRARY      ISICQ INITINSTANCE TERMINSTANCE
+
+PROTMODE
+
+DATA         MULTIPLE READWRITE LOADONCALL NONSHARED
+CODE         LOADONCALL
+
+EXPORTS      isicq_Configure
+	     isicq_Terminate
+             isicq_Start
+             isicq_Stop
+             isicq_Interpret
+             isicq_Timer
+
+
+

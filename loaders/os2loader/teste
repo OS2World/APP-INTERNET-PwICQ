@@ -1,0 +1,32 @@
+pwicq.c(220):	win.cx = 188
+pwicq.c(221):	win.cy = 72
+pwicq.c(57):	main		(Jan 18 2002 23:11:36)
+Guard Page Allocation Failure exception occurred at EIP = 1F79C344 on thread 0002.
+Register Dump at point of exception:
+EAX = 01000334    EBX = 19CC6B54  ECX = 00000000    EDX = 00000352
+EBP = 001D1008    EDI = 1EEF0000  ESI = 19CCBEBC    ESP = 001D0FF4
+ÿCS =     005B  CSLIM = FFFFFFFF   DS =     0053  DSLIM = FFFFFFFF
+ÿES =     0053  ESLIM = FFFFFFFF   FS =     150B  FSLIM = 00000030
+ÿGS =     0000  GSLIM = 00000000   SS =     0053  SSLIM = FFFFFFFF
+Exception occurred handling a prior exception.
+Process terminating.
+pwicq.c(246):	vlr = 0
+pwicq.c(262):	
+pwicq.c(246):	vlr = 1
+pwicq.c(262):	Verifying network service level
+pwicq.c(246):	vlr = 2
+pwicq.c(262):	Loading configuration file
+pwicq.c(246):	vlr = 3
+pwicq.c(262):	Processing command line parameters
+pwicq.c(246):	vlr = 4
+pwicq.c(262):	Loading filter files
+pwicq.c(246):	vlr = 5
+pwicq.c(262):	Loading plugins
+pwicq.c(246):	vlr = 6
+pwicq.c(262):	Plugins loaded
+pwicq.c(60):	icq = 1cb80020
+pwicq.c(246):	vlr = -4
+pwicq.c(262):	Can't start skin manager
+pwicq.c(98):	main		(Jan 18 2002 23:11:36)
+pwicq.c(108):	main		(Jan 18 2002 23:11:36)
+pwicq.c(120):	Terminado

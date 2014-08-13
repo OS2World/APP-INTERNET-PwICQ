@@ -1,0 +1,6 @@
+set include=s:\watcom\h;s:\watcom\h\nt;..\..\include
+set lib=S:\WATCOM\LIB386;S:\WATCOM\LIB386\NT;
+wcc386 -bd -bm -bt=nt -bw -d0 -DWIN32 -fp5 -zw common.c
+wcc386 -bd -bm -bt=nt -bw -d0 -DWIN32 -fp5 -zw winnet.c
+wlink @icqnetw.wlk
+

@@ -1,0 +1,337 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>
+	OSCAR Protocol: Section 2: AIM Commands
+    </title>
+  </head>
+
+  <body bgcolor="#FFFFFF" link="#444444" vlink="#666666">
+    <table width="1" border="0" align="center">
+      <tr>
+	<td><img src="/images/blank.gif" height="1" width="540">
+      </tr>
+      <tr>
+	<td align="right">
+	  <img src="/faim/faim.gif" border="0" width="111" height="50"><br>
+	  <A href="/pst/"><img src="/pst/pst_small.gif" border="0"></a>
+	</td>
+      </tr>
+      <tr>
+	<td align="center">
+	  <b><font size="+1">AIM/Oscar Protocol Specification: Section 2: AIM Commands</font></b>
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  <hr noshade>
+	  <table width="100%" border="0" align="center">
+	    <tr>
+	      <td width="1%" valign="top">
+		<img src="/images/blank.gif" width="5" height="1" border="0"><br>
+	      </td>
+	      <td width="1%" bgcolor="#BBBBBB">
+
+	      </td>
+	      <td width="1%">
+		<img src="/images/blank.gif" width="5" height="1" border="0">
+	      </td>
+	      <td width="98%">
+		<img src="/images/blank.gif" width="460" height="1" border="0"><br>
+
+
+		<font size="+1"><b>2.0 AIM Commands</b></font>
+		<p>
+		  Everything in the AIM protocol is embodied in AIM commands.  The division is not of packets because more than one command may be sent in any one packet, depending on the transmit timing, etc.  Commands are an abstraction above packets, and leads to the definition of the FLAP protocol below.
+		</p>
+		<p>
+		  Below is an attempt to generalize the layout of all AIM commands.  The acronyms used are those used by the AIM client and the AIM divison of AOL as defined in the document at <a href="http://www.aim.aol.com/javadev/terminology.html">http://www.aim.aol.com/javadev/terminology.html</a>.  Please refer to that document if the explanations listed here are not complete enough for you.
+		</p>
+		<b>Fig 2.1 Generalized Command Structure</b>
+		<center>
+		  <table border="2" width="60%">
+		    <tr>
+		      <td>
+			<u>FLAP</u>
+			<ul>
+			  <li>Command Start (byte: 0x2a)</li>
+			  <li>Channel ID (byte)</li>
+			  <li>Sequence Number (word)</li>
+			  <li>Data Field Length (word)</li>
+			  </ul>
+			  <center>
+			  <table border="2" width="80%">
+			    <tr>
+			      <td>
+				<u>Data Field</u>
+				<ul>
+				  <li>Usually SNAC Data (variable)</li>
+				</ul>
+			      </td>
+			    </tr>
+			  </table>
+			</center>
+		      </td>
+		    </tr>
+		  </table>
+		</center>
+		<b>2.1 FLAP</b>
+		<p>
+		  The FLAP is the protocol that sits at the bottom of everything communicated across AIM channels.  This generally makes up the first 6 bytes of every AIM command.  If this protocol is not obeyed, the OSCAR server will disconnect the offending client immediatly upon reception of a malformed command.  This is not helpful for debuging, to say the least.
+		</p>
+		<u>2.1.1 FLAP: Headers</u>
+		<p>
+		  Contained in the FLAP headers are: (in order of appearance)
+		</p>
+		<ul>
+		  <li>Command-Start [byte] (always 0x2a)</li>
+		  <li>Channel Identification [byte]</li>
+		  <li>Sequence Number [word]</li>
+		  <li>FLAP Data Field Length [word]</li>
+		</ul>
+		<p>
+		  This is followed immediatly by an unterminated FLAP Data Field, which concludes the FLAP command.
+		</p>
+		<u>2.1.2 FLAP: Data Field</u>
+		<p>
+		  Normally, the FLAP Data Field contains a SNAC.  The FLAP Data Field makes up the rest of the command (there is no FLAP-specific command terminator).
+		</p>
+		<u>2.1.3 Sequence Numbers</u>
+		<p>
+		  Why AOL decided to use sequence numbering with TCP is beyond me.  The retransmit and data integrity standards of TCP connections make this pointless.  So, they're really just there for looks, though that doesn't mean that they can be incorrect.  If the server gets an out-of-order command (according to the seqnums, not actual order), you will be disconnected.
+		</p>
+		<p>
+		  The sequence number origins are picked quite randomly.  There is no connection between the sequence number set from the server and the set from the client.  Sequence numbers are always incremented upward (towards 0xFFFF) for each command sent.  If the seqence number does reach 0xFFFF, it will wrap to 0x0000, for obvious reasons.  If you start a new connection, it is recommended that a new sequence number origin is picked for that connection, for purposes of internal coherency.  Sequence numbers are independent of channels: there's a single series of sequence numbers per TCP connection (per socket).  See section 2.1.4 for more information.
+		</p>
+		<u>2.1.4 Channels</u>
+		<p>
+		  Channels are the method used to multiplex seperate paths of communication across the same TCP socket.  These are analogous to TCP/UDP port numbers.  Four channels are currently used by OSCAR:
+		</p>
+		<ul>
+		  <li>0x01 - New Connection Negotiation</li>
+		  <li>0x02 - SNAC data (non connection-oriented data)</li>
+		  <li>0x03 - FLAP-level Error</li>
+		  <li>0x04 - Close Connection Negotiation</li>
+		</ul>
+		<p>
+		  After a new connection (socket) is set up using channel 0x01, data should only be carried on channel 0x02, until a low-level FLAP error occurs (channel 0x03) or there is planned termination, which gets "negotiated" (on channel 0x04).  Most live events processed during the lifespan of the client are done over channel 0x02.  <b>SNACs are never transmitted on any channel other than 0x02.</b>
+		</p>
+		<u>2.1.5 Features of FLAP</u>
+		<p>
+		  [Not yet.]
+		</p>
+		<u>2.1.6 Thoughts on FLAP Implementation</u>
+		<p>
+		  The best way to read an incoming FLAP command is to first read only the starting 6 bytes (the FLAP headers).  From these 6bytes, you can determine how many more bytes you need to read to complete the command, and how much memory you need to allocate to store it.  Never read more or less than the number of bytes specified in the FLAP headers, or your read will result in a truncated or uninterpretable command.  (If you read too much, you will probably end up reading the start of the next command, which is bad.  Lost data is unacceptable in the AIM standard.)
+		</p>
+		<p>
+		  Because every command must follow FLAP guidelines, I'd recommend using a low-level routine to add the FLAP headers (normally, this will be the "flush transmit queue" routine, so that addition of sequence numbers and the rest of the FLAP headers is done as close timewise as possible to the command being put on the wire).  This is the best way to prevent out-of-order seqnums from getting used (which, as stated earlier, is quite fatal).  
+		</p>
+		<b>2.2 SNAC</b>
+		<p>
+		  The SNAC is the unit that sits immediatly above FLAP on most commands, and is the normal contents of the FLAP Data Field for channel 0x02.  SNACs are only sent over channel 0x02.  Data sent across other channels are not considered complete SNACs.  There can be only one SNAC per FLAP command.
+		</p>
+		<p>
+		  SNACs are generalized into the following format:
+		</p>
+		<table align="Center" border="2">
+		  <tr><td>Position</td><td>Size</td><td>Purpose</td></tr>
+		  <tr><td>1</td><td>word</td><td>Family ID</td></tr>
+		  <tr><td>3</td><td>word</td><td>SubType ID</td></tr>
+		  <tr><td>5</td><td>byte</td><td>Flags[0]</td></tr>
+		  <tr><td>6</td><td>byte</td><td>Flags[1]</td></tr>
+		  <tr><td>7</td><td>dword</td><td>Request ID</td></tr>
+		  <Tr><td>11</td><td>variable</td><td>SNAC Data</td></tr>
+		</table>
+		<p>
+		  There is no formal declaration of the length of the SNAC data portion (that information must be assumed from the FLAP headers).
+		</p>
+		<p>
+		  "Families", identified by the "Family ID", constitute a group of services.  These are usually quite large groups.
+		</p>
+		<p>
+		  Subtypes are a subdivision of the Families.  Each subtype ID is different depending on the specific service or information provided in the data section.
+		</p>
+		<p>
+		  Flags are completely optional.  They're very rarely used, if at all.
+		</p>
+		<p>
+		  Request IDs are 32bit values used to identify non-atomic information.  The client can generate completely random reqid's as long as it remembers what the request was for.  Often, though, the results of the SNAC are irrelevent, and the reqid's can be forgotten.  But, in information-requestion SNACs, it is imparative you remember the reqid you sent because that's the only way to link it to the response!  If this is not done, it will be impossible to have more than one pending request of the same SNAC subtype (which is unlikely at best).  For server-initiated SNACs, the reqid is ORed with the fixed value -2147483648, and count up to zero from than from zero.
+		</p>
+		<p>
+		  Table 2.2.1 lists all documented SNAC types and subtypes.
+		</p>
+		<center><b>Table 2.2.1 Known SNACs</b></center>
+		<table align="center" border="2">
+		  <tr><td>Subtype</td><td>Source</td><td>Function</td></tr>
+		  <tr><td colspan="3"><Center>Family 0x0001: Generic Service Controls</center></td></tr>
+		  <tr><td>0x0001</td><td>Client or Server</td><td>Error</td></tr>
+		  <tr><td>0x0002</td><td>Client</td><td>Client is now online and ready for normal function</td></tr>
+		  <tr><td>0x0003</td><td>Server</td><td>Server is now  ready for normal functions</td></tr>
+		  <tr><td>0x0004</td><td>Client</td><td>Request for new service (the server will redirect the client to a new host where the service is available)</td></tr>
+		  <tr><td>0x0005</td><td>Server</td><td>Redirect (response to subtype 0x0004 from client)</td></tr>
+		  <tr><td>0x0006</td><td>Client</td><td>Request Rate Information (request rate at which client can send SNACs)</td></tr>
+		  <Tr><td>0x0007</td><td>Server</td><td>Rate information response (response to subtype 0x0006)</td></tr>
+		  <tr><Td>0x0008</td><td>Client</td><td>Rate Information Response Ack</td></tr>
+		  <tr><Td>0x000A</td><td>Server</td><td>Rate information change</td></tr>
+		  <tr><Td>0x000B</td><td>Server</td><td>Pause</td></tr>
+		  <tr><Td>0x000D</td><td>Server</td><td>Resume</td></tr>
+		  <tr><td>0x000E</td><td>Client</td><td>Request information on the screen name you've been authenticated under.</td></tr>
+		  <tr><td>0x000F</td><td>Server</td><td>Information the screen name you've been authenticated under.</td></tr>
+		  <tr><td>0x0010</td><td>Server</td><td>Evil notification</td></tr>
+		  <tr><td>0x0012</td><td>Server</td><td>Migration notice/request</td></tr>
+		  <tr><td>0x0013</td><td>Server</td><td>Message of the day</td></tr>
+		  <tr><td>0x0014</td><td>Client</td><td>Set Privacy flags</td></tr>
+		  <tr><td>0x0015</td><td>Server</td><td>Well known urls</td></tr>
+		  <tr><td>0x0016</td><td>Server</td><td>No op</td></tr>
+		  <tr><td colspan="3"><center>Family 0x0002: Location Services</center></td></tr>
+		  <tr><td>0x0001</td><td>Client or Server</td><td>Error</td></tr>
+		  <tr><td>0x0002</td><td>Client</td><td>Request rights information</tD></tr>
+		  <Tr><Td>0x0003</td><td>Server</td><td>Rights information</td></tr>
+		  <tr><td>0x0004</td><td>Client</td><td>Set user information</td></tr>
+		  <tr><td>0x0005</td><td>Client</td><td>Request user information</td></tr>
+		  <tr><td>0x0006</td><td>Server</tD><td>User information</td></tr>
+		  <tr><td>0x0007</td><td>Client</tD><td>Watcher sub request</td></tr>
+		  <tr><td>0x0008</td><td>Server</tD><td>Watcher notification</td></tr>
+		  <tr><td colspan="3"><center>Family 0x0003: Buddy List Management</center></td></tr>
+		  <tr><td>0x0001</td><td>Client or Server</td><td>Error</td></tr>
+		  <tr><td>0x0002</td><td>Client</td><td>Request rights information</td></tr>
+		  <tr><td>0x0003</td><td>Server</td><td>Rights information</td></tr>
+		  <tr><td>0x0004</td><td>Client</td><td>Add buddy to buddy list</td></tr>
+		  <tr><td>0x0005</td><td>Client</td><td>Remove buddy from buddy list</td></tr>
+		  <tr><td>0x0006</td><td>Client</td><td>Watcher list query</td></tr>
+		  <tr><td>0x0007</td><td>Server</td><td>Watcher list response</td></tr>
+		  <tr><td>0x0008</td><td>Client</td><td>Watcher sub request</td></tr>
+		  <tr><td>0x0009</td><td>Server</td><td>Watcher notification</td></tr>
+		  <tr><td>0x000A</td><td>Server</td><td>Reject notification</td></tr>
+		  <tr><td>0x000B</td><td>Server</td><td>Oncoming buddy</td></tr>
+		  <tr><td>0x000C</td><td>Server</td><td>Offgoing buddy</td></tr>
+		  <Tr><td colspan="3"><center>Family 0x0004: Messaging</center></td></tr>
+		  <tr><td>0x0001</td><td>Client or Server</td><td>Error</td></tr>
+		  <tr><td>0x0002</td><td>Client</td><td>Add ICBM parameter</td></tr>
+		  <tr><td>0x0003</td><td>Client</td><td>Remove ICBM parameter</td></tr>
+		  <tr><td>0x0004</td><td>Client</td><td>Request parameter information</td></tr>
+		  <tr><td>0x0005</td><td>Server</td><td>Parameter information</td></tr>
+		  <tr><td>0x0006</td><td>Client</td><td>Message from the client</td></tr>
+		  <tr><td>0x0007</td><td>Server</td><td>Message to the client</td></tr>
+		  <tr><td>0x0008</td><td>Client</td><td>Evil request</td></tr>
+		  <tr><td>0x0009</td><td>Server</td><td>Evil reply</td></tr>
+		  <tr><td>0x000A</td><td>Server</td><td>Missed calls</td></tr>
+		  <tr><td>0x000B</td><td>Client or Server</td><td>Client error</td></tr>
+		  <tr><td>0x000C</td><td>Server</td><td>Host ack</td></tr>
+		  <tr><td colspan="3"><centeR>Family 0x0005: Advertisments</center></td></tr>
+		  <tr><td>0x0001</td><td>Client or Server</td><td>Error</td></tr>
+		  <Tr><td>0x0002</td><td>Client</td><td>Request advertisments</td></tr>
+		  <Tr><td>0x0003</td><td>Server</td><td>Advertisment data (GIFs)</td></tr>
+		  <tr><td colspan="3"><centeR>Family 0x0006: Invitation and Client-to-Client</center></td></tr>
+		  <tr><td>0x0002</td><td>Client</td><td>Invite a friend to join AIM</td></tr>
+		  <tr><td>0x0003</td><td>Server</td><td>Invite a friend to join AIM ack</td></tr>
+		  <tr><td colspan="3"><centeR>Family 0x0007: Administrative</center></td></tr>
+		  <tr><td>0x0001</td><td>Server</td><td>Admin error</td></tr>
+		  <tr><td>0x0002</td><td>Client</td><td>Information request</td></tr>
+		  <tr><td>0x0003</td><td>Server</td><td>Information reply</td></tr>
+		  <tr><td>0x0004</td><td>Client</td><td>Information change request</td></tr>
+		  <tr><td>0x0005</td><td>Server</td><td>Information change reply</td></tr>
+		  <tr><td>0x0006</td><td>Client</td><td>Account confirm request</td></tr>
+		  <tr><td>0x0007</td><td>Server</td><td>Account confirm reply</td></tr>
+		  <tr><td>0x0008</td><td>Client</td><td>Account delete request</td></tr>
+		  <tr><td>0x0009</td><td>Server</td><td>Account delete reply</td></tr>
+		  <tr><td colspan="3"><centeR>Family 0x0008: Popup Notices</center></td></tr>
+		  <tr><td>0x0001</td><td>Client or Server</td><td>Error</td></tr>
+		  <tr><td>0x0002</td><td>Server</td><td>Display popup</td></tr>
+		  <tr><td colspan="3"><centeR>Family 0x0009: BOS-specific</center></td></tr>
+		  <tr><td>0x0001</td><td>Client or Server</td><td>Error</td></tr>
+		  <tr><td>0x0002</td><td>Client</td><td>Request BOS Rights</td></tr>
+		  <tr><td>0x0003</td><td>Server</td><td>BOS Rights</td></tr>
+		  <Tr><td>0x0004</td><td>Client</td><td>Set group permission mask</td></tr>
+		  <Tr><td>0x0005</td><td>Client</td><td>Add permission list entries</td></tr>
+		  <Tr><td>0x0006</td><td>Client</td><td>Delete permission list entries</td></tr>
+		  <Tr><td>0x0007</td><td>Client</td><td>Add deny list entries</td></tr>
+		  <Tr><td>0x0008</td><td>Client</td><td>Delete deny list entries</td></tr>
+		  <tr><td>0x0009</td><td>Server</td><td>BOS error</td></tr>
+		  <tr><td colspan="3"><centeR>Family 0x000A: User Lookup</center></td></tr>
+		  <tr><td>0x0001</td><td>Client or Server</td><td>Error (often Search Failed)</td></tr>
+		  <tr><td>0x0002</td><td>Client</td><td>Search for screen name by email address</td></tr>
+		  <tr><td>0x0003</td><td>Server</td><td>Search Response</td></tr>
+		  <tr><td colspan="3"><center>Family 0x000B: Stats</center></td></tr>
+		  <tr><td>0x0001</td><td>Client or Server</td><td>Error</td></tr>
+		  <tr><td>0x0002</td><td>Server</td><td>Set minimum report interval</td></tr>
+		  <tr><td>0x0003</td><td>Client</td><td>Report events</td></tr>
+		  <tr><td>0x0004</td><td>Server</td><td>Report ack</td></tr>
+		  <tr><td colspan="3"><center>Family 0x000C: Translate</center></td></tr>
+		  <tr><td>0x0001</td><td>Client or Server</td><td>Error</td></tr>
+		  <tr><td>0x0002</td><td>Client</td><td>Translate request</td></tr>
+		  <tr><td>0x0003</td><td>Server</td><td>Translate reply</td></tr>
+		  <tr><td colspan="3"><center>Family 0x000D: Chat Navigation</center></td></tr>
+		  <tr><td>0x0001</td><td>Client or Server</td><td>Error</td></tr>
+		  <tr><td>0x0002</td><td>Client</td><td>Request chat rights</td></tr>
+		  <tr><td>0x0003</td><td>Client</td><td>Request exchange information</td></tr>
+		  <tr><td>0x0004</td><td>Client</td><td>Request room information</td></tr>
+		  <tr><td>0x0005</td><td>Client</td><td>Request more room information</td></tr>
+		  <tr><td>0x0006</td><td>Client</td><td>Request occupant list</td></tr>
+		  <tr><td>0x0007</td><td>Client</td><td>Search for room</td></tr>
+		  <tr><td>0x0008</td><td>Client</td><td>Create room</td></tr>
+		  <tr><td>0x0009</td><td>Server</td><td>Navigation information</td></tr>
+		  <tr><td colspan="3"><center>Family 0x000E: Chat</center></td></tr>
+		  <tr><td>0x0001</td><td>Client or Server</td><td>Error</td></tr>
+		  <tr><td>0x0002</td><td>Server</td><td>Room information update</td></tr>
+		  <tr><td>0x0003</td><td>Server</td><td>Users joined</td></tr>
+		  <tr><td>0x0004</td><td>Server</td><td>Users left</td></tr>
+		  <tr><td>0x0005</td><td>Client</td><td>Channel message from client</td></tr>
+		  <tr><td>0x0006</td><td>Server</td><td>Channel message to client</td></tr>
+		  <tr><td>0x0007</td><td>Server</td><td>Evil request</td></tr>
+		  <tr><td>0x0008</td><td>Server</td><td>Evil reply</td></tr>
+		  <tr><td>0x0009</td><td>Client or Server</td><td>Client error</td></tr>
+		  <tr><td colspan="3"><CenteR>Family 0x0045: Unknown (Client Something?)</center></td></tr>
+		  <tr><td>0x0002</td><td>Client</td><td>Add to notify list</td></tr>
+		  
+		</table>
+		<p>
+		</p>
+		<u>2.2.1 Notes on SNACs</u>
+		<p>
+		  If you have more to add to the list, please do.  These are the basics of OSCAR communication, so there's bound to be alot of them!
+		</p>
+		<p>
+		  One last note on the subject: never eat SNACs.  They're extremely fattening, no matter what the National SNAC Council's television commercials tell you about them. Also, they have been known to cause your limbs to start FLAPing, which often results in unannounced levetation.
+		</p>
+
+		<b>2.3 TLVs</b>
+		<p>
+		  TLVs are a very convenient and efficient method of putting data into an organized format, esp variable length strings, etc.  TLV litterally stands for "Type, Length, Value".  And that's exactly what it is: a 16bit Type code, a 16bit value for the length of the Value field, and then the actual data in the Value field (variable length).  
+		</p>
+		<p>
+		  TLVs can be be in SNACs, but thats not required.  TLVs often are used directly in the FLAP Data Field, but normally are inside of SNACs.  No more than one TLV of each Type code may exist in a single FLAP command (SNAC or not).  TLVs must follow the strict tuple-rule, or they're really not TLVs, they're raw data.
+		</p>
+		<p>
+		  TLVs are a big win.  They make sending a variable length string like, eg, "afritz@iname" as simple as defining a TLV with values {0x0011, 0x000c, "afritz@iname.com"}.  (The type 0x0011 is used throughout the authorization process as the "email address type".)  A side note about strings: strings in this protocol are never NULL-terminated.  If they look like they are, that's probably a word-length value behind it.
+		</p>
+
+	      </td>
+
+	      <td width="1%">
+		<img src="/images/blank.gif" width="10" height="1" border="0">
+	      </td>
+	      <td width="1%" bgcolor="#BBBBBB">
+		&nbsp;
+	      </td>
+	      <td width="1%" valign="top">
+		<img src="/images/blank.gif" width="50" height="1" border="0"><br>
+		<a href="/pst/"><img src="/pst/bar_home.gif" width="50" height="15" border="0"></a><br>
+		<a href="/pst/software/"><img src="/pst/bar_software.gif" width="50" height="15" border="0"></a>
+	      </td>
+	    </tr>
+	  </table>
+	  <hr noshade>
+	  <Center>
+	    <address><a href="mailto:afritz@iname.com">Adam Fritzler</a></address>
+	      <!-- Created: Sat Jun 20 20:35:10 MST 1998 -->
+	    <!-- hhmts start -->
+Last modified: Fri Jul 24 23:21:53 MST 1998
+<!-- hhmts end -->	
+	  </center>
+	</td>
+      </tr>
+    </table>
+  </body>
+</html>

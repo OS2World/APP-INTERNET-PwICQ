@@ -1,0 +1,1918 @@
+ Opening IPTRACE.DMP ...  Sucessful
+ Reading packet headers ...  37 headers read.
+ PreProcess packet info
+
+-------------------------- #:1 --------------------------
+ Delta Time:  0.000sec   Packet Length: 73 bytes (49 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 200.176.002.010    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 59 (x3B) bytes          Id: 021B
+ IP:  Flags: 0
+ IP:     .0..       May Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 17  UDP
+ IP:  Header Checksum: 2533    (Correct)
+ IP:  No Options
+
+---------------------- UDP HEADER ----------------------
+ UDP:  Source Port: 49265 (Unassigned port)    Dest Port: 53 (Domain NameServer)
+ UDP:  Length: 39 (x27)
+ UDP:  Checksum: 3047   (Correct)
+------------------------ DNS ----------------------------
+ DNS: ID:96
+ DNS: Query  Standard Query
+ DNS: FLAGS: 10
+ DNS:    .0. .... = No Truncation
+ DNS:    ..1 .... = Recursion Desired
+ DNS: Return Code: 0  No Error
+ DNS: Question Cnt:  1,    Answer Cnt:  0
+ DNS: Authority Cnt:  0,   Additional Cnt:  0
+ DNS:  Question Section
+ DNS:    Name: login.icq.com
+ DNS:    Type: 01    Class: 01
+
+-------------------------- #:2 --------------------------
+ Delta Time:  0.000sec   Packet Length: 73 bytes (49 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 200.199.252.068    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 59 (x3B) bytes          Id: 021C
+ IP:  Flags: 0
+ IP:     .0..       May Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 17  UDP
+ IP:  Header Checksum: 2AE0    (Correct)
+ IP:  No Options
+
+---------------------- UDP HEADER ----------------------
+ UDP:  Source Port: 49266 (Unassigned port)    Dest Port: 53 (Domain NameServer)
+ UDP:  Length: 39 (x27)
+ UDP:  Checksum: 35F4   (Correct)
+------------------------ DNS ----------------------------
+ DNS: ID:96
+ DNS: Query  Standard Query
+ DNS: FLAGS: 10
+ DNS:    .0. .... = No Truncation
+ DNS:    ..1 .... = Recursion Desired
+ DNS: Return Code: 0  No Error
+ DNS: Question Cnt:  1,    Answer Cnt:  0
+ DNS: Authority Cnt:  0,   Additional Cnt:  0
+ DNS:  Question Section
+ DNS:    Name: login.icq.com
+ DNS:    Type: 01    Class: 01
+
+-------------------------- #:3 --------------------------
+ Delta Time:  0.031sec   Packet Length: 186 bytes (BA hex)
+ DIX:   Dest: 00:00:39:18:A0:99   Source: 00:C0:49:3F:4A:85
+ DIX:   Dest: 192.168.200.001    Source:  200.199.252.068
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 172 (xAC) bytes          Id: 22E7
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 251 sec    Protocol: 17  UDP
+ IP:  Header Checksum: 0EA3    (Correct)
+ IP:  No Options
+
+---------------------- UDP HEADER ----------------------
+ UDP:  Source Port: 53 (Domain NameServer)    Dest Port: 49266 (Unassigned port)
+ UDP:  Length: 152 (x98)
+ UDP:  Checksum: 18E9   (Correct)
+------------------------ DNS ----------------------------
+ DNS: ID:96
+ DNS: Query Response   Standard Query
+ DNS: FLAGS: 18
+ DNS:    .0. .... = No Truncation
+ DNS:    ..1 .... = Recursion Desired
+ DNS:    ... 1... = Recursion Available
+ DNS: Return Code: 0  No Error
+ DNS: Question Cnt:  1,    Answer Cnt:  2
+ DNS: Authority Cnt:  2,   Additional Cnt:  2
+ DNS:  Question Section
+ DNS:    Name: login.icq.com
+ DNS:    Type: 01    Class: 01
+ DNS: Answer Section
+ DNS:    Name: login.icq.com
+ DNS:    Type: 1   Class: 1
+ DNS:    TTL: 36    Len: 0004
+ DNS:    Address:  205.188.179.233
+
+ DNS:    Name: login.icq.com
+ DNS:    Type: 1   Class: 1
+ DNS:    TTL: 36    Len: 0004
+ DNS:    Address:  064.012.162.057
+
+ DNS: Authority Section
+ DNS:    Domain Name: icq.com
+ DNS:    Type: 2   Class: 1
+ DNS:    TTL: 165814    Len: 0016
+ DNS:    Name Server: DNS-01.ICQ.NET
+
+ DNS:    Domain Name: icq.com
+ DNS:    Type: 2   Class: 1
+ DNS:    TTL: 165814    Len: 0009
+ DNS:    Name Server: DNS-02.ICQ.NET
+
+ DNS: Additional Section
+ DNS:    Domain Name: DNS-01.ICQ.NET
+ DNS:    Type: 1   Class: 1
+ DNS:    TTL: 165776    Len: 0004
+ DNS:    Address:  152.163.159.234
+
+ DNS:    Domain Name: DNS-02.ICQ.NET
+ DNS:    Type: 1   Class: 1
+ DNS:    TTL: 177    Len: 0004
+ DNS:    Address:  205.188.157.234
+
+
+-------------------------- #:4 --------------------------
+ Delta Time:  0.031sec   Packet Length: 186 bytes (BA hex)
+ DIX:   Dest: 00:00:39:18:A0:99   Source: 00:C0:49:3F:4A:85
+ DIX:   Dest: 192.168.200.001    Source:  200.176.002.010
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 172 (xAC) bytes          Id: 5956
+ IP:  Flags: 0
+ IP:     .0..       May Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 54 sec    Protocol: 17  UDP
+ IP:  Header Checksum: D786    (Correct)
+ IP:  No Options
+
+---------------------- UDP HEADER ----------------------
+ UDP:  Source Port: 53 (Domain NameServer)    Dest Port: 49265 (Unassigned port)
+ UDP:  Length: 152 (x98)
+ UDP:  Checksum: 8A71   (Correct)
+------------------------ DNS ----------------------------
+ DNS: ID:96
+ DNS: Query Response   Standard Query
+ DNS: FLAGS: 18
+ DNS:    .0. .... = No Truncation
+ DNS:    ..1 .... = Recursion Desired
+ DNS:    ... 1... = Recursion Available
+ DNS: Return Code: 0  No Error
+ DNS: Question Cnt:  1,    Answer Cnt:  2
+ DNS: Authority Cnt:  2,   Additional Cnt:  2
+ DNS:  Question Section
+ DNS:    Name: login.icq.com
+ DNS:    Type: 01    Class: 01
+ DNS: Answer Section
+ DNS:    Name: login.icq.com
+ DNS:    Type: 1   Class: 1
+ DNS:    TTL: 0    Len: 0004
+ DNS:    Address:  064.012.162.057
+
+ DNS:    Name: login.icq.com
+ DNS:    Type: 1   Class: 1
+ DNS:    TTL: 0    Len: 0004
+ DNS:    Address:  205.188.179.233
+
+ DNS: Authority Section
+ DNS:    Domain Name: icq.com
+ DNS:    Type: 2   Class: 1
+ DNS:    TTL: 68361    Len: 0016
+ DNS:    Name Server: DNS-01.ICQ.NET
+
+ DNS:    Domain Name: icq.com
+ DNS:    Type: 2   Class: 1
+ DNS:    TTL: 68361    Len: 0009
+ DNS:    Name Server: DNS-02.ICQ.NET
+
+ DNS: Additional Section
+ DNS:    Domain Name: DNS-01.ICQ.NET
+ DNS:    Type: 1   Class: 1
+ DNS:    TTL: 111583    Len: 0004
+ DNS:    Address:  152.163.159.234
+
+ DNS:    Domain Name: DNS-02.ICQ.NET
+ DNS:    Type: 1   Class: 1
+ DNS:    TTL: 551    Len: 0004
+ DNS:    Address:  205.188.157.234
+
+
+-------------------------- #:5 --------------------------
+ Delta Time:  0.000sec   Packet Length: 70 bytes (46 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 200.176.002.010    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 56 (x38) bytes          Id: 021D
+ IP:  Flags: 0
+ IP:     .0..       May Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 1  ICMP
+ IP:  Header Checksum: 2544    (Correct)
+ IP:  No Options
+---------------------- ICMP HEADER ----------------------
+ ICMP:  Type: 03  Dest unreach
+ ICMP:  Code: 03  Port Unreachable
+ ICMP:  Checksum: 1642    (Correct)
+--------------------------------- DATA -----------------------------------
+0000 45 00 00 AC 56 59 00 00    36 11 00 00 C8 B0 02 0A   E...VY..6.......
+0010 C0 A8 C8 01 00 35 C0 71    00 98 00 00               .....5.q....
+
+
+-------------------------- #:6 --------------------------
+ Delta Time:  2.844sec   Packet Length: 62 bytes (3E hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 205.188.179.233    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 48 (x30) bytes          Id: 021E
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 6  TCP
+ IP:  Header Checksum: 2E5A    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 58855  (Unassigned port)       Dest Port: 5190  (Unassigned port)
+ TCP:  Sequence #: 2158442540
+ TCP:  Ack #: 0
+ TCP:  Offset: 28 bytes
+ TCP:  Flags: 02
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...0 ....        Ack bit Off
+ TCP:     .... 0...        Push bit Off
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..1.  <SYN> Synchronize bit On
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 32768      Checksum: 46CD   (Correct)
+ TCP:  Option Code: 02     Length: 4 bytes        [MSS]
+ TCP:    Max Segment Size 1460 (x5B4)
+ TCP:  Option Code: 01     Length: 1 bytes        [NOP]
+ TCP:    No Operation
+ TCP:  Option Code: 03     Length: 3 bytes        [WIN_SCALE]
+ TCP:    Window scale factor 0 (x0)
+ TCP:  No data or not output.
+
+-------------------------- #:7 --------------------------
+ Delta Time:  0.617sec   Packet Length: 60 bytes (3C hex)
+ DIX:   Dest: 00:00:39:18:A0:99   Source: 00:C0:49:3F:4A:85
+ DIX:   Dest: 192.168.200.001    Source:  205.188.179.233
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 44 (x2C) bytes Error??  Id: ACCF
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 44 sec    Protocol: 6  TCP
+ IP:  Header Checksum: 97AC    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 5190  (Unassigned port)       Dest Port: 58855  (Unassigned port)
+ TCP:  Sequence #: 4063414489
+ TCP:  Ack #: 2158442541
+ TCP:  Offset: 24 bytes
+ TCP:  Flags: 12
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 0...        Push bit Off
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..1.  <SYN> Synchronize bit On
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 16384      Checksum: E01A   (Correct)
+ TCP:  Option Code: 02     Length: 4 bytes        [MSS]
+ TCP:    Max Segment Size 1360 (x550)
+ TCP:  No data or not output.
+
+-------------------------- #:8 --------------------------
+ Delta Time:  0.000sec   Packet Length: 54 bytes (36 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 205.188.179.233    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 40 (x28) bytes          Id: 021F
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 6  TCP
+ IP:  Header Checksum: 2E61    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 58855  (Unassigned port)       Dest Port: 5190  (Unassigned port)
+ TCP:  Sequence #: 2158442541
+ TCP:  Ack #: 4063414490
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 10
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 0...        Push bit Off
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 34000      Checksum: B2A3   (Correct)
+ TCP:  No Options
+ TCP:  No data or not output.
+
+-------------------------- #:9 --------------------------
+ Delta Time:  0.516sec   Packet Length: 64 bytes (40 hex)
+ DIX:   Dest: 00:00:39:18:A0:99   Source: 00:C0:49:3F:4A:85
+ DIX:   Dest: 192.168.200.001    Source:  205.188.179.233
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 50 (x32) bytes          Id: AD1F
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 44 sec    Protocol: 6  TCP
+ IP:  Header Checksum: 9756    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 5190  (Unassigned port)       Dest Port: 58855  (Unassigned port)
+ TCP:  Sequence #: 4063414490
+ TCP:  Ack #: 2158442541
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 18
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 1...  <PUSH>Push bit On
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 16384      Checksum: 8F3F   (Correct)
+ TCP:  No Options
+--------------------------------- DATA -----------------------------------
+0000 2A 01 3E 1C 00 04 00 00    00 01                     *.>.......
+
+        2A
+        01
+        3E 1C
+        00 04
+
+        00 00 00 01
+
+-------------------------- #:10 --------------------------
+ Delta Time:  0.101sec   Packet Length: 194 bytes (C2 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 205.188.179.233    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 180 (xB4) bytes          Id: 0220
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 6  TCP
+ IP:  Header Checksum: 2DD4    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 58855  (Unassigned port)       Dest Port: 5190  (Unassigned port)
+ TCP:  Sequence #: 2158442541
+ TCP:  Ack #: 4063414500
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 18
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 1...  <PUSH>Push bit On
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 34000      Checksum: FAA6   (Correct)
+ TCP:  No Options
+--------------------------------- DATA -----------------------------------
+0000 2A 01 00 00 00 86 00 00    00 01 00 01 00 09 31 33   *.............13
+0010 30 34 33 34 31 37 38 00    02 00 08 87 54 E0 B7 51   0434178.....T..Q
+0020 E5 BA FC 00 03 00 33 49    43 51 20 49 6E 63 2E 20   ......3ICQ Inc.
+0030 2D 20 50 72 6F 64 75 63    74 20 6F 66 20 49 43 51   - Product of ICQ
+0040 20 28 54 4D 29 2E 32 30    30 30 62 2E 34 2E 36 33    (TM).2000b.4.63
+0050 2E 31 2E 33 32 37 39 2E    38 35 00 16 00 02 01 0A   .1.3279.85......
+0060 00 17 00 02 00 04 00 18    00 02 00 3F 00 19 00 02   ...........?....
+0070 00 01 00 1A 00 02 0C CF    00 14 00 04 00 00 00 55   ...............U
+0080 00 0F 00 02 65 6E 00 0E    00 02 75 73               ....en....us
+
+ DWORD   1
+ TLV(1)  UIN
+ TLV(2)  encrypted password
+ TLV(3)  client profile, usually "ICQ Inc. - Product of ICQ (TM).2000b.4.63.1.3279.85"
+ TLV(16) unknown, usually 0x010A
+ TLV(17) major version (4 for icq2000b)
+ TLV(18) minor version
+ TLV(19) lesser version
+ TLV(1A) build version
+ TLV(14) dunno version
+ TLV(0F) language, usually "en"
+ TLV(0E) country, usually "us"
+
+128251187
+
+        2A
+        01
+        00 00
+        00 86
+
+        00 00 00 01             DWORD
+
+        00 01 00 09             TLV 01  - UIN
+        31 33 30 34             130434178
+        33 34 31 37
+        38
+
+        00 02 00 08             TLV 02
+        87 54 E0 B7             Password
+        51 E5 BA FC
+
+        00 03 00 33
+        49 43 51 20 49 6E 63 2E client profile, usually "ICQ Inc. - Product of ICQ (TM).2000b.4.63.1.3279.85"
+        20 2D 20 50 72 6F 64 75
+        63 74 20 6F 66 20 49 43
+        51 20 28 54 4D 29 2E 32
+        30 30 30 62 2E 34 2E 36
+        33 2E 31 2E 33 32 37 39
+        2E 38 35
+
+        00 16 00 02             Unknow, usually 0x010A
+        01 0A
+
+        00 17 00 02             Major Version 0x04 for ICQ2000b
+        00 04
+
+        00 18 00 02             Minor version
+        00 3F
+
+        00 19 00 02             lesser version
+        00 01
+
+        00 1A 00 02             Build version
+        0C CF
+
+        00 14 00 04
+        00 00 00 55             Dunno version
+
+        00 0F 00 02             Language
+        65 6E                   en
+
+        00 0E 00 02             Country
+        75 73                   us
+
+
+-------------------------- #:11 --------------------------
+ Delta Time:  0.422sec   Packet Length: 355 bytes (163 hex)
+ DIX:   Dest: 00:00:39:18:A0:99   Source: 00:C0:49:3F:4A:85
+ DIX:   Dest: 192.168.200.001    Source:  205.188.179.233
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 341 (x155) bytes          Id: AD68
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 44 sec    Protocol: 6  TCP
+ IP:  Header Checksum: 95EA    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 5190  (Unassigned port)       Dest Port: 58855  (Unassigned port)
+ TCP:  Sequence #: 4063414500
+ TCP:  Ack #: 2158442681
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 18
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 1...  <PUSH>Push bit On
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 16384      Checksum: 5F9   (Correct)
+ TCP:  No Options
+--------------------------------- DATA -----------------------------------
+0000 2A 04 3E 1D 01 27 00 01    00 09 31 33 30 34 33 34   *.>..'....130434
+0010 31 37 38 00 05 00 12 32    30 35 2E 31 38 38 2E 38   178....205.188.8
+0020 2E 31 32 38 3A 35 31 39    30 00 06 01 00 5C 9D E3   .128:5190....\..
+0030 50 D2 53 35 8C 5E 77 EF    9D 11 E9 CB 88 9B 76 18   P.S5.^w.......v.
+0040 60 BE AD AD B4 98 79 C1    F7 2D C4 1B 75 C7 EF 72   `.....y..-..u..r
+0050 D8 47 AE F8 25 90 62 47    8C 99 B2 87 E2 94 B9 F9   .G..%.bG........
+0060 A4 E9 A3 89 0D A2 AE 41    83 B4 A4 FD 0F 8A DD 8A   .......A........
+0070 E1 83 2B 3D 19 7C 51 EA    CE 37 B3 44 96 A5 1A C1   ..+=.|Q..7.D....
+0080 2F A4 96 97 48 33 CC E3    55 EB 9D 43 EA 61 8C 36   /...H3..U..C.a.6
+0090 B0 DC 68 1E 71 FC BA 78    C6 98 68 CB 9C 5D 19 61   ..h.q..x..h..].a
+00A0 FD 4C 9E D9 54 C6 B1 E6    4D 7D 33 4B C5 56 35 82   .L..T...M}3K.V5.
+00B0 80 46 D2 2F 35 F7 B8 BD    02 69 2C CC FB 17 EA E3   .F./5....i,.....
+00C0 60 49 07 39 08 E0 CF 91    2B 20 1F C4 22 9E 36 72   `I.9....+ ..".6r
+00D0 8D 73 F3 4E 3A D9 4D 55    C2 7A 76 C5 86 36 57 76   .s.N:.MU.zv..6Wv
+00E0 FC 48 08 AB F0 6A 07 65    72 7C 9A 8F 5E 1D 6F 9C   .H...j.er|..^.o.
+00F0 E4 2E 8D 17 0E 1E 85 B2    A6 15 38 72 8D 55 0F C7   ..........8r.U..
+0100 D6 1F 49 CC B0 85 71 83    70 94 A6 FE B6 EC 09 F5   ..I...q.p.......
+0110 5F 2F 09 DF 1B B9 AD 48    CF 06 2E 0A EC E5 59 9A   _/.....H......Y.
+0120 20 A7 7C 01 00 2C 16 E1    15 BF 9B 3A 9C             .|..,.....:.
+
+
+-------------------------- #:12 --------------------------
+ Delta Time:  0.008sec   Packet Length: 54 bytes (36 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 205.188.179.233    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 40 (x28) bytes          Id: 0221
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 6  TCP
+ IP:  Header Checksum: 2E5F    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 58855  (Unassigned port)       Dest Port: 5190  (Unassigned port)
+ TCP:  Sequence #: 2158442681
+ TCP:  Ack #: 4063414801
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 10
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 0...        Push bit Off
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 33699      Checksum: B20D   (Correct)
+ TCP:  No Options
+ TCP:  No data or not output.
+
+-------------------------- #:13 --------------------------
+ Delta Time:  0.047sec   Packet Length: 54 bytes (36 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 205.188.179.233    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 40 (x28) bytes          Id: 0222
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 6  TCP
+ IP:  Header Checksum: 2E5E    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 58855  (Unassigned port)       Dest Port: 5190  (Unassigned port)
+ TCP:  Sequence #: 2158442681
+ TCP:  Ack #: 4063414801
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 11
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 0...        Push bit Off
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...1  <FIN> Finish bit On
+ TCP:  Window: 34000      Checksum: B0DF   (Correct)
+ TCP:  No Options
+ TCP:  No data or not output.
+
+-------------------------- #:14 --------------------------
+ Delta Time:  0.078sec   Packet Length: 86 bytes (56 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 200.176.002.010    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 72 (x48) bytes          Id: 0223
+ IP:  Flags: 0
+ IP:     .0..       May Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 17  UDP
+ IP:  Header Checksum: 251E    (Correct)
+ IP:  No Options
+
+---------------------- UDP HEADER ----------------------
+ UDP:  Source Port: 49267 (Unassigned port)    Dest Port: 53 (Domain NameServer)
+ UDP:  Length: 52 (x34)
+ UDP:  Checksum: 3159   (Correct)
+------------------------ DNS ----------------------------
+ DNS: ID:97
+ DNS: Query  Standard Query
+ DNS: FLAGS: 10
+ DNS:    .0. .... = No Truncation
+ DNS:    ..1 .... = Recursion Desired
+ DNS: Return Code: 0  No Error
+ DNS: Question Cnt:  1,    Answer Cnt:  0
+ DNS: Authority Cnt:  0,   Additional Cnt:  0
+ DNS:  Question Section
+ DNS:    Name: 128.8.188.205.in-addr.arpa
+ DNS:    Type: 012    Class: 01
+
+-------------------------- #:15 --------------------------
+ Delta Time:  0.234sec   Packet Length: 157 bytes (9D hex)
+ DIX:   Dest: 00:00:39:18:A0:99   Source: 00:C0:49:3F:4A:85
+ DIX:   Dest: 192.168.200.001    Source:  200.176.002.010
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 143 (x8F) bytes          Id: 6211
+ IP:  Flags: 0
+ IP:     .0..       May Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 54 sec    Protocol: 17  UDP
+ IP:  Header Checksum: CEE8    (Correct)
+ IP:  No Options
+
+---------------------- UDP HEADER ----------------------
+ UDP:  Source Port: 53 (Domain NameServer)    Dest Port: 49267 (Unassigned port)
+ UDP:  Length: 123 (x7B)
+ UDP:  Checksum: 9E47   (Correct)
+------------------------ DNS ----------------------------
+ DNS: ID:97
+ DNS: Query Response   Standard Query
+ DNS: FLAGS: 58
+ DNS:    1.. .... = Authoritive Answer
+ DNS:    .0. .... = No Truncation
+ DNS:    ..1 .... = Recursion Desired
+ DNS:    ... 1... = Recursion Available
+ DNS: Return Code: 3  Name Not Found
+ DNS: Question Cnt:  1,    Answer Cnt:  0
+ DNS: Authority Cnt:  1,   Additional Cnt:  0
+ DNS:  Question Section
+ DNS:    Name: 128.8.188.205.in-addr.arpa
+ DNS:    Type: 012    Class: 01
+ DNS: Authority Section
+ DNS:    Domain Name: 8.188.205.in-addr.arpa
+ DNS:    Type: 6   Class: 1
+ DNS:    TTL: 3600    Len: 0059
+--------------------------------- DATA -----------------------------------
+0000 06 64 6E 73 2D 30 31 02    6E 73 03 61 6F 6C 03 63   .dns-01.ns.aol.c
+0010 6F 6D 00 0A 68 6F 73 74    6D 61 73 74 65 72 03 61   om..hostmaster.a
+0020 6F 6C 03 6E 65 74 00 77    17 D3 35 00 00 07 08 00   ol.net.w..5.....
+0030 00 01 2C 00 09 3A 80 00    00 0E 10                  ..,..:.....
+
+
+
+-------------------------- #:16 --------------------------
+ Delta Time:  0.000sec   Packet Length: 62 bytes (3E hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 205.188.008.128    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 48 (x30) bytes          Id: 0224
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 6  TCP
+ IP:  Header Checksum: D9BD    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 58856  (Unassigned port)       Dest Port: 5190  (Unassigned port)
+ TCP:  Sequence #: 2158956430
+ TCP:  Ack #: 0
+ TCP:  Offset: 28 bytes
+ TCP:  Flags: 02
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...0 ....        Ack bit Off
+ TCP:     .... 0...        Push bit Off
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..1.  <SYN> Synchronize bit On
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 32768      Checksum: 1ACC   (Correct)
+ TCP:  Option Code: 02     Length: 4 bytes        [MSS]
+ TCP:    Max Segment Size 1460 (x5B4)
+ TCP:  Option Code: 01     Length: 1 bytes        [NOP]
+ TCP:    No Operation
+ TCP:  Option Code: 03     Length: 3 bytes        [WIN_SCALE]
+ TCP:    Window scale factor 0 (x0)
+ TCP:  No data or not output.
+
+-------------------------- #:17 --------------------------
+ Delta Time:  0.047sec   Packet Length: 60 bytes (3C hex)
+ DIX:   Dest: 00:00:39:18:A0:99   Source: 00:C0:49:3F:4A:85
+ DIX:   Dest: 192.168.200.001    Source:  205.188.179.233
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 40 (x28) bytes Error??  Id: ADAD
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 44 sec    Protocol: 6  TCP
+ IP:  Header Checksum: 96D2    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 5190  (Unassigned port)       Dest Port: 58855  (Unassigned port)
+ TCP:  Sequence #: 4063414801
+ TCP:  Ack #: 2158442682
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 11
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 0...        Push bit Off
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...1  <FIN> Finish bit On
+ TCP:  Window: 16384      Checksum: F5AE   (Correct)
+ TCP:  No Options
+ TCP:  No data or not output.
+
+-------------------------- #:18 --------------------------
+ Delta Time:  0.000sec   Packet Length: 54 bytes (36 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 205.188.179.233    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 40 (x28) bytes          Id: 0225
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 6  TCP
+ IP:  Header Checksum: 2E5B    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 58855  (Unassigned port)       Dest Port: 5190  (Unassigned port)
+ TCP:  Sequence #: 2158442682
+ TCP:  Ack #: 4063414802
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 10
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 0...        Push bit Off
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 34000      Checksum: B0DE   (Correct)
+ TCP:  No Options
+ TCP:  No data or not output.
+
+-------------------------- #:19 --------------------------
+ Delta Time:  0.305sec   Packet Length: 60 bytes (3C hex)
+ DIX:   Dest: 00:00:39:18:A0:99   Source: 00:C0:49:3F:4A:85
+ DIX:   Dest: 192.168.200.001    Source:  205.188.008.128
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 44 (x2C) bytes Error??  Id: F8AF
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 44 sec    Protocol: 6  TCP
+ IP:  Header Checksum: F735    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 5190  (Unassigned port)       Dest Port: 58856  (Unassigned port)
+ TCP:  Sequence #: 3898087969
+ TCP:  Ack #: 2158956431
+ TCP:  Offset: 24 bytes
+ TCP:  Flags: 12
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 0...        Push bit Off
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..1.  <SYN> Synchronize bit On
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 16384      Checksum: 6CAC   (Correct)
+ TCP:  Option Code: 02     Length: 4 bytes        [MSS]
+ TCP:    Max Segment Size 1360 (x550)
+ TCP:  No data or not output.
+
+-------------------------- #:20 --------------------------
+ Delta Time:  0.000sec   Packet Length: 54 bytes (36 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 205.188.008.128    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 40 (x28) bytes          Id: 0226
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 6  TCP
+ IP:  Header Checksum: D9C3    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 58856  (Unassigned port)       Dest Port: 5190  (Unassigned port)
+ TCP:  Sequence #: 2158956431
+ TCP:  Ack #: 3898087970
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 10
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 0...        Push bit Off
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 34000      Checksum: 3F35   (Correct)
+ TCP:  No Options
+ TCP:  No data or not output.
+
+-------------------------- #:21 --------------------------
+ Delta Time:  0.023sec   Packet Length: 324 bytes (144 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 205.188.008.128    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 310 (x136) bytes          Id: 0227
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 6  TCP
+ IP:  Header Checksum: D8B4    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 58856  (Unassigned port)       Dest Port: 5190  (Unassigned port)
+ TCP:  Sequence #: 2158956431
+ TCP:  Ack #: 3898087970
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 18
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 1...  <PUSH>Push bit On
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 34000      Checksum: 6964   (Correct)
+ TCP:  No Options
+--------------------------------- DATA -----------------------------------
+0000 2A 01 00 00 01 08 00 00    00 01 00 06 01 00 5C 9D   *.............\.
+0010 E3 50 D2 53 35 8C 5E 77    EF 9D 11 E9 CB 88 9B 76   .P.S5.^w.......v
+0020 18 60 BE AD AD B4 98 79    C1 F7 2D C4 1B 75 C7 EF   .`.....y..-..u..
+0030 72 D8 47 AE F8 25 90 62    47 8C 99 B2 87 E2 94 B9   r.G..%.bG.......
+0040 F9 A4 E9 A3 89 0D A2 AE    41 83 B4 A4 FD 0F 8A DD   ........A.......
+0050 8A E1 83 2B 3D 19 7C 51    EA CE 37 B3 44 96 A5 1A   ...+=.|Q..7.D...
+0060 C1 2F A4 96 97 48 33 CC    E3 55 EB 9D 43 EA 61 8C   ./...H3..U..C.a.
+0070 36 B0 DC 68 1E 71 FC BA    78 C6 98 68 CB 9C 5D 19   6..h.q..x..h..].
+0080 61 FD 4C 9E D9 54 C6 B1    E6 4D 7D 33 4B C5 56 35   a.L..T...M}3K.V5
+0090 82 80 46 D2 2F 35 F7 B8    BD 02 69 2C CC FB 17 EA   ..F./5....i,....
+00A0 E3 60 49 07 39 08 E0 CF    91 2B 20 1F C4 22 9E 36   .`I.9....+ ..".6
+00B0 72 8D 73 F3 4E 3A D9 4D    55 C2 7A 76 C5 86 36 57   r.s.N:.MU.zv..6W
+00C0 76 FC 48 08 AB F0 6A 07    65 72 7C 9A 8F 5E 1D 6F   v.H...j.er|..^.o
+00D0 9C E4 2E 8D 17 0E 1E 85    B2 A6 15 38 72 8D 55 0F   ...........8r.U.
+00E0 C7 D6 1F 49 CC B0 85 71    83 70 94 A6 FE B6 EC 09   ...I...q.p......
+00F0 F5 5F 2F 09 DF 1B B9 AD    48 CF 06 2E 0A EC E5 59   ._/.....H......Y
+0100 9A 20 A7 7C 01 00 2C 16    E1 15 BF 9B 3A 9C         . .|..,.....:.
+
+        2A
+        01
+        00 00   <- Sequence
+        01 08   <- Size
+
+        00 00 00 01
+
+        00 06 01 00     <- TLV
+
+        5C 9D   *.............\.
+ E3 50 D2 53 35 8C 5E 77    EF 9D 11 E9 CB 88 9B 76   .P.S5.^w.......v
+ 18 60 BE AD AD B4 98 79    C1 F7 2D C4 1B 75 C7 EF   .`.....y..-..u..
+ 72 D8 47 AE F8 25 90 62    47 8C 99 B2 87 E2 94 B9   r.G..%.bG.......
+ F9 A4 E9 A3 89 0D A2 AE    41 83 B4 A4 FD 0F 8A DD   ........A.......
+ 8A E1 83 2B 3D 19 7C 51    EA CE 37 B3 44 96 A5 1A   ...+=.|Q..7.D...
+ C1 2F A4 96 97 48 33 CC    E3 55 EB 9D 43 EA 61 8C   ./...H3..U..C.a.
+ 36 B0 DC 68 1E 71 FC BA    78 C6 98 68 CB 9C 5D 19   6..h.q..x..h..].
+ 61 FD 4C 9E D9 54 C6 B1    E6 4D 7D 33 4B C5 56 35   a.L..T...M}3K.V5
+ 82 80 46 D2 2F 35 F7 B8    BD 02 69 2C CC FB 17 EA   ..F./5....i,....
+ E3 60 49 07 39 08 E0 CF    91 2B 20 1F C4 22 9E 36   .`I.9....+ ..".6
+ 72 8D 73 F3 4E 3A D9 4D    55 C2 7A 76 C5 86 36 57   r.s.N:.MU.zv..6W
+ 76 FC 48 08 AB F0 6A 07    65 72 7C 9A 8F 5E 1D 6F   v.H...j.er|..^.o
+ 9C E4 2E 8D 17 0E 1E 85    B2 A6 15 38 72 8D 55 0F   ...........8r.U.
+ C7 D6 1F 49 CC B0 85 71    83 70 94 A6 FE B6 EC 09   ...I...q.p......
+ F5 5F 2F 09 DF 1B B9 AD    48 CF 06 2E 0A EC E5 59   ._/.....H......Y
+ 9A 20 A7 7C 01 00 2C 16    E1 15 BF 9B 3A 9C         . .|..,.....:.
+
+
+-------------------------- #:22 --------------------------
+ Delta Time:  0.321sec   Packet Length: 64 bytes (40 hex)
+ DIX:   Dest: 00:00:39:18:A0:99   Source: 00:C0:49:3F:4A:85
+ DIX:   Dest: 192.168.200.001    Source:  205.188.008.128
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 50 (x32) bytes          Id: F931
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 44 sec    Protocol: 6  TCP
+ IP:  Header Checksum: F6AD    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 5190  (Unassigned port)       Dest Port: 58856  (Unassigned port)
+ TCP:  Sequence #: 3898087970
+ TCP:  Ack #: 2158956431
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 18
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 1...  <PUSH>Push bit On
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 16384      Checksum: 75AE   (Correct)
+ TCP:  No Options
+--------------------------------- DATA -----------------------------------
+0000 2A 01 E4 3E 00 04 00 00    00 01                     *..>......
+
+
+-------------------------- #:23 --------------------------
+ Delta Time:  0.164sec   Packet Length: 54 bytes (36 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 205.188.008.128    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 40 (x28) bytes          Id: 0228
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 6  TCP
+ IP:  Header Checksum: D9C1    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 58856  (Unassigned port)       Dest Port: 5190  (Unassigned port)
+ TCP:  Sequence #: 2158956701
+ TCP:  Ack #: 3898087980
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 10
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 0...        Push bit Off
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 34000      Checksum: 3E1D   (Correct)
+ TCP:  No Options
+ TCP:  No data or not output.
+
+-------------------------- #:24 --------------------------
+ Delta Time:  0.070sec   Packet Length: 94 bytes (5E hex)
+ DIX:   Dest: 00:00:39:18:A0:99   Source: 00:C0:49:3F:4A:85
+ DIX:   Dest: 192.168.200.001    Source:  205.188.008.128
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 80 (x50) bytes          Id: F98D
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 44 sec    Protocol: 6  TCP
+ IP:  Header Checksum: F633    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 5190  (Unassigned port)       Dest Port: 58856  (Unassigned port)
+ TCP:  Sequence #: 3898087980
+ TCP:  Ack #: 2158956701
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 18
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 1...  <PUSH>Push bit On
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 16384      Checksum: 6756   (Correct)
+ TCP:  No Options
+--------------------------------- DATA -----------------------------------
+0000 2A 02 E4 3F 00 22 00 01    00 03 00 00 82 20 8A 74   *..?."....... .t
+0010 00 01 00 02 00 03 00 04    00 06 00 08 00 09 00 0A   ................
+0020 00 0B 00 0C 00 13 00 15                              ........
+
+        2A
+        02
+        E4 3F
+        00 22
+
+        00 01
+        00 03
+        00 00
+        82 20 8A 74
+
+        0001 0002 0003 0004
+        0006 0008 0009 000A
+        000B 000C 0013 0015
+
+
+
+-------------------------- #:25 --------------------------
+ Delta Time:  0.086sec   Packet Length: 102 bytes (66 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 205.188.008.128    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 88 (x58) bytes          Id: 0229
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 6  TCP
+ IP:  Header Checksum: D990    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 58856  (Unassigned port)       Dest Port: 5190  (Unassigned port)
+ TCP:  Sequence #: 2158956701
+ TCP:  Ack #: 3898088020
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 18
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 1...  <PUSH>Push bit On
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 34000      Checksum: 131F   (Correct)
+ TCP:  No Options
+--------------------------------- DATA -----------------------------------
+0000 2A 02 00 01 00 2A 00 01    00 17 00 00 00 00 00 17   *....*..........
+0010 00 01 00 03 00 02 00 01    00 03 00 01 00 15 00 01   ................
+0020 00 04 00 01 00 06 00 01    00 09 00 01 00 0A 00 01   ................
+
+        2A
+        02
+        00 01
+        00 2A
+
+        00 01
+        00 17
+        00 00
+
+        00 00 00 17
+
+        0001 0003 0002 0001 0003 0001 0015 0001
+        0004 0001 0006 0001 0009 0001 000A 0001
+
+
+-------------------------- #:26 --------------------------
+ Delta Time:  0.328sec   Packet Length: 118 bytes (76 hex)
+ DIX:   Dest: 00:00:39:18:A0:99   Source: 00:C0:49:3F:4A:85
+ DIX:   Dest: 192.168.200.001    Source:  205.188.008.128
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 104 (x68) bytes          Id: FA22
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 44 sec    Protocol: 6  TCP
+ IP:  Header Checksum: F586    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 5190  (Unassigned port)       Dest Port: 58856  (Unassigned port)
+ TCP:  Sequence #: 3898088020
+ TCP:  Ack #: 2158956749
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 18
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 1...  <PUSH>Push bit On
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 16384      Checksum: 662D   (Correct)
+ TCP:  No Options
+--------------------------------- DATA -----------------------------------
+0000 2A 02 E4 40 00 3A 00 01    00 18 00 00 82 20 8A F0   *..@.:....... ..
+0010 00 01 00 03 00 02 00 01    00 03 00 01 00 04 00 01   ................
+0020 00 06 00 01 00 08 00 01    00 09 00 01 00 0A 00 01   ................
+0030 00 0B 00 01 00 0C 00 01    00 13 00 02 00 15 00 01   ................
+
+        2A
+        02
+        E4 40
+        00 3A
+
+        00 01
+        00 18 00 00 82 20 8A F0   *..@.:....... ..
+ 00 01 00 03 00 02 00 01    00 03 00 01 00 04 00 01   ................
+ 00 06 00 01 00 08 00 01    00 09 00 01 00 0A 00 01   ................
+ 00 0B 00 01 00 0C 00 01    00 13 00 02 00 15 00 01   ................
+
+-------------------------- #:27 --------------------------
+ Delta Time:  0.000sec   Packet Length: 519 bytes (207 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 205.188.008.128    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 505 (x1F9) bytes          Id: 022A
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 6  TCP
+ IP:  Header Checksum: D7EE    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 58856  (Unassigned port)       Dest Port: 5190  (Unassigned port)
+ TCP:  Sequence #: 2158956749
+ TCP:  Ack #: 3898088084
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 18
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 1...  <PUSH>Push bit On
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 33936      Checksum: 806D   (Correct)
+ TCP:  No Options
+--------------------------------- DATA -----------------------------------
+0000 2A 02 00 02 00 0A 00 01    00 0E 00 00 00 00 00 0E   *...............
+
+        2A
+        02
+        00 02
+        00 0A
+
+        00 01           Family
+        00 0E           SubType
+        00 00           flags
+        00 00 00 0E     Request
+
+
+
+
+0010 2A 02 00 03 00 0A 00 02    00 02 00 00 00 00 00 02   *...............
+0020 2A 02 00 04 00 0A 00 03    00 02 00 00 00 00 00 02   *...............
+0030 2A 02 00 05 00 0A 00 04    00 04 00 00 00 00 00 04   *...............
+0040 2A 02 00 06 00 0A 00 09    00 02 00 00 00 00 00 02   *...............
+0050 2A 02 00 07 00 1A 00 04    00 02 00 00 00 00 00 02   *...............
+0060 00 00 00 00 00 03 1F 40    03 E7 03 E7 00 00 00 00   .......@........
+
+0070 2A 02 00 08 00 2E 00 02    00 04 00 00 00 00 00 04   *...............
+0080 00 05 00 20 09 46 13 49    4C 7F 11 D1 82 22 44 45   ... .F.IL...."DE
+0090 53 54 00 00 09 46 13 44    4C 7F 11 D1 82 22 44 45   ST...F.DL...."DE
+00A0 53 54 00 00
+
+        2A
+        02
+        00 08
+        00 2E           Size
+
+        00 02
+        00 04           SNAC 2,04
+
+        00 00           Flags
+        00 00 00 04     Request
+
+        00 05 00 20     TLV 5
+
+        09 46 13 49
+        4C 7F 11 D1
+        82 22 44 45
+        53 54 00 00
+
+        09 46 13 44
+        4C 7F 11 D1
+        82 22 44 45
+        53 54 00 00
+
+
+                 2A 02 00 09    00 64 00 03 00 04 00 00   ST..*....d......
+00B0 00 00 00 04 08 32 36 35    30 30 32 38 36 08 31 31   .....26500286.11
+00C0 31 31 31 31 31 31 08 32    32 32 32 32 32 32 32 08   111111.22222222.
+00D0 33 33 33 33 33 33 33 33    08 34 34 34 34 34 34 34   33333333.4444444
+00E0 34 08 35 35 35 35 35 35    35 35 08 36 36 36 36 36   4.55555555.66666
+00F0 36 36 36 08 37 37 37 37    37 37 37 37 08 38 38 38   666.77777777.888
+0100 38 38 38 38 38 08 39 39    39 39 39 39 39 39
+
+
+        2A
+        02
+        00 09
+        00 64
+
+        00 03
+        00 04   SNAC 3,04 - Contact list
+        00 00
+        00 00 00 04
+
+        08
+        32 36 35 30
+        30 32 38 36
+
+        08
+        31 31 31 31
+        31 31 31 31
+
+        08
+        32 32 32 32
+        32 32 32 32
+
+        08
+        33 33 33 33
+        33 33 33 33
+
+        08
+        34 34 34 34
+        34 34 34 34
+
+        08
+        35 35 35 35
+        35 35 35 35
+
+        08
+        36 36 36 36
+        36 36 36 36
+
+        08
+        37 37 37 37
+        37 37 37 37
+
+        08
+        38 38 38 38
+        38 38 38 38
+
+        08
+        39 39 39 39
+        39 39 39 39
+
+                                                  2A 02   88888.99999999*.
+0110 00 0A 00 0A 00 09 00 07    00 00 00 00 00 07
+
+
+        2A
+        02
+        00 0A
+        00 0A
+
+        00 09           SNAC 9,07       - Invisible list
+        00 07
+        00 00
+        00 00 00 07
+
+
+                                                  2A 02   ..............*.
+0120 00 0B 00 41 00 01 00 1E    00 00 00 00 00 1E 00 06   ...A............
+0130 00 04 00 03 00 00 00 08    00 02 00 00 00 0C 00 25   ...............%
+0140 C0 A8 04 6B 00 00 73 74    04 00 07 1D AE F0 9E 00   ...k..st........
+0150 00 00 50 00 00 00 03 3B    17 6B 57 3B 18 AC E9 3B   ..P....;.kW;...;
+0160 17 6B 4E 00 00
+
+        2A
+        02
+        00 0B
+        00 41		65 Bytes
+
+        00 01
+        00 1E           SNAC 1,1E
+        00 00
+        00 00 00 1E
+
+        00 06 00 04     TLV6 - Status
+        00 03 00 00
+
+        00 08 00 02     TLV8 - Unknown
+        00 00
+
+        00 0C 00 25     TLVC - direct-connection-info
+
+        C0 A8 04 6B     IP Address
+        00 00 73 74     Port where listening for connections
+        04              X1
+        00 07           X2
+        1D AE           X3
+        F0 9E           X4
+        00 00 00 50     X5
+        00 00 00 03     X6
+        3B 17 6B 57     X7
+        3B 18 AC E9     X8
+        3B 17 6B 4E     X9
+        00 00           X10
+
+
+
+    IPADDR  ip address
+    DWORD   port where listening for connections
+    BYTE    unknown, usually 04
+    3 WORD  unknown, usually 0007 xxxx xxxx
+                        licq 0006 xxxx xxxx
+    2 DWORD unknown, usually 00000050 00000003
+    DWORD   a date? usually 3AA773EE or 39656F0F or 3AA773EE licq 7D800352
+    DWORD   a date? usually 3AA66380 or 3AA5146F or 3AA66380 licq 00000000
+    DWORD   a date? usually 3A877A42 or 00000000 or 3A877A42 licq 00000010
+    WORD    unknown, usually 0000
+
+
+                    2A 02 00    0C 00 0E 00 01 00 11 00   .kN..*..........
+0170 00 00 00 00 11 00 00 00    00
+
+        2A
+        02
+        00 0C
+        00 0E
+
+        00 01
+        00 11
+        00 00
+        00 00 00 11
+
+        00 00 00 00
+
+
+				   2A 02 00 0D 00 52 00   .........*....R.
+0180 01 00 02 00 00 00 00 00    02 00 01 00 03 00 04 06   ................
+0190 86 00 02 00 01 00 04 00    01 00 03 00 01 00 04 00   ................
+01A0 01 00 04 00 01 00 04 00    01 00 06 00 01 00 04 00   ................
+01B0 01 00 08 00 01 00 04 00    01 00 09 00 01 00 04 00   ................
+01C0 01 00 0A 00 01 00 04 00    01 00 0B 00 01 00 04 00   ................
+01D0 01                                                   .
+
+        2A
+        02
+        00 0D
+        00 52
+
+        00 01
+        00 02		SNAC 1,2
+        00 00
+        00 00 00 02
+
+        00 01 00 03 00 04 06   ................
+     86 00 02 00 01 00 04 00    01 00 03 00 01 00 04 00   ................
+     01 00 04 00 01 00 04 00    01 00 06 00 01 00 04 00   ................
+     01 00 08 00 01 00 04 00    01 00 09 00 01 00 04 00   ................
+     01 00 0A 00 01 00 04 00    01 00 0B 00 01 00 04 00   ................
+     01                                                   .
+
+
+-------------------------- #:28 --------------------------
+ Delta Time:  0.367sec   Packet Length: 441 bytes (1B9 hex)
+ DIX:   Dest: 00:00:39:18:A0:99   Source: 00:C0:49:3F:4A:85
+ DIX:   Dest: 192.168.200.001    Source:  205.188.008.128
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 427 (x1AB) bytes          Id: FAA9
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 44 sec    Protocol: 6  TCP
+ IP:  Header Checksum: F3BC    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 5190  (Unassigned port)       Dest Port: 58856  (Unassigned port)
+ TCP:  Sequence #: 3898088084
+ TCP:  Ack #: 2158957214
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 18
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 1...  <PUSH>Push bit On
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 16384      Checksum: 2126   (Correct)
+ TCP:  No Options
+--------------------------------- DATA -----------------------------------
+0000 2A 02 E4 41 00 67 00 01    00 0F 00 00 00 00 00 0E   *..A.g..........
+0010 09 31 33 30 34 33 34 31    37 38 00 00 00 06 00 01   .130434178......
+0020 00 02 00 80 00 0C 00 25    00 00 00 00 00 00 00 00   .......%........
+0030 00 00 00 00 00 00 00 00    00 00 00 00 00 00 00 00   ................
+0040 00 00 00 00 00 00 00 00    00 00 00 00 00 00 0A 00   ................
+0050 04 C8 B5 58 B9 00 0F 00    04 00 00 00 01 00 02 00   ...X............
+0060 04 3B C0 64 EB 00 03 00    04 3B C0 64 EC
+
+        2A
+        02
+        E4 41
+        00 67
+
+        00 01
+        00 0F		Confirmacao de login pelo servidor
+        00 00
+        00 00 00 0E
+
+        09              UIN
+        31 33 30 34
+        33 34 31 37
+        38
+
+        00 00           Warning Level
+        00 06           User class
+
+        00 01 00 02     TLV(1)
+        00 80
+
+        00 0C 00 25     TLV(C)
+        00 00 00 00
+        00 00 00 00
+        00 00 00 00
+        00 00 00 00
+        00 00 00 00
+        00 00 00 00
+        00 00 00 00
+        00 00 00 00
+        00 00 00 00
+        00
+
+        00 0A 00 04     TLV(A)  - IP Adress
+        C8 B5 58 B9
+
+        00 0F 00 04     TLV(F)
+        00 00 00 01
+
+        00 02 00 04     TLV(2)
+        3B C0 64 EB
+
+        00 03 00 04     TLV(3)
+        3B C0 64 EC
+
+
+
+                                               2A 02 E4   .;.d.....;.d.*..
+0070 42 00 1C 00 02 00 03 00    00 00 00 00 02 00 01 00   B...............
+0080 02 04 00 00 02 00 02 00    10 00 03 00 02 00 0A 2A   ...............*
+0090 02 E4 43 00 1C 00 03 00    03 00 00 00 00 00 02 00   ..C.............
+00A0 01 00 02 02 58 00 02 00    02 02 EE 00 03 00 02 02   ....X...........
+00B0 00 2A 02 E4 44 00 1A 00    04 00 05 00 00 00 00 00   .*..D...........
+00C0 04 00 02 00 00 00 03 02    00 03 E7 03 E7 00 00 03   ................
+00D0 E8 2A 02 E4 45 00 16 00    09 00 03 00 00 00 00 00   .*..E...........
+00E0 02 00 02 00 02 00 A0 00    01 00 02 00 A0 2A 02 E4   .............*..
+00F0 46 00 3E 00 01 00 0F 00    00 82 20 8B 15 09 31 33   F.>....... ...13
+0100 30 34 33 34 31 37 38 00    00 00 05 00 01 00 02 00   0434178.........
+0110 80 00 06 00 04 00 03 00    00 00 0F 00 04 00 00 00   ................
+0120 01 00 02 00 04 3B C0 64    EB 00 03 00 04 3B C0 64   .....;.d.....;.d
+0130 EC 2A 02 E4 47 00 12 00    01 00 1F 00 00 82 20 8B   .*..G......... .
+0140 16 00 00 10 00 00 00 00    00 2A 02 E4 48 00 0C 00   .........*..H...
+0150 0B 00 02 00 00 82 20 8B    17 04 B0 2A 02 E4 49 00   ...... ....*..I.
+0160 22 00 01 00 13 00 00 82    20 8B 18 00 04 00 0B 00   "....... .......
+0170 12 68 74 74 70 3A 2F 2F    77 77 77 2E 61 6F 6C 2E   .http://www.aol.
+0180 63 6F 6D                                             com
+
+
+-------------------------- #:29 --------------------------
+ Delta Time:  0.164sec   Packet Length: 54 bytes (36 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 205.188.008.128    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 40 (x28) bytes          Id: 022B
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 6  TCP
+ IP:  Header Checksum: D9BE    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 58856  (Unassigned port)       Dest Port: 5190  (Unassigned port)
+ TCP:  Sequence #: 2158957214
+ TCP:  Ack #: 3898088471
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 10
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 0...        Push bit Off
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 33822      Checksum: 3AE3   (Correct)
+ TCP:  No Options
+ TCP:  No data or not output.
+
+-------------------------- #:30 --------------------------
+ Delta Time:  0.125sec   Packet Length: 88 bytes (58 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 205.188.008.128    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 74 (x4A) bytes          Id: 022C
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 6  TCP
+ IP:  Header Checksum: D99B    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 58856  (Unassigned port)       Dest Port: 5190  (Unassigned port)
+ TCP:  Sequence #: 2158957214
+ TCP:  Ack #: 3898088471
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 18
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 1...  <PUSH>Push bit On
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 33942      Checksum: 4B45   (Correct)
+ TCP:  No Options
+--------------------------------- DATA -----------------------------------
+0000 2A 02 00 0E 00 1C 00 01    00 20 00 00 00 00 00 12   *........ ......
+0010 00 10 D4 1D 8C D9 8F 00    B2 04 E9 80 09 98 EC F8   ................
+0020 42 7E                                                B~
+
+     	2A
+     	02
+     	00 0E
+     	00 1C
+     	
+     	00 01
+     	00 20
+     	00 00
+     	00 00 00 12
+     00 10 D4 1D 8C D9 8F 00    B2 04 E9 80 09 98 EC F8   ................
+     42 7E                                                B~
+
+
+-------------------------- #:31 --------------------------
+ Delta Time:  0.149sec   Packet Length: 206 bytes (CE hex)
+ DIX:   Dest: 00:00:39:18:A0:99   Source: 00:C0:49:3F:4A:85
+ DIX:   Dest: 192.168.200.001    Source:  205.188.008.128
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 192 (xC0) bytes          Id: FB64
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 44 sec    Protocol: 6  TCP
+ IP:  Header Checksum: F3EC    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 5190  (Unassigned port)       Dest Port: 58856  (Unassigned port)
+ TCP:  Sequence #: 3898088471
+ TCP:  Ack #: 2158957214
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 18
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 1...  <PUSH>Push bit On
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 16384      Checksum: F7A0   (Correct)
+ TCP:  No Options
+--------------------------------- DATA -----------------------------------
+0000 2A 02 E4 4A 00 92 00 03    00 0B 00 00 82 20 8B 19   *..J......... ..
+0010 08 35 35 35 35 35 35 35    35 00 00 00 08 00 01 00   .55555555.......
+0020 02 00 50 00 0C 00 25 00    00 00 00 00 00 00 00 04   ..P...%.........
+0030 00 07 02 B7 DD 22 00 00    00 50 00 00 00 03 3B B7   ....."...P....;.
+0040 7F 42 38 E4 AA 04 38 F6    A4 02 00 00 00 0A 00 04   .B8...8.........
+0050 00 00 00 00 00 06 00 04    20 02 00 05 00 0D 00 20   ........ ......
+0060 09 46 13 49 4C 7F 11 D1    82 22 44 45 53 54 00 00   .F.IL...."DEST..
+0070 09 46 13 44 4C 7F 11 D1    82 22 44 45 53 54 00 00   .F.DL...."DEST..
+0080 00 0F 00 04 00 00 E4 48    00 02 00 04 3B BF 80 A5   .......H....;...
+0090 00 03 00 04 3B BF 80 A5                              ....;...
+
+
+-------------------------- #:32 --------------------------
+ Delta Time:  0.133sec   Packet Length: 54 bytes (36 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 205.188.008.128    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 40 (x28) bytes          Id: 022D
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 6  TCP
+ IP:  Header Checksum: D9BC    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 58856  (Unassigned port)       Dest Port: 5190  (Unassigned port)
+ TCP:  Sequence #: 2158957248
+ TCP:  Ack #: 3898088623
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 10
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 0...        Push bit Off
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 34000      Checksum: 3977   (Correct)
+ TCP:  No Options
+ TCP:  No data or not output.
+
+-------------------------- #:33 --------------------------
+ Delta Time:  0.179sec   Packet Length: 60 bytes (3C hex)
+ DIX:   Dest: 00:00:39:18:A0:99   Source: 00:C0:49:3F:4A:85
+ DIX:   Dest: 192.168.200.001    Source:  205.188.008.128
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 40 (x28) bytes Error??  Id: FBD8
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 44 sec    Protocol: 6  TCP
+ IP:  Header Checksum: F410    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 5190  (Unassigned port)       Dest Port: 58856  (Unassigned port)
+ TCP:  Sequence #: 3898088623
+ TCP:  Ack #: 2158957248
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 10
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 0...        Push bit Off
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 16384      Checksum: 7E47   (Correct)
+ TCP:  No Options
+ TCP:  No data or not output.
+
+-------------------------- #:34 --------------------------
+ Delta Time:  6.805sec   Packet Length: 54 bytes (36 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 205.188.008.128    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 40 (x28) bytes          Id: 022E
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 6  TCP
+ IP:  Header Checksum: D9BB    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 58856  (Unassigned port)       Dest Port: 5190  (Unassigned port)
+ TCP:  Sequence #: 2158957248
+ TCP:  Ack #: 3898088623
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 11
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 0...        Push bit Off
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...1  <FIN> Finish bit On
+ TCP:  Window: 34000      Checksum: 3976   (Correct)
+ TCP:  No Options
+ TCP:  No data or not output.
+
+-------------------------- #:35 --------------------------
+ Delta Time:  0.937sec   Packet Length: 54 bytes (36 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 205.188.008.128    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 40 (x28) bytes          Id: 022F
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 6  TCP
+ IP:  Header Checksum: D9BA    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 58856  (Unassigned port)       Dest Port: 5190  (Unassigned port)
+ TCP:  Sequence #: 2158957248
+ TCP:  Ack #: 3898088623
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 11
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 0...        Push bit Off
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...1  <FIN> Finish bit On
+ TCP:  Window: 34000      Checksum: 3976   (Correct)
+ TCP:  No Options
+ TCP:  No data or not output.
+
+-------------------------- #:36 --------------------------
+ Delta Time:  0.610sec   Packet Length: 60 bytes (3C hex)
+ DIX:   Dest: 00:00:39:18:A0:99   Source: 00:C0:49:3F:4A:85
+ DIX:   Dest: 192.168.200.001    Source:  205.188.008.128
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 40 (x28) bytes Error??  Id: 080D
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 44 sec    Protocol: 6  TCP
+ IP:  Header Checksum: E7DC    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 5190  (Unassigned port)       Dest Port: 58856  (Unassigned port)
+ TCP:  Sequence #: 3898088623
+ TCP:  Ack #: 2158957249
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 11
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 0...        Push bit Off
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...1  <FIN> Finish bit On
+ TCP:  Window: 16384      Checksum: 7E45   (Correct)
+ TCP:  No Options
+ TCP:  No data or not output.
+
+-------------------------- #:37 --------------------------
+ Delta Time:  0.000sec   Packet Length: 54 bytes (36 hex)
+ DIX:   Dest: 00:C0:49:3F:4A:85   Source: 00:00:39:18:A0:99
+ DIX:   Dest: 205.188.008.128    Source:  192.168.200.001
+----------------------- IP HEADER -----------------------
+ IP:  Version: 4 Correct    Header Length: 20 bytes
+ IP:  Type Of Service: 00
+ IP:     000. ....  Routine
+ IP:     ...0 ....  Normal Delay
+ IP:     .... 0...  Normal Throughput
+ IP:     .... .0..  Normal Reliability
+ IP:  Total Len: 40 (x28) bytes          Id: 0230
+ IP:  Flags: 2
+ IP:     .1..       Don't Fragment
+ IP:     ..0.       Last Fragment
+ IP:  Fragment Offset: 000
+ IP:  Time To Live: 64 sec    Protocol: 6  TCP
+ IP:  Header Checksum: D9B9    (Correct)
+ IP:  No Options
+---------------------- TCP HEADER ----------------------
+ TCP:  Source Port: 58856  (Unassigned port)       Dest Port: 5190  (Unassigned port)
+ TCP:  Sequence #: 2158957249
+ TCP:  Ack #: 3898088624
+ TCP:  Offset: 20 bytes
+ TCP:  Flags: 10
+ TCP:     ..0. ....        Urgent bit Off
+ TCP:     ...1 ....  <ACK> Ack bit On
+ TCP:     .... 0...        Push bit Off
+ TCP:     .... .0..        Reset bit Off
+ TCP:     .... ..0.        Synchronize bit Off
+ TCP:     .... ...0        Finish bit Off
+ TCP:  Window: 34000      Checksum: 3975   (Correct)
+ TCP:  No Options
+ TCP:  No data or not output.
+ Finished

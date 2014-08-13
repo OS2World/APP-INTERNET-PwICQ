@@ -1,0 +1,29 @@
+
+#---[ Dados do projeto ]---------------------------------------------------------------#
+
+#Nome do executavel final
+PROJECT   = icqconf
+EXTRAINCL = w:\data\ibmcpp\sources\icq2\include
+EXTRALIB  = \public\pwicq2\os2\lib\icqkrnl.lib
+#Tipo do executavel
+EXETYPE   = VIO
+
+# Lista de modulos
+USETHREAD = 1
+DEFFILE   = icqconf.def
+RESOURCES = icqconf.res
+
+#CPARMS    = -DEXTENDED_LOG
+
+SOURCES   = icqconf.c spmcfg.c basic.c away.c cfgcpg.c
+
+#---[ Diretorios ]---------------------------------------------------------------------#
+
+EXEPATH     = w:\private\pwicq2\plugins
+RELEASEPATH = w:\public\pwicq2\os2\bin\plugins
+
+!include <pwMake.mak>
+
+
+
+

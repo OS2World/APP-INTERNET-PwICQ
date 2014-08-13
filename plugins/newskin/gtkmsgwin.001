@@ -1,0 +1,323 @@
+/*
+ * gtkmsgwin.c - GTK Message Window
+ */
+
+
+ #include <malloc.h>
+ #include <string.h>
+ #include <unistd.h>
+ #include <pwicqgui.h>
+
+/*---[ Constants ]------------------------------------------------------------*/
+
+ #pragma pack(1)
+
+ static const struct _button
+ {
+    USHORT     id;
+    const char *wText;
+ } buttonList[] =
+ {
+#ifdef GTK2
+    { MSGID_CLOSEBUTTON, "_Close"         },
+    { MSGID_SENDBUTTON,  "_Send"          },
+    { MSGID_ADDBUTTON,   "_Add"           }
+#else
+    { MSGID_CLOSEBUTTON, "Close"          },
+    { MSGID_SENDBUTTON,  "Send"           },
+    { MSGID_ADDBUTTON,   "Add"            }
+#endif	
+ };
+
+ static const struct _userButton
+ {
+	USHORT id;
+	USHORT icon;
+ } userButtons[] =
+ {
+	{ MSGID_INFOBUTTON,  ICQICON_USERINFO },
+	{ MSGID_ABOUTBUTTON, ICQICON_ABOUT    }
+ };
+
+/*---[ Prototipes ]-----------------------------------------------------------*/
+
+ static void destroy( GtkWidget *, ICQMSGDIALOG *);
+
+/*---[ Implementation ]-------------------------------------------------------*/
+
+ void icqskin_setFont(hWindow hwnd, const char *name)
+ {
+#ifdef GTK2	
+	
+	char buffer[0x0100];
+	char *ptr;
+	int  f;
+	char *parms[] = { NULL, NULL, NULL };
+	
+	strncpy(buffer,name,0xFF);
+	
+	ptr = strtok(buffer,".");
+	for(f=0;f<3&&ptr;f++)
+    {
+	   parms[f] = ptr;
+	   ptr      = strtok(NULL,".");
+	}
+	
+    PangoFontDescription *font = pango_font_description_new();
+
+	if(parms[1])
+	{
+       pango_font_description_set_family(font,parms[1]);
+	}
+
+    if(parms[2])
+    {
+	   if(!strcmp(parms[2],"Bold"))
+   	      pango_font_description_set_weight(font,PANGO_WEIGHT_BOLD);
+	}
+	
+	gtk_widget_modify_font(hwnd,font);
+	pango_font_description_free(font);
+#endif	
+ }
+
+ hWindow icqskin_createMsgWindow(HICQ icq)
+ {
+	static const char *normal = "8.Helv";
+	static const char *bold   = "8.Helv.Bold";
+	
+	SKINDATA       *skn   = icqGetSkinDataBlock(icq);
+	hWindow        ret    = 0;
+	
+	ICQMSGDIALOG   *wnd;
+	int            sz;
+	int            f;
+    GtkWidget      *hBox;
+    GtkWidget      *box;
+	GtkWidget      *vBox;
+	GtkWidget      *temp;
+    GtkRequisition size;
+	
+    sz  = sizeof(ICQMSGDIALOG) + (MSG_WINDOW_COMPONENTS * sizeof(hWindow));
+	wnd = malloc(sz);
+
+	if(!wnd)
+	   return 0;
+
+	memset(wnd,0,sz);
+	wnd->fr.sz      = sizeof(ICQMSGDIALOG);
+	wnd->fr.icq     = icq;
+	wnd->fr.childs  = MSG_WINDOW_COMPONENTS;
+    ret             = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
+    icqskin_setWindowDataBlock(ret,wnd);	
+
+    gtk_signal_connect( GTK_OBJECT(ret),"destroy",GTK_SIGNAL_FUNC(destroy),wnd );
+	
+	vBox = gtk_vbox_new(FALSE,0);
+	
+	/* Create top bar */
+	hBox = gtk_table_new(1,6,FALSE);
+
+    temp  = gtk_image_new_from_pixbuf(skn->icons[ICQICON_OFFLINE]);  	
+    icqskin_setDlgItemHandle(ret, MSGID_USERMODE, temp);
+    gtk_table_attach(GTK_TABLE(hBox), temp, 0, 1, 0, 1, 0, 0, 2, 2);
+    gtk_object_set_user_data(GTK_OBJECT(temp), (gpointer) wnd);	
+	DBGTracex(temp);
+	
+	temp  = gtk_label_new("Nick:");
+	icqskin_setFont(temp,normal);
+	gtk_misc_set_alignment(GTK_MISC(temp), 0, .5);
+    icqskin_setDlgItemHandle(ret, MSGID_NICK, temp);
+    gtk_table_attach(GTK_TABLE(hBox), temp, 1, 2, 0, 1, 0, 0, 2, 2);
+	
+    temp = gtk_label_new("N/A");
+	icqskin_setFont(temp,bold);
+	gtk_misc_set_alignment(GTK_MISC(temp), 0, .5);
+    icqskin_setDlgItemHandle(ret, MSGID_NICKENTRY, temp);
+    gtk_widget_size_request(temp,&size);
+    gtk_widget_set_usize(temp,10,size.height);
+    gtk_table_attach(GTK_TABLE(hBox), temp, 2, 3, 0, 1,GTK_EXPAND|GTK_SHRINK|GTK_FILL,0, 2, 2);
+
+	temp = gtk_label_new("Name:");
+	icqskin_setFont(temp,normal);
+	gtk_misc_set_alignment(GTK_MISC(temp), 0, .5);
+    icqskin_setDlgItemHandle(ret, MSGID_NAMEENTRY, temp);
+    gtk_table_attach(GTK_TABLE(hBox), temp, 3, 4, 0, 1, 0, 0, 2, 2);
+	
+    temp = gtk_label_new("N/A");
+	icqskin_setFont(temp,bold);
+	gtk_misc_set_alignment(GTK_MISC(temp), 0, .5);
+    icqskin_setDlgItemHandle(ret, MSGID_NAMEENTRY, temp);
+    gtk_widget_size_request(temp,&size);
+    gtk_widget_set_usize(temp,10,size.height);
+    gtk_table_attach(GTK_TABLE(hBox), temp, 4, 5, 0, 1,GTK_EXPAND|GTK_SHRINK|GTK_FILL,0, 2, 2);
+	
+	/* Button bar */
+    box = gtk_hbox_new(FALSE,0);
+
+	for(f=0;f<(sizeof(userButtons)/sizeof(struct _userButton));f++)
+	{
+       temp = gtk_button_new();
+       icqskin_setDlgItemHandle(ret, userButtons[f].id, temp);
+       gtk_container_add(GTK_CONTAINER(temp),gtk_pixmap_new(skn->iPixmap[userButtons[f].icon],skn->iBitmap[userButtons[f].icon]));
+       gtk_button_set_relief(GTK_BUTTON(temp),GTK_RELIEF_NONE);
+	   gtk_box_pack_end(GTK_BOX(box), temp, FALSE, FALSE, 0);
+	}
+
+    gtk_table_attach(GTK_TABLE(hBox), box, 4, 5, 0, 1,GTK_SHRINK|GTK_FILL,0, 2, 2);
+	
+	/* Add table in the frame */
+    temp = gtk_frame_new("User");
+    gtk_container_add (GTK_CONTAINER(temp), hBox);
+    gtk_box_pack_start(GTK_BOX(vBox), temp, FALSE, FALSE, 0);
+	
+	/* Create edit box */
+    box = gtk_vpaned_new();
+
+    /* History area */
+    temp = gtk_clist_new(2);
+    icqskin_setDlgItemHandle(ret, MSGID_HISTORY, temp);
+	
+    gtk_clist_set_column_auto_resize(GTK_CLIST(temp),0,0);
+    gtk_clist_set_column_width(GTK_CLIST(temp),0,skn->iconSize);
+	
+#ifdef GTK2
+
+    hBox = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(hBox),GTK_POLICY_NEVER,GTK_POLICY_ALWAYS);
+	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(hBox),GTK_SHADOW_ETCHED_IN);
+    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(hBox),temp);
+
+    gtk_paned_pack1(GTK_PANED(box),hBox,TRUE,TRUE);
+
+    /* Text editing area */
+	
+    temp = gtk_text_view_new();
+    icqskin_setDlgItemHandle(ret, MSGID_EDITBOX, temp);
+
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(temp),GTK_WRAP_WORD);
+
+    hBox = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(hBox),GTK_POLICY_NEVER,GTK_POLICY_ALWAYS);
+	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(hBox),GTK_SHADOW_ETCHED_IN);
+    gtk_container_add(GTK_CONTAINER(hBox),temp);
+	
+    gtk_paned_pack2(GTK_PANED(box),hBox,TRUE,TRUE);
+    gtk_widget_set_usize(hBox, -1, 50);
+
+
+#endif
+
+#ifdef GTK1
+
+    hBox = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(hBox),GTK_POLICY_NEVER,GTK_POLICY_ALWAYS);
+    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(hBox),temp);
+
+    gtk_paned_pack1(GTK_PANED(box),hBox,TRUE,TRUE);
+
+    /* Text editing area */
+    temp = gtk_text_new(NULL,NULL);
+    icqskin_setDlgItemHandle(ret, MSGID_EDITBOX, temp);
+
+    gtk_text_set_editable(GTK_TEXT(temp),TRUE);
+    gtk_text_set_word_wrap(GTK_TEXT(temp),TRUE);
+
+    hBox = gtk_hbox_new(FALSE,0);
+    gtk_box_pack_start(GTK_BOX(hBox), temp,TRUE,TRUE,0);
+    gtk_box_pack_start(GTK_BOX(hBox),gtk_vscrollbar_new(GTK_TEXT(temp)->vadj),FALSE,FALSE,0);
+
+    gtk_paned_pack2(GTK_PANED(box),hBox,TRUE,TRUE);
+    gtk_widget_set_usize(hBox, -1, 50);
+
+#endif	
+
+    temp = gtk_frame_new(NULL);
+    gtk_container_add (GTK_CONTAINER(temp),box);
+    gtk_box_pack_start(GTK_BOX(vBox), temp, TRUE, TRUE, 0);
+	
+    /* Create button bar */
+    hBox = gtk_hbox_new(FALSE,0);
+
+    gtk_box_pack_start(GTK_BOX(hBox), gtk_label_new(""), TRUE, TRUE, 0);
+	
+	for(f=0;f<(sizeof(buttonList)/sizeof(struct _button));f++)
+	{
+#ifdef GTK2	
+       temp = gtk_button_new_with_mnemonic(buttonList[f].wText);
+#else
+	   temp = gtk_button_new_with_label(buttonList[f].wText);
+#endif	
+       icqskin_setDlgItemHandle(ret, buttonList[f].id, temp);
+       gtk_box_pack_end(GTK_BOX(hBox), temp, FALSE, FALSE, 0);
+	   DBGTracex(temp);
+	}
+    gtk_box_pack_end(GTK_BOX(vBox), hBox, FALSE, FALSE, 0);
+
+	/* Put the box in the window, show contents */
+	
+    gtk_container_add(GTK_CONTAINER(ret), vBox);
+    gtk_widget_show_all(GTK_WIDGET(ret));
+
+	icqskin_insertMessageHistory(ret, 0, "Header", "Teste linha1\nlinha2\nlinha3");
+
+    return ret;
+ }
+
+ static void destroy(GtkWidget *hwnd, ICQMSGDIALOG *cfg )
+ {
+	/* Message window is beeing closed */
+	DBGMessage("Closing message window");
+	
+	if(cfg && cfg->fr.sz == sizeof(ICQMSGDIALOG))
+	{
+	   DBGMessage("Releasing message window");
+       icqskin_terminateMessageEditor(cfg->fr.icq, hwnd);
+   	   memset(cfg,0,sizeof(ICQMSGDIALOG));
+	   free(cfg);
+	}
+#ifdef DEBUG
+	else
+	{
+	   DBGMessage("********* INVALID MESSAGE WINDOW");
+	}
+#endif	
+
+	
+ }
+
+ int icqskin_setMsgWindowText(hWindow hwnd, USHORT id, const char *text)
+ {
+	hWindow h = icqskin_getDlgItemHandle(hwnd, id);
+	
+	if(!h)
+	{
+	   return -1;
+	}
+	else if(GTK_IS_LABEL(h))
+	{
+	   gtk_label_set(GTK_LABEL(h), text);
+	}
+	else
+	{
+	   return 1;
+	}
+	
+    return 0;	
+ }
+
+ int icqskin_insertMessageHistory(HWND hwnd, ULONG flags, const char *hdl, const char *text)
+ {
+	int          pos;
+    gchar        *tbl[] = { "A", (gchar *) text };
+ 	ICQMSGDIALOG *cfg   = icqskin_getWindowDataBlock(hwnd);
+	SKINDATA     *skn   = icqGetSkinDataBlock(cfg->fr.icq);
+    hWindow      h      = icqskin_getDlgItemHandle(hwnd, MSGID_HISTORY);
+
+    pos = gtk_clist_append(GTK_CLIST(h),(gchar **) &tbl);
+    gtk_clist_set_pixmap (GTK_CLIST(h),pos,0,skn->iPixmap[ICQICON_MESSAGERECEIVED],skn->iBitmap[ICQICON_MESSAGERECEIVED]);
+	
+    return 0;
+ }
+

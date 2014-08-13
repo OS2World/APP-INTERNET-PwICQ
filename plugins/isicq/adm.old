@@ -1,0 +1,213 @@
+/*
+ * adm.c - Administration port listener
+ */
+
+#ifdef __OS2__
+ #pragma strings(readonly)
+ #define INCL_DOSPROCESS
+#endif
+
+ #include <stdio.h>
+ #include <malloc.h>
+ #include <string.h>
+
+ #include "ishared.h"
+
+/*---[ Structures and Macros ]---------------------------------------------------------------------------*/
+
+ #pragma pack(1)
+
+ typedef struct _packet_processor
+ {
+#ifdef WIN32
+    int		id;
+#else
+    UCHAR	id;
+#endif
+    int		(*exec)(ISHARED_ADMIN *);
+ } packet_processor;
+
+ #define DECLARE_PACKET_PROCESSOR(x)      static int x(ISHARED_ADMIN *);
+ #define BEGIN_PACKET_PROCESSOR_TABLE(x)  static const packet_processor x[] = {
+ #define PACKET_PROCESSOR(p,x)            { p, (int (*)(ISHARED_ADMIN *)) x },
+ #define END_PACKET_PROCESSOR_TABLE()     { 0, NULL } };
+
+ #define BEGIN_PACKET_PROCESSOR(x)        static int x(ISHARED_ADMIN *adm)
+
+ #pragma pack()
+
+/*---[ Function processors ]-----------------------------------------------------------------------------*/
+
+ DECLARE_PACKET_PROCESSOR(logon)
+
+ BEGIN_PACKET_PROCESSOR_TABLE(packet_processor_table)
+
+ PACKET_PROCESSOR( ISHARETCP_LOGON,   logon)
+
+ END_PACKET_PROCESSOR_TABLE()
+
+
+/*---[ Prototipes ]--------------------------------------------------------------------------------------*/
+
+ DECLARE_THREAD(admMain)
+ DECLARE_THREAD(admThread)
+
+/*---[ Implementation ]----------------------------------------------------------------------------------*/
+
+ void ICQAPI ishare_startAdmin(ISHARED_CONFIG *cfg)
+ {
+    if(cfg->sz != sizeof(ISHARED_CONFIG))
+    {
+       log(cfg,"Invalid configuration block");
+       return;
+    }
+    ishare_beginThread(cfg,16384,admMain,cfg);
+ }
+
+ void ICQAPI ishare_stopAdmin(ISHARED_CONFIG *cfg)
+ {
+    ISHARED_ADMIN *adm;
+    int		  f;
+
+    if(cfg->admSock > 0)
+       ishare_ShutdownSocket(cfg->admSock);
+
+    walklist(adm,cfg->admUsers)
+       adm->rc = ISHARE_ERROR_SHUTDOWN;
+
+    delayloop(f, 300, cfg->admUsers.first);
+
+ }
+
+ THREAD_START(admMain)
+ {
+    ISHARED_CONFIG      *cfg = (ISHARED_CONFIG *) GET_THREAD_PARAMETER();
+    int  		sock;
+    long 		ip;
+    int  		port;
+    ISHARED_ADMIN	*adm;
+
+    DBGMessage("Administration service started");
+
+    cfg->admSock = ishare_OpenTCP(loadValue(cfg,"admin",ISHARE_ADM_PORT));
+
+    if(cfg->admSock < 0)
+    {
+       log(cfg,"Can't create administration port");
+       return;
+    }
+
+    ishare_Listen(cfg->admSock);
+    
+    sock = ishare_Accept(cfg->admSock,&ip,&port);
+
+    DBGTrace(sock);
+    while(isActive(cfg) && sock > 0)
+    {
+       adm = malloc(sizeof(ISHARED_ADMIN));
+       memset(adm,0,sizeof(ISHARED_ADMIN));
+       adm->sock = sock;
+       adm->cfg  = cfg;
+       ishare_insertItem(&cfg->admUsers,&adm->l);
+
+       adm->thread = ishare_beginThread(cfg,16384,admThread,adm);
+
+       sock = ishare_Accept(cfg->admSock,&ip,&port);
+    }
+
+    if(cfg->admSock > 0)
+       ishare_CloseSocket(cfg->admSock);
+
+    DBGMessage("Administration service stopped");
+
+    THREAD_END();
+ }
+
+ static void disconnect(ISHARED_ADMIN *adm)
+ {
+    #pragma pack(1)
+
+    struct _packet
+    {
+       UCHAR	id;	
+       USHORT	rc;
+    } p			= { ISHARETCP_ERROR, adm->rc };
+
+    if(adm->rc)
+       ishare_Send(adm->sock,&p,sizeof(p));
+
+    ishare_CloseSocket(adm->sock);
+    adm->sock = -1;
+ }
+
+ THREAD_START(admThread)
+ {
+    ISHARED_ADMIN          *adm = (ISHARED_ADMIN *) GET_THREAD_PARAMETER();
+    ISHARED_CONFIG         *cfg = adm->cfg;
+    const packet_processor *cmd;
+
+    #pragma pack(1)
+
+    struct _header
+    {
+       USHORT	marker;
+       UCHAR	id;
+    }	h;
+
+    DBGTracex(adm->cfg);
+
+    log(cfg,"Administration session started");
+
+    while(adm->sock > 0 && !adm->rc && ishare_RecBlock(adm,sizeof(h),&h))
+    {
+       DBGTracex(h.id);
+
+       if(h.marker != 0x08FD)
+       {
+          adm->rc = ISHARE_ERROR_MALFORMED;
+       }
+       else
+       {
+          for(cmd = packet_processor_table;cmd->exec && cmd->id != h.id;cmd++);
+          if(cmd->exec)
+             cmd->exec(adm);
+          else
+             adm->rc = ISHARE_ERROR_UNKNOWN;
+       }
+    }
+
+    if(adm->sock > 0)
+       disconnect(adm);
+
+    log(cfg,"Administration session terminated");
+
+    ishare_removeItem(&cfg->admUsers,&adm->l);
+    free(adm);
+
+    THREAD_END();
+ }
+
+
+ BEGIN_PACKET_PROCESSOR(logon)
+ {
+    USHORT	clientVersion	= ishare_RecShort(adm);
+    char	clientName[0x0100];
+    char	userName[40];
+    char	password[40];
+
+    ishare_RecString(adm,clientName,0xFF);
+    ishare_RecString(adm,userName,39);
+    ishare_RecString(adm,password,39);
+
+    if(adm->rc)
+       return -1;	
+
+    DBGTracex(clientVersion);
+    DBGMessage(clientName);
+    DBGMessage(userName);
+    DBGMessage(password);
+
+    return 0;
+ }
+
+

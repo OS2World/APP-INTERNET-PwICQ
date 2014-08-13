@@ -1,0 +1,10 @@
+LIBRARY      ICQULOG INITINSTANCE TERMINSTANCE
+DATA         MULTIPLE READWRITE PRELOAD NONSHARED
+
+EXPORTS      icqulog_Configure
+             icqulog_Event
+             icqulog_UserEvent
+
+
+
+

@@ -1,0 +1,12 @@
+LIBRARY      ICQPMDC
+DATA         MULTIPLE READWRITE PRELOAD NONSHARED
+
+EXPORTS      icqpmdc_Configure
+             icqpmdc_Start
+             icqpmdc_addSendTo
+             icqpmdc_ConfigPage
+             icqpmdc_Event
+             icqpmdc_rpcRequest
+
+
+

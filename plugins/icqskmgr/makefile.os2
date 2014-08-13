@@ -1,0 +1,33 @@
+
+#---[ Dados do projeto ]---------------------------------------------------------------#
+
+#Nome do executavel final
+PROJECT     = icqskmgr
+EXTRAINCL   = w:\data\ibmcpp\sources\icq2\include
+EXTRALIB    = \public\pwicq2\os2\lib\icqkrnl.lib \public\pwicq2\os2\lib\icqskin.lib \public\pwicq2\os2\lib\icqwin.lib
+
+#CPARMS      = -DEXTENDED_LOG
+
+#Tipo do executavel
+EXETYPE     = VIO
+
+# Lista de modulos
+USETHREAD   = 1
+DEFFILE     = icqskmgr.def
+
+SOURCES     =  icqskmgr.c init.c mainwin.c sysevent.c sysmenu.c timer.c ulist.c \
+               userevent.c usrmenu.c away.c config.c
+
+RESOURCES   = icqskmgr.res
+
+
+#---[ Diretorios ]---------------------------------------------------------------------#
+
+EXEPATH     = w:\private\pwicq2\plugins
+RELEASEPATH = w:\public\pwicq2\os2\bin\plugins
+
+!include <pwMake.mak>
+
+
+
+

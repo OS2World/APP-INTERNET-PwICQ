@@ -1,0 +1,87 @@
+wcc -5 -bd -bm -bt=win -d0 -fp5 -dWIN32 -i=s:\wintlkt\include -i=..\..\include -zw -zW common.c
+echo wcc -5 -bd -bm -bt=win -d0 -fp5 -dWIN32 -i=s:\wintlkt\include -i=..\..\include -zw -zW common.c > watcom.cmd
+watcom.cmd
+dir
+exit
+dir
+type wc.cmd
+wc
+dir s:\watcom\h\
+dir s:\watcom\h /w
+wc
+dir
+del *.obj
+less common.err
+del *.err
+dir
+less sck.message
+dir
+less wc.cmd
+exit
+alias
+wc
+eset include
+wc
+dir *.lib
+del icqnetw.lib
+wc
+dir *.zip
+wc
+echo
+echo.exe
+cmd /c echo.exe
+850
+printf "\n"
+wc
+printf
+850
+printf ""
+wc
+exit
+run
+s:
+os2tk45\h\
+grep Rbind *.h
+grep -r Rbind *.h
+grep -r bind *.h
+grep -r bind *.h | grep R
+grep Rbind *
+grep Rconnect *
+grep bind *
+grep Rconnect *
+grep -r socks *
+less socks.h
+grep Rconnect *
+grep -r Rconnect *
+less sys\socket.h
+bd
+cl
+exit
+run
+cl
+less \data\etc\socks.cfg
+dir \data\etc\socks*.*
+dir *.dll
+copy *.dll \Temp
+cl
+dir
+del _wlib282.$$$
+exit
+cl
+exit
+rl
+exit
+db
+rl
+run
+cl
+m
+rl
+exit
+rl
+rl
+dir
+exit
+rl
+exit
+rl & exit

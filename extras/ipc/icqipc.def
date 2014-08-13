@@ -1,0 +1,59 @@
+
+LIBRARY      ICQIPC INITINSTANCE TERMINSTANCE
+DESCRIPTION  'pwICQ V2 IPC/Rexx extension module'
+
+PROTMODE
+
+DATA         MULTIPLE READWRITE NONSHARED
+CODE         LOADONCALL EXECUTEONLY
+
+EXPORTS      icqIPCQueryBuild                   @1
+             icqIPCSendCommand                  @2
+             icqIPCSetMode                      @3
+             icqIPCSendCMD                      @4
+             icqIPCSetModeByName                @5
+             icqIPCWriteLog                     @6
+             icqIPCQueryInstance                @7
+             icqIPCGetSharedBlock               @8
+             icqIPCReleaseSharedBlock           @9
+             icqIPCExecuteCommand               @10
+             icqIPCShowPopupMenu                @11
+             icqIPCOpenFirstMessage             @12
+             icqIPCShowUserList                 @13
+             icqIPCPluginRequest                @14
+             icqIPCMPTRequest	   		        @15
+             icqIPCQueryOnlineMode	      	    @16
+             icqIPCConvertCodePage              @17
+             icqIPCSetPeerInfo                  @18
+             icqIPCPeerConnect                  @19
+             icqIPCQueryAvailable               @20
+             icqIPCSendFile                     @21
+			 icqIPCAddUser                      @22
+			 icqIPCOpenURL                      @23
+			 icqIPCSendURL                      @24
+			
+
+EXPORTS      rxICQLoadFuncs
+             rxICQQueryBuild
+             rxICQDropFuncs
+             rxICQSetMode
+             rxICQQueryUIN
+             rxICQExecute
+             rxICQOpenFirstMessage
+             rxICQShowPopupMenu
+             rxICQShowUserList
+             rxICQPluginRequest
+             rxICQMPTRequest
+             rxICQQueryOnlineMode
+             rxICQConvertCodePage
+             rxICQSetPeerInfo
+             rxICQPeerConnect
+             rxICQQueryAvailable
+             rxICQSendFile
+			 rxICQAddUser
+			 rxICQOpenURL
+			 rxICQOSD
+			 rxICQSendURL
+			
+			
+

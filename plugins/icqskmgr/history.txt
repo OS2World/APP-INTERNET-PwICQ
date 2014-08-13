@@ -1,0 +1,89 @@
+..\newskin\
+grep icqAjustTaskList *.c
+less libmain.c
+..\..\core\skintlkt\
+grep 1039 *.c
+cd -
+bd
+rl
+cl
+db
+db
+less ..\newskin\icqwin.def
+dir
+less makefile
+dir \Public\pwicq\os2\lib /od
+dir \Private\pwicq2
+dir \Private\pwicq2 /od
+db
+del \Public\pwicq\os2\lib\icqwin.lib
+db
+rl
+dir
+exit
+db
+rl
+exit
+rl
+exit
+less \Temp\pwicq.log
+rl
+exit
+rl
+exit
+less ..\..\include\icqdefs.h
+run
+rl
+exit
+less ..\icqsound\sndconfig.c
+cl
+exit
+less ..\icqconf\away.c
+run
+run
+less ..\..\include\icqdefs.h
+run
+run
+cl
+rl
+exit
+exit
+less config.c
+exit
+less ..\..\include\icqdefs.h
+run
+dir w:\public\pwicq\skins\GreenSkin\about.jpg
+dir w:\public\pwicq\skins\GreenSkin
+run
+dir w:\public\pwicq\skins\GreenSkin\about.jpg
+w:\public\pwicq\skins\
+dir
+open greenskin.JPG
+unzip -v GreenSkin.zip
+dir GreenSkin\preview.jpg
+run
+bd
+run
+GreenSkin\preview.jpg
+dir w:\public\pwicq\skins\GreenSkin\preview.jpg
+open w:\public\pwicq\skins\GreenSkin\preview.jpg
+run
+rl
+exit
+db
+run
+m
+rl
+exit
+run
+run
+rl
+ping router
+exit
+less ..\..\include\icqdefs.h
+rl
+exit
+db
+run
+cl
+exit

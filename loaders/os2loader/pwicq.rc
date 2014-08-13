@@ -1,0 +1,101 @@
+#define INCL_WIN
+#define INCL_NLS
+#include "os2.h"
+
+icon 1 pwicq.ico
+
+bitmap 2 pwicq.bmp
+
+bitmap 116 flower00.bmp
+bitmap 115 flower01.bmp
+bitmap 114 flower02.bmp
+bitmap 113 flower03.bmp
+bitmap 112 flower04.bmp
+bitmap 111 flower05.bmp
+bitmap 110 flower06.bmp
+bitmap 109 flower07.bmp
+bitmap 108 flower08.bmp
+bitmap 107 flower09.bmp
+bitmap 106 flower10.bmp
+bitmap 105 flower11.bmp
+bitmap 104 flower12.bmp
+bitmap 103 flower13.bmp
+bitmap 102 flower14.bmp
+bitmap 101 flower15.bmp
+bitmap 100 flower16.bmp
+
+STRINGTABLE
+BEGIN
+        1000, "Configuring base environment"
+        1001, "Verifying network service level"
+        1002, "Loading configuration file"
+        1003, "Processing command line parameters"
+        1004, "Loading filter files"
+        1005, "Loading plugins"
+        1006, "Plugins loaded"
+        1007, "Starting skin manager"
+        1008, "Loading skin"
+        1009, "Skin loaded"
+        1010, "Loading contacts list"
+        1011, "Starting plugins"
+        1012, "Main core is ready"
+END
+
+STRINGTABLE
+BEGIN
+        1500, "Can't load network manager"
+        1501, "Invalid network manager"
+        1502, "Invalid network stack detected"
+        1503, "Can't start skin manager"
+        1504, "Invalid skin manager"
+        1505, "Unexpected Core identifier"
+END
+
+
+DLGTEMPLATE 2
+BEGIN
+        DIALOG "pwICQ - Startup", 100, 16, 97, 145, 106, FS_TASKLIST | FS_DLGBORDER | FS_SCREENALIGN | NOT WS_SAVEBITS | WS_CLIPSIBLINGS | WS_SYNCPAINT
+        PRESPARAMS PP_FONTNAMESIZE "8.Helv"
+PRESPARAMS PP_FOREGROUNDCOLOR , 0xff00L
+PRESPARAMS PP_BACKGROUNDCOLOR , 0x0L
+        BEGIN
+                CONTROL 100, 101, 23, 40, 98, 67, WC_STATIC, SS_BITMAP | WS_VISIBLE | WS_GROUP
+                CONTROL "Version 2.0", 102, 6, 28, 134, 8, WC_STATIC, SS_TEXT | DT_CENTER | DT_VCENTER | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+                CONTROL "Loading startup module", 103, 6, 18, 134, 8, WC_STATIC, SS_TEXT | DT_CENTER | DT_VCENTER | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+                CONTROL "", 104, 8, 5, 129, 8, WC_STATIC, SS_TEXT | DT_CENTER | DT_VCENTER | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+                PRESPARAMS PP_FOREGROUNDCOLOR , 0xff0000L
+                CONTROL "", 105, 3, 15, 139, 23, WC_STATIC, SS_FGNDFRAME | WS_VISIBLE | WS_GROUP
+                PRESPARAMS PP_FOREGROUNDCOLOR , 0x7f00L
+                CONTROL "", 106, 3, 3, 139, 11, WC_STATIC, SS_FGNDFRAME | WS_VISIBLE | WS_GROUP
+                PRESPARAMS PP_FOREGROUNDCOLOR , 0x7f0000L
+        END
+
+END
+
+DLGTEMPLATE 3 
+BEGIN
+	DIALOG "pwICQ - Startup", 100, 12, 133, 251, 72, FS_TASKLIST | FS_DLGBORDER | FS_SCREENALIGN | NOT WS_SAVEBITS | WS_CLIPSIBLINGS | WS_SYNCPAINT
+	PRESPARAMS PP_FONTNAMESIZE "8.Helv"
+PRESPARAMS PP_FOREGROUNDCOLOR , 0xff00L
+PRESPARAMS PP_BACKGROUNDCOLOR , 0x0L
+	BEGIN
+		CONTROL 100, 101, 4, 5, 93, 65, WC_STATIC, SS_BITMAP | WS_VISIBLE | WS_GROUP
+		CONTROL "Version 2.0", 102, 107, 55, 134, 11, WC_STATIC, SS_TEXT | DT_CENTER | DT_VCENTER | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+		PRESPARAMS PP_FONTNAMESIZE "8.Helv.Bold"
+PRESPARAMS PP_BACKGROUNDCOLOR , 0x202020L
+		CONTROL "-", 203, 107, 30, 134, 9, WC_STATIC, SS_TEXT | DT_CENTER | DT_VCENTER | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+		PRESPARAMS PP_FOREGROUNDCOLOR , 0x4000L
+		CONTROL "-", 202, 107, 22, 134, 9, WC_STATIC, SS_TEXT | DT_CENTER | DT_VCENTER | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+		PRESPARAMS PP_FOREGROUNDCOLOR , 0x8000L
+		CONTROL "-", 201, 107, 14, 134, 9, WC_STATIC, SS_TEXT | DT_CENTER | DT_VCENTER | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+		CONTROL "By Perry Werneck", 200, 108, 6, 134, 9, WC_STATIC, SS_TEXT | DT_CENTER | DT_VCENTER | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+		PRESPARAMS PP_FOREGROUNDCOLOR , 0xff0000L
+		CONTROL "Starting loader", 130, 104, 41, 139, 27, WC_STATIC, SS_FGNDFRAME | WS_VISIBLE | WS_GROUP
+		PRESPARAMS PP_FOREGROUNDCOLOR , 0x7f00L
+PRESPARAMS PP_BACKGROUNDCOLOR , 0x202020L
+		CONTROL "Unregistered", 106, 107, 43, 134, 11, WC_STATIC, SS_TEXT | DT_CENTER | DT_VCENTER | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+		PRESPARAMS PP_FONTNAMESIZE "8.Helv.Bold"
+PRESPARAMS PP_BACKGROUNDCOLOR , 0x202020L
+	END
+
+END

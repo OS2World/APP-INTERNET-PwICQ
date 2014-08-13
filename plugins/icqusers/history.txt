@@ -1,0 +1,89 @@
+..\..\include\
+grep icqRegisterUserDBManager *
+e icqtlkt.h
+cd -
+e register.c
+run
+cl
+bd
+run
+dir w:\data\ibmcpp\sources\icq2\plugins\icqusers\icqusrdb.dl
+dir w:\data\ibmcpp\sources\icq2\plugins\icqusers\icqusrdb.dll
+run
+dir w:\data\ibmcpp\sources\icq2\config\
+run
+run
+..\..\core\kernel\
+less event.c
+less init.c
+bd
+run
+cl
+dir
+exit
+run
+type go.cmd
+dir
+dir ..
+copy ..\icqulog\go.cmd
+dir *.dll
+run
+rl
+\logs\27241234.log
+dir \Private\pwicq2\plugins
+rl
+exit
+exit
+exit
+grep icqusrdb_Save *.c
+rl
+exit
+rl
+exit
+..\icqv8\
+grep -i rand *.c
+less main.c
+grep -i access *.c
+grep access *.c
+cd ..
+grep -r access *.c
+grep -r access *
+less isicq\config.c
+bd
+run
+dir \data\ibmcpp\sources\icq2\config
+cd -
+cd -
+cd ..\..\config
+grep -i rand *.c
+bd
+..\icqconf\
+cd -
+..\icqv8\
+bd
+rl
+..\..\config\
+dir
+dir *.dat
+dir 27241234.*
+exit
+rl
+exit
+..\icqv8\
+grep -i update *.c
+grep -i update *.c | grep -i icqload
+grep -i icqLoadValue *.c
+grep -i modified *.c
+less snac13.c
+bd
+rl
+exit
+rl
+dir
+exit
+less ..\..\include\icqdefs.h
+rl
+exity
+exit
+rl
+exit

@@ -1,0 +1,568 @@
+/*
+ * pwICQLIB.C - Biblioteca esta¡tica para acesso as funcoes do nucleo
+ */
+
+#include <icqkernel.h>
+
+#ifdef __cplusplus
+   extern "C" {
+#endif	  
+
+ #define PWICQ pwICQStaticLibraryEntryPoints
+	  
+/*---[ Tabela ]----------------------------------------------------------------------------*/
+
+ const struct icqftable *PWICQ = NULL;
+
+/*---[ Implementacao ]---------------------------------------------------------------------*/
+
+ int EXPENTRY pwICQConfigureLibrary(const struct icqftable *tbl)
+ {
+    if( tbl->sz == sizeof(struct icqftable)
+        && tbl->Version      == ICQFTABLE_VERSION
+        && tbl->szKrnl       == sizeof(ICQ)
+        && tbl->szUser       == sizeof(USERINFO)
+        && tbl->pwICQVersion == PWICQVERSIONID
+      )
+    {
+       DBGMessage(tbl->ident);
+       PWICQ = tbl;
+       return 0;
+    }
+	
+	DBGMessage("Invalid library");
+    return -1;
+ }
+
+ const char * EXPENTRY icqQueryUserNick(HUSER usr)
+ {
+    return PWICQ->icqQueryUserNick(usr);
+ }
+
+ HUSER EXPENTRY icqQueryNextUser(HICQ icq, HUSER usr)
+ {
+    return PWICQ->icqQueryNextUser(icq,usr);
+ }
+
+ void * EXPENTRY icqGetSkinDataBlock(HICQ icq)
+ {
+    return PWICQ->icqGetSkinDataBlock(icq);
+ }
+
+ void EXPENTRY icqSetSkinDataBlock(HICQ icq, void *ptr)
+ {
+    PWICQ->icqSetSkinDataBlock(icq,ptr);
+ }
+
+ ULONG EXPENTRY icqQueryUIN(HICQ icq)
+ {
+    return icq->uin;
+ }
+
+ void EXPENTRY icqWriteSysLog(HICQ icq, const char *proj, const char *txt)
+ {
+    PWICQ->icqWriteSysLog(icq,proj,txt);
+ }
+
+ BOOL EXPENTRY icqRegisterSkinManager(HICQ icq, const SKINMGR *mgr)
+ {
+    return PWICQ->icqRegisterSkinManager(icq,mgr);
+ }
+
+ void EXPENTRY icqSetServerBusy(HICQ icq, BOOL modo)
+ {
+    PWICQ->icqSetServerBusy(icq,modo);
+ }
+
+ HUSER EXPENTRY icqSetUserOnlineMode(HICQ icq, ULONG p1, ULONG p2)
+ {
+    return PWICQ->icqSetUserOnlineMode(icq,p1,p2);
+ }
+
+ void EXPENTRY icqDumpPacket(HICQ icq, HUSER usr, const char *msg, int size, unsigned char *dbg)
+ {
+ }
+
+ void EXPENTRY icqSystemEvent(HICQ icq, USHORT event)
+ {
+    PWICQ->icqSystemEvent(icq,event);
+ }
+
+ void EXPENTRY icqUserEvent(HICQ icq, HUSER user, USHORT event)
+ {
+    PWICQ->icqUserEvent(icq,user,event);
+ }
+
+ void EXPENTRY icqAbend(HICQ icq, ULONG msg)
+ {
+    PWICQ->icqAbend(icq,msg);
+ }
+
+ int EXPENTRY icqQueryUserDataBlockLength(void)
+ {
+    return PWICQ->icqQueryUserDataBlockLength();
+ }
+
+ HUSER EXPENTRY icqUserOnline(HICQ icq, ULONG uin, ULONG status, long ip, long gateway, short port, long tcpVersion, ULONG version)
+ {
+    return PWICQ->icqUserOnline(icq, uin, status, ip, gateway, port, tcpVersion, version);
+ }
+
+ HLIST EXPENTRY icqCreateList(void)
+ {
+    return PWICQ->icqCreateList();
+ }
+
+ HLIST EXPENTRY icqDestroyList(HLIST lst)
+ {
+    return PWICQ->icqDestroyList(lst);
+ }
+
+ void EXPENTRY icqClearList(HLIST lst)
+ {
+    return PWICQ->icqClearList(lst);
+ }
+
+ void * EXPENTRY icqAddElement(HLIST lst, int sz)
+ {
+    return PWICQ->icqAddElement(lst,sz);
+ }
+
+ int EXPENTRY icqRemoveElement(HLIST lst, void *ptr)
+ {
+    return PWICQ->icqRemoveElement(lst,ptr);
+ }
+
+ void * EXPENTRY icqQueryFirstElement(HLIST lst)
+ {
+    return PWICQ->icqQueryFirstElement(lst);
+ }
+
+ void * EXPENTRY icqQueryLastElement(HLIST lst)
+ {
+    return PWICQ->icqQueryLastElement(lst);
+ }
+
+ void * EXPENTRY icqQueryNextElement(HLIST lst, void *ptr)
+ {
+    return PWICQ->icqQueryNextElement(lst,ptr);
+ }
+
+ void * EXPENTRY icqQueryPreviousElement(HLIST lst, void *ptr)
+ {
+    return PWICQ->icqQueryPreviousElement(lst,ptr);
+ }
+
+ void * EXPENTRY icqResizeElement(HLIST lst, int sz, void *ptr)
+ {
+    return PWICQ->icqResizeElement(lst,sz,ptr);
+ }
+
+ ULONG EXPENTRY _System icqLoadValue(HICQ icq, const char *key, ULONG def)
+ {
+    return PWICQ->icqLoadValue(icq,key,def);
+ }
+
+ char * EXPENTRY icqLoadString(HICQ icq, const char *p1, const char *p2, char *p3, int p4)
+ {
+    return PWICQ->icqLoadString(icq,p1,p2,p3,p4);
+ }
+
+ ULONG EXPENTRY icqSaveValue(HICQ icq, const char *key, ULONG def)
+ {
+    return PWICQ->icqSaveValue(icq,key,def);
+ }
+
+ void EXPENTRY icqSaveString(HICQ icq, const char *key, const char *vlr)
+ {
+    PWICQ->icqSaveString(icq,key,vlr);
+ }
+
+ void EXPENTRY icqSetServiceStatus(HICQ icq,int id, BOOL status)
+ {
+    PWICQ->icqSetServiceStatus(icq,id,status);
+ }
+
+ BOOL EXPENTRY icqInsertMessage(HICQ icq, ULONG uin, USHORT type, time_t tm, ULONG flags, int sz, const char *txt)
+ {
+    return PWICQ->icqInsertMessage(icq, uin, type, tm, flags, sz, txt);
+ }
+
+ BOOL EXPENTRY icqRegisterServerProtocolManager(HICQ icq, const C2SPROTMGR *mgr)
+ {
+    return PWICQ->icqRegisterServerProtocolManager(icq, mgr);
+ }
+
+ void EXPENTRY icqRegisterUserAction(HUSER usr)
+ {
+    return PWICQ->icqRegisterUserAction(usr);
+ }
+
+ BOOL EXPENTRY icqInsertAwayMessage(HICQ icq, ULONG uin, const char *title, char *txt)
+ {
+    return PWICQ->icqInsertAwayMessage(icq, uin, title, txt);
+ }
+
+ long EXPENTRY icqQueryPeerPort(HICQ icq)
+ {
+     return PWICQ->icqQueryPeerPort(icq);
+ }
+
+ UCHAR * EXPENTRY icqConvertCodePage(HICQ icq, BOOL in, UCHAR *txt, int sz)
+ {
+    return PWICQ->icqConvertCodePage(icq, in, txt, sz);
+ }
+
+ BOOL EXPENTRY icqDeRegisterServerProtocolManager(HICQ icq, const C2SPROTMGR *mgr)
+ {
+    return PWICQ->icqDeRegisterServerProtocolManager(icq, mgr);
+ }
+
+ BOOL EXPENTRY icqIsActive(HICQ icq)
+ {
+    return PWICQ->icqIsActive(icq);
+ }
+
+ int EXPENTRY icqCreateThread(HICQ icq, void (* _System start_address)(ICQTHREAD *), unsigned int stack_size, int sz, void *arglist, const char *id)
+ {
+    return PWICQ->icqCreateThread(icq, start_address, stack_size, sz, arglist, id);
+ }
+
+ void EXPENTRY icqProcessServerConfirmation(HICQ icq, ULONG uin, ULONG id)
+ {
+    PWICQ->icqProcessServerConfirmation(icq, uin, id);
+ }
+
+ ULONG EXPENTRY icqReconnect(HICQ icq)
+ {
+    return PWICQ->icqReconnect(icq);
+ }
+
+ BOOL EXPENTRY icqSetLocalIP(HICQ icq, long ip)
+ {
+    return PWICQ->icqSetLocalIP(icq, ip);
+ }
+
+ void EXPENTRY icqQueryPassword(HICQ icq, char *buffer)
+ {
+    PWICQ->icqQueryPassword(icq, buffer);
+ }
+
+ ULONG EXPENTRY icqSetOnlineMode(HICQ icq, ULONG mode)
+ {
+    return PWICQ->icqSetOnlineMode(icq, mode);
+ }
+
+ BOOL EXPENTRY icqClearToSend(HICQ icq)
+ {
+    return PWICQ->icqClearToSend(icq);
+ }
+
+ HUSER EXPENTRY icqQueryUserHandle(HICQ icq, ULONG uin)
+ {
+    return PWICQ->icqQueryUserHandle(icq,uin);
+ }
+
+ HUSER EXPENTRY icqUpdateUserInfo(HICQ icq, ULONG uin, BOOL add, const char *nickName, const char *firstName, const char *lastName, const char *email, BOOL authorize)
+ {
+    return PWICQ->icqUpdateUserInfo(icq, uin, add, nickName, firstName, lastName, email, authorize);
+ }
+
+ ULONG EXPENTRY icqQueryOnlineMode(HICQ icq)
+ {
+    return PWICQ->icqQueryOnlineMode(icq);
+ }
+
+ int EXPENTRY icqOpenURL(HICQ icq, const char *url)
+ {
+    return PWICQ->icqOpenURL(icq,url);
+ }
+
+int EXPENTRY icqBlacklistUser(HICQ icq, ULONG uin)
+{
+   return PWICQ->icqBlacklistUser(icq,uin);
+ }
+
+ULONG EXPENTRY icqRemoveUser(HICQ icq, HUSER usr)
+{
+   return PWICQ->icqRemoveUser(icq,usr);
+}
+
+ULONG EXPENTRY icqRejectUser(HICQ icq, HUSER usr, BOOL spammer)
+{
+   return PWICQ->icqRejectUser(icq, usr, spammer);
+}
+
+int EXPENTRY icqRequestUserUpdate(HICQ icq, ULONG uin)
+{
+   return PWICQ->icqRequestUserUpdate(icq, uin);
+}
+
+const char * EXPENTRY icqQueryUserFirstName(HUSER usr)
+{
+   return PWICQ->icqQueryUserFirstName(usr);
+}
+
+const char * EXPENTRY icqQueryUserLastName(HUSER usr)
+{
+   return PWICQ->icqQueryUserLastName(usr);
+}
+
+const char * EXPENTRY icqQueryUserEmail(HUSER usr)
+{
+   return PWICQ->icqQueryUserEmail(usr);
+}
+
+void EXPENTRY icqSaveProfileString(HICQ icq, const char *aplic, const char *key, const char *string)
+{
+   PWICQ->icqSaveProfileString(icq, aplic, key, string);
+}
+
+char * EXPENTRY icqLoadProfileString(HICQ icq, const char *tag, const char *key, const char *def, char *buf, int sz)
+{
+   return PWICQ->icqLoadProfileString(icq, tag, key, def, buf, sz);
+}
+
+const MSGMGR * EXPENTRY icqQueryMessageManager(HICQ icq, USHORT type)
+{
+   return PWICQ->icqQueryMessageManager(icq,type);
+}
+
+BOOL EXPENTRY icqRemoveMessage(HICQ icq, ULONG uin, HMSG msg)
+{
+   return PWICQ->icqRemoveMessage(icq,uin,msg);
+}
+
+HMSG EXPENTRY icqQueryMessage(HICQ icq, ULONG uin)
+{
+   return PWICQ->icqQueryMessage(icq,uin);
+}
+
+const char * EXPENTRY icqQueryProgramPath(HICQ icq, const char *ext, char *buffer, int sz)
+{
+   return PWICQ->icqQueryProgramPath(icq,ext,buffer,sz);
+}
+
+const ICQMODETABLE * EXPENTRY icqQueryModeTable(HICQ icq)
+{
+   return PWICQ->icqQueryModeTable(icq);
+}
+
+BOOL EXPENTRY icqQueryLogonStatus(HICQ icq)
+{
+   return PWICQ->icqQueryLogonStatus(icq);
+}
+
+void EXPENTRY icqEvent(HICQ icq, ULONG uin, char id, USHORT event, ULONG parm)
+{
+   return PWICQ->icqEvent(icq,uin,id,event,parm);
+}
+
+ULONG EXPENTRY icqDisconnect(HICQ icq)
+{
+   return PWICQ->icqDisconnect(icq);
+}
+
+int EXPENTRY icqInitialize(HICQ icq, STATUSCALLBACK *callback )
+{
+   return PWICQ->icqInitialize(icq,callback);
+}
+
+int EXPENTRY icqSetCurrentUser(HICQ icq, ULONG uin, const char *password, BOOL save)
+{
+   return PWICQ->icqSetCurrentUser(icq, uin, password, save);
+}
+
+HUSER EXPENTRY icqAddNewUser(HICQ icq, ULONG uin, const char *nickName, const char *firstName, const char *lastName, const char *email, BOOL authorize)
+{
+   return PWICQ->icqAddNewUser(icq, uin, nickName, firstName, lastName, email, authorize);
+}
+
+void EXPENTRY icqNewUserMessage(HICQ icq, ULONG uin, USHORT type, const char *txt, const char *url)
+{
+   PWICQ->icqNewUserMessage(icq,uin,type,txt,url);
+}
+
+BOOL EXPENTRY icqOpenSystemMessage(HICQ icq)
+{
+   return PWICQ->icqOpenSystemMessage(icq);
+}
+
+void EXPENTRY icqOpenUserMessageWindow(HICQ icq, HUSER usr)
+{
+   PWICQ->icqOpenUserMessageWindow(icq,usr);
+}
+
+void EXPENTRY icqInsertSendToOptions(HICQ icq, MSGEDITWINDOW hwnd, USHORT type, BOOL out, const MSGMGR *mgr, int ( * _System insert)(HWND, USHORT, const char *, SENDTOCALLBACK *))
+{
+   PWICQ->icqInsertSendToOptions(icq, hwnd, type, out, mgr, insert);
+}
+
+void EXPENTRY icqInsertConfigPage(HICQ icq, ULONG uin, USHORT type, HWND hwnd, const DLGINSERT *insert, char *buffer)
+{
+   return PWICQ->icqInsertConfigPage(icq, uin, type, hwnd,  insert, buffer);
+}
+
+ULONG EXPENTRY icqQueryOfflineMode(HICQ icq)
+{
+    if(icq->offline)
+       return icq->offline->mode;
+    return 0xFFFFFFFF;
+}
+
+int EXPENTRY icqQueryMaxMessageLength(HICQ icq, HUSER usr)
+{
+   if(usr && usr->u.peer)
+      return usr->u.peer->maxMsgSize;
+   if(icq->c2s)
+      return icq->c2s->maxSize;
+   return 0x0100;
+}
+
+ULONG EXPENTRY icqGetCaps(HICQ icq)
+{
+   return icq->modeCaps;
+}
+
+ULONG EXPENTRY icqSetCaps(HICQ icq, ULONG caps)
+{
+   icq->modeCaps |= caps;
+   return icq->modeCaps;
+}
+
+int EXPENTRY icqSendMessage(HICQ icq, ULONG uin, USHORT type, UCHAR *txt)
+{
+   return PWICQ->icqSendMessage(icq, uin, type, txt);
+}
+
+int EXPENTRY icqSendConfirmation(HICQ icq, ULONG uin, USHORT msgType, BOOL log, char *text)
+{
+   return PWICQ->icqSendConfirmation(icq, uin, msgType, log, text);
+}
+
+int EXPENTRY icqValidateMsgEditHelper(HICQ icq, USHORT sz)
+{
+   DBGTracex(PWICQ->icqValidateMsgEditHelper);
+   return PWICQ->icqValidateMsgEditHelper(icq, sz);
+}
+
+int EXPENTRY icqRegisterDefaultMessageProcessor(HICQ icq, USHORT sz, const MSGDESCR *msgmgr)
+{
+   CHKPoint();
+   return PWICQ->icqRegisterDefaultMessageProcessor(icq, sz, msgmgr);
+}
+
+int EXPENTRY icqStartThread(HICQ icq, void (* _System start_address)(ICQTHREAD *, void *), unsigned int stack_size, int sz, const void *parm, const char *id)
+{
+   return PWICQ->icqStartThread(icq, start_address,  stack_size, sz, parm, id);
+}
+
+char * EXPENTRY icqQueryPath(HICQ icq, const char *ext, char *buffer, int size)
+{
+   return PWICQ->icqQueryPath(icq, ext, buffer, size);
+}
+
+char * EXPENTRY icqQueryMessageTitle(HICQ icq, ULONG uin, BOOL out, ICQMSG *m, char *buffer, int sz)
+{
+   return PWICQ->icqQueryMessageTitle(icq, uin, out, m, buffer, sz);
+}
+
+HUSER EXPENTRY icqInsertUser(HICQ icq, ULONG uin, const char *nickName, const char *firstName, const char *lastName, const char *email, const char *sound, ULONG flags)
+{
+   return PWICQ->icqInsertUser(icq, uin, nickName, firstName, lastName, email, sound, flags);
+}
+
+void EXPENTRY icqWriteUserLog(HICQ icq,const char *id, HUSER usr, const char *txt)
+{
+   PWICQ->icqWriteUserLog(icq,id,usr,txt);
+}
+
+ULONG EXPENTRY icqSetPeerCookie(HICQ icq, ULONG cookie)
+{
+   return PWICQ->icqSetPeerCookie(icq,cookie);
+}
+
+void * EXPENTRY icqGetPluginDataBlock(HICQ icq, HMODULE mod)
+{
+   return PWICQ->icqGetPluginDataBlock(icq,mod);
+}
+
+BOOL EXPENTRY icqInsertRTFMessage(HICQ icq, ULONG uin, USHORT type, time_t tm, ULONG flags, const char *txt)
+{
+   return PWICQ->icqInsertRTFMessage(icq, uin, type, tm, flags, txt);
+}
+
+const char * icqQueryAwayMessage(HICQ icq)
+{
+   return PWICQ->icqQueryAwayMessage(icq);
+}
+
+HUSER EXPENTRY icqAddUserInCache(HICQ icq, ULONG uin)
+{
+   return PWICQ->icqAddUserInCache(icq, uin);
+}
+
+ULONG EXPENTRY icqUpdateUserFlag(HICQ icq, HUSER usr, BOOL modo, ULONG flag)
+{
+   return PWICQ->icqUpdateUserFlag(icq, usr, modo, flag);
+}
+
+ULONG EXPENTRY icqQueryModeFlags(HICQ icq)
+{
+   return PWICQ->icqQueryModeFlags(icq);
+}
+
+int EXPENTRY icqShowPopupMenu(HICQ icq, ULONG uin, USHORT id)
+{
+   return PWICQ->icqShowPopupMenu(icq, uin, id);
+}
+
+int EXPENTRY icqExecuteCmd(HICQ icq, char *lin)
+{
+   return PWICQ->icqExecuteCmd(icq, lin);
+}
+
+int EXPENTRY icqBeginSearch(HICQ icq, ULONG uin, ULONG sequence)
+{
+   return PWICQ->icqBeginSearch(icq,uin,sequence);
+}
+
+int EXPENTRY icqEndSearch(HICQ icq, ULONG sequence)
+{
+   return PWICQ->icqEndSearch(icq,sequence);
+}
+
+BOOL EXPENTRY icqRegisterUserDBManager(HICQ icq, const USERDBMGR *mgr)
+{
+   if(mgr->sz != sizeof(USERDBMGR))
+   {
+      icqWriteSysLog(icq,PROJECT,"Invalid user database manager loaded");
+      return FALSE;
+   }
+   icq->userDB = mgr;
+   return TRUE;
+}
+
+BOOL EXPENTRY icqDeRegisterUserDBManager(HICQ icq, const USERDBMGR *mgr)
+{
+   if(mgr != icq->userDB)
+      return FALSE;
+   icq->userDB = NULL;
+   return TRUE;
+}
+
+ULONG EXPENTRY icqQuerySearchUIN(HICQ icq, ULONG sequence)
+{
+   return PWICQ->icqQuerySearchUIN(icq,sequence);
+}
+
+void EXPENTRY icqAjustUserIcon(HICQ icq, HUSER usr, BOOL event)
+{
+   PWICQ->icqAjustUserIcon(icq, usr, event);
+}
+
+#ifdef __cplusplus
+   }
+#endif	  
+
+   

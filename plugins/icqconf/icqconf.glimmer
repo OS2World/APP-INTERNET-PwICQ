@@ -1,0 +1,91 @@
+<file>
+filename=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqconf/spmcfg.c
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=4
+line=15
+directory=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqconf
+compiler=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 %3.o 2>&1
+debugger=%term% gdb %3
+execution=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 run
+</file>
+<file>
+filename=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqconf/makefile
+over_ride=0
+bracketmatch=1
+highlight=0
+use_spaces=0
+tab_stop=4
+line=3
+directory=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqconf
+compiler=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 %3.o 2>&1
+debugger=%term% gdb %3
+execution=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 run
+</file>
+<file>
+filename=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqconf/lnxconfig.c
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=4
+line=29
+directory=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqconf
+compiler=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 %3.o 2>&1
+debugger=%term% gdb %3
+execution=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 run
+</file>
+<file>
+filename=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqconf/icqconf.h
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=4
+line=25
+directory=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqconf
+compiler=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 %3.o 2>&1
+debugger=%term% gdb %3
+execution=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 run
+</file>
+<file>
+filename=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqconf/groups.c
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=4
+line=39
+directory=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqconf
+compiler=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 %3.o 2>&1
+debugger=%term% gdb %3
+execution=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 run
+</file>
+<file>
+filename=/mnt/os2data/data/ibmcpp/sources/icq2/include/icqlinux.h
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=4
+line=102
+directory=/mnt/os2data/data/ibmcpp/sources/icq2/include
+compiler=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 %3.o 2>&1
+debugger=%term% gdb %3
+execution=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 run
+</file>
+<file>
+filename=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqconf/away.c
+over_ride=0
+bracketmatch=1
+highlight=1
+use_spaces=0
+tab_stop=4
+line=107
+directory=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqconf
+compiler=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 %3.o 2>&1
+debugger=%term% gdb %3
+execution=glimmerout make -I /home/perry/include/linux LINUX=1 DEBUG=1 run
+</file>

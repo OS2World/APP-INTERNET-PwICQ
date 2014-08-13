@@ -1,0 +1,96 @@
+del \Public\pwicq2\sound-schemes
+e \Temp\lib\crc16.c
+rl
+bd
+rl
+\Public\pwicq2\sound-schemes\
+dir
+less speaker.scm
+dir /f
+bd
+db
+run
+less \data\ibmcpp\sources\icq2\include\icqos2.h
+less \data\ibmcpp\sources\icq2\include\icqlinux.h
+rl
+dir \Public\pwicq2\sound-schemes
+dir /f \Public\pwicq2\sound-schemes
+exit
+rl
+exit
+rl
+exit
+rl
+less \logs\27241234.log
+m
+run
+less go.cmd
+type \Temp\pwicq.dbg
+e go.cmd
+run
+rl
+m
+grep icqSound_Speaker *.c
+grep ICQEVENT_BEGINPLAY *.c
+rl
+exit
+m
+rl & exit
+exit
+less ..\..\include\icqdefs.h
+rl
+exit
+..\icqconf\
+dir *.c
+less icqconf.c
+run
+cl
+bd
+run
+rl
+exit
+dir
+exit
+..\icqpipe\
+dir
+less icqpipe.c
+grep EXPENTRY *.c
+grep icqpipe_* *.c
+..\icqosd\
+dir
+less icqosd.c
+less ..\..\include\icqqueue.h
+bd
+dir
+less scheme.c
+dir *.rc
+less icqsound.rc
+rl
+exit
+run
+e go.cmd
+..\..\loaders\textloader\
+dir
+rl
+cd -
+run
+del icqsound.dll
+run
+run
+rl
+exit
+cl
+exit
+rl
+exit
+less ..\..\include\icqdefs.h
+less ..\newskin\edit.c
+less ..\newskin\os2dialog.c
+rl
+exit
+less ..\newskin\os2tools.c
+run
+rl
+exit
+less icqsound.rc
+exit

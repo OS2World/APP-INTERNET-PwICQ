@@ -1,0 +1,427 @@
+Frame 1 (90 on wire, 90 captured)
+    Arrival Time: Oct 17, 2001 19:01:51.662932
+    Time delta from previous packet: 0.000000 seconds
+    Time relative to first packet: 0.000000 seconds
+    Frame Number: 1
+    Packet Length: 90 bytes
+    Capture Length: 90 bytes
+Ethernet II
+    Destination: 00:c0:49:40:9f:fe (US_40:9f:fe)
+    Source: 00:a0:c9:0a:ee:6e (Intel_0a:ee:6e)
+    Type: IP (0x0800)
+Internet Protocol, Src Addr: 172.17.31.230 (172.17.31.230), Dst Addr: 205.188.9.135 (205.188.9.135)
+    Version: 4
+    Header length: 20 bytes
+    Differentiated Services Field: 0x00 (DSCP 0x00: Default; ECN: 0x00)
+        0000 00.. = Differentiated Services Codepoint: Default (0x00)
+        .... ..0. = ECN-Capable Transport (ECT): 0
+        .... ...0 = ECN-CE: 0
+    Total Length: 76
+    Identification: 0x5701
+    Flags: 0x04
+        .1.. = Don't fragment: Set
+        ..0. = More fragments: Not set
+    Fragment offset: 0
+    Time to live: 128
+    Protocol: TCP (0x06)
+    Header checksum: 0x0070 (correct)
+    Source: 172.17.31.230 (172.17.31.230)
+    Destination: 205.188.9.135 (205.188.9.135)
+Transmission Control Protocol, Src Port: nimreg (1059), Dst Port: aol (5190), Seq: 1278034, Ack: 2626529455
+    Source port: nimreg (1059)
+    Destination port: aol (5190)
+    Sequence number: 1278034
+    Next sequence number: 1278070
+    Acknowledgement number: 2626529455
+    Header length: 20 bytes
+    Flags: 0x0018 (PSH, ACK)
+        0... .... = Congestion Window Reduced (CWR): Not set
+        .0.. .... = ECN-Echo: Not set
+        ..0. .... = Urgent: Not set
+        ...1 .... = Acknowledgment: Set
+        .... 1... = Push: Set
+        .... .0.. = Reset: Not set
+        .... ..0. = Syn: Not set
+        .... ...0 = Fin: Not set
+    Window size: 9520
+    Checksum: 0x7d41 (correct)
+AOL Instant Messenger
+    Command Start: 0x2a
+    Channel ID: 0x02
+    Sequence Number: 7932
+    Data Field Length: 30
+    FNAC
+        FNAC Family ID: 0x0015
+        FNAC Subtype ID: 0x0002
+
+0000  00 c0 49 40 9f fe 00 a0 c9 0a ee 6e 08 00 45 00   ..I@.......n..E.             
+0010  00 4c 57 01 40 00 80 06 00 70 ac 11 1f e6 cd bc   .LW.@....p......             
+0020  09 87 04 23 14 46 00 13 80 52 9c 8d a8 af 50 18   ...#.F...R....P.             
+0030  25 30 7d 41 00 00 2a 02 1e fc 00 1e 00 15 00 02   %0}A..*.........             
+0040  00 00 00 05 00 02 00 01 00 10 0e 00 88 df 53 00   ..............S.             
+0050  d0 07 0b 00 ba 04 93 b8 30 00                     ........0.                   
+
+Frame 2 (133 on wire, 133 captured)
+    Arrival Time: Oct 17, 2001 19:01:52.042051
+    Time delta from previous packet: 0.379119 seconds
+    Time relative to first packet: 0.379119 seconds
+    Frame Number: 2
+    Packet Length: 133 bytes
+    Capture Length: 133 bytes
+Ethernet II
+    Destination: 00:a0:c9:0a:ee:6e (Intel_0a:ee:6e)
+    Source: 00:c0:49:40:9f:fe (US_40:9f:fe)
+    Type: IP (0x0800)
+Internet Protocol, Src Addr: 205.188.9.135 (205.188.9.135), Dst Addr: 172.17.31.230 (172.17.31.230)
+    Version: 4
+    Header length: 20 bytes
+    Differentiated Services Field: 0x00 (DSCP 0x00: Default; ECN: 0x00)
+        0000 00.. = Differentiated Services Codepoint: Default (0x00)
+        .... ..0. = ECN-Capable Transport (ECT): 0
+        .... ...0 = ECN-CE: 0
+    Total Length: 119
+    Identification: 0xe5e4
+    Flags: 0x04
+        .1.. = Don't fragment: Set
+        ..0. = More fragments: Not set
+    Fragment offset: 0
+    Time to live: 44
+    Protocol: TCP (0x06)
+    Header checksum: 0xc561 (correct)
+    Source: 205.188.9.135 (205.188.9.135)
+    Destination: 172.17.31.230 (172.17.31.230)
+Transmission Control Protocol, Src Port: aol (5190), Dst Port: nimreg (1059), Seq: 2626529455, Ack: 1278070
+    Source port: aol (5190)
+    Destination port: nimreg (1059)
+    Sequence number: 2626529455
+    Next sequence number: 2626529534
+    Acknowledgement number: 1278070
+    Header length: 20 bytes
+    Flags: 0x0018 (PSH, ACK)
+        0... .... = Congestion Window Reduced (CWR): Not set
+        .0.. .... = ECN-Echo: Not set
+        ..0. .... = Urgent: Not set
+        ...1 .... = Acknowledgment: Set
+        .... 1... = Push: Set
+        .... .0.. = Reset: Not set
+        .... ..0. = Syn: Not set
+        .... ...0 = Fin: Not set
+    Window size: 16384
+    Checksum: 0x427d (correct)
+AOL Instant Messenger
+    Command Start: 0x2a
+    Channel ID: 0x02
+    Sequence Number: 576
+    Data Field Length: 73
+    FNAC
+        FNAC Family ID: 0x0015
+        FNAC Subtype ID: 0x0003
+
+0000  00 a0 c9 0a ee 6e 00 c0 49 40 9f fe 08 00 45 00   .....n..I@....E.             
+0010  00 77 e5 e4 40 00 2c 06 c5 61 cd bc 09 87 ac 11   .w..@.,..a......             
+0020  1f e6 14 46 04 23 9c 8d a8 af 00 13 80 76 50 18   ...F.#.......vP.             
+0030  40 00 42 7d 00 00 2a 02 02 40 00 49 00 15 00 03   @.B}..*..@.I....             
+0040  00 00 00 05 00 02 00 01 00 3b 39 00 88 df 53 00   .........;9...S.             
+0050  da 07 0b 00 04 01 0a 08 00 4d 61 79 72 69 6e 6b   .........Mayrink             
+0060  00 02 00 52 00 02 00 4d 00 17 00 72 6d 61 79 72   ...R...M...rmayr             
+0070  69 6e 6b 40 6d 61 69 6c 62 72 2e 63 6f 6d 2e 62   ink@mailbr.com.b             
+0080  72 00 00 01 00                                    r....                        
+
+Frame 51 (418 on wire, 418 captured)
+    Arrival Time: Oct 17, 2001 19:03:04.246770
+    Time delta from previous packet: 72.204719 seconds
+    Time relative to first packet: 72.583838 seconds
+    Frame Number: 51
+    Packet Length: 418 bytes
+    Capture Length: 418 bytes
+Ethernet II
+    Destination: 00:a0:c9:0a:ee:6e (Intel_0a:ee:6e)
+    Source: 00:c0:49:40:9f:fe (US_40:9f:fe)
+    Type: IP (0x0800)
+Internet Protocol, Src Addr: 205.188.9.135 (205.188.9.135), Dst Addr: 172.17.31.230 (172.17.31.230)
+    Version: 4
+    Header length: 20 bytes
+    Differentiated Services Field: 0x00 (DSCP 0x00: Default; ECN: 0x00)
+        0000 00.. = Differentiated Services Codepoint: Default (0x00)
+        .... ..0. = ECN-Capable Transport (ECT): 0
+        .... ...0 = ECN-CE: 0
+    Total Length: 404
+    Identification: 0xcbb1
+    Flags: 0x04
+        .1.. = Don't fragment: Set
+        ..0. = More fragments: Not set
+    Fragment offset: 0
+    Time to live: 44
+    Protocol: TCP (0x06)
+    Header checksum: 0xde77 (correct)
+    Source: 205.188.9.135 (205.188.9.135)
+    Destination: 172.17.31.230 (172.17.31.230)
+Transmission Control Protocol, Src Port: aol (5190), Dst Port: nimreg (1059), Seq: 2626529534, Ack: 1278070
+    Source port: aol (5190)
+    Destination port: nimreg (1059)
+    Sequence number: 2626529534
+    Next sequence number: 2626529898
+    Acknowledgement number: 1278070
+    Header length: 20 bytes
+    Flags: 0x0018 (PSH, ACK)
+        0... .... = Congestion Window Reduced (CWR): Not set
+        .0.. .... = ECN-Echo: Not set
+        ..0. .... = Urgent: Not set
+        ...1 .... = Acknowledgment: Set
+        .... 1... = Push: Set
+        .... .0.. = Reset: Not set
+        .... ..0. = Syn: Not set
+        .... ...0 = Fin: Not set
+    Window size: 16384
+    Checksum: 0xb5b9 (correct)
+AOL Instant Messenger
+    Command Start: 0x2a
+    Channel ID: 0x02
+    Sequence Number: 577
+    Data Field Length: 358
+    FNAC
+        FNAC Family ID: 0x0004
+        FNAC Subtype ID: 0x0007
+        Screen Name: 3192979
+
+0000  00 a0 c9 0a ee 6e 00 c0 49 40 9f fe 08 00 45 00   .....n..I@....E.             
+0010  01 94 cb b1 40 00 2c 06 de 77 cd bc 09 87 ac 11   ....@.,..w......             
+0020  1f e6 14 46 04 23 9c 8d a8 fe 00 13 80 76 50 18   ...F.#.......vP.             
+0030  40 00 b5 b9 00 00 2a 02 02 41 01 66 00 04 00 07   @.....*..A.f....             
+0040  00 00 8b 4a fb af 3b cd f2 40 00 07 78 0f 00 01   ...J..;..@..x...             
+0050  07 33 31 39 32 39 37 39 00 00 00 05 00 01 00 02   .3192979........             
+0060  00 50 00 06 00 04 00 13 00 13 00 0f 00 04 00 00   .P..............             
+0070  59 d0 00 02 00 04 34 10 91 c0 00 03 00 04 3b cd   Y.....4.......;.             
+0080  98 70 00 02 01 1c 05 01 00 01 01 01 01 01 13 00   .p..............             
+0090  00 00 00 4f 6c 68 61 20 61 20 66 75 6e 63 61 6f   ...Olha a funcao             
+00a0  3a 0d 0a 46 75 6e 63 74 69 6f 6e 20 53 74 72 54   :..Function StrT             
+00b0  6f 48 65 78 28 73 20 3a 20 53 74 72 69 6e 67 29   oHex(s : String)             
+00c0  20 3a 20 4c 6f 6e 67 57 6f 72 64 3b 0d 0a 76 61    : LongWord;..va             
+00d0  72 20 62 20 3a 20 42 79 74 65 3b 20 63 20 3a 20   r b : Byte; c :              
+00e0  43 68 61 72 3b 0d 0a 62 65 67 69 6e 0d 0a 20 20   Char;..begin..               
+00f0  52 65 73 75 6c 74 20 3a 3d 20 30 3b 0d 0a 20 20   Result := 0;..               
+0100  66 6f 72 20 62 3a 3d 31 20 74 6f 20 4c 65 6e 67   for b:=1 to Leng             
+0110  74 68 28 73 29 20 64 6f 20 62 65 67 69 6e 0d 0a   th(s) do begin..             
+0120  20 20 20 20 63 3a 3d 73 5b 62 5d 3b 0d 0a 20 20       c:=s[b];..               
+0130  20 20 77 72 69 74 65 6c 6e 28 63 29 3b 0d 0a 20     writeln(c);..              
+0140  20 20 20 52 65 73 75 6c 74 20 3a 3d 20 28 52 65      Result := (Re             
+0150  73 75 6c 74 20 2a 20 32 35 36 29 20 2b 20 28 6f   sult * 256) + (o             
+0160  72 64 28 63 29 29 3b 0d 0a 20 20 20 20 77 72 69   rd(c));..    wri             
+0170  74 65 28 27 4f 52 44 3a 20 27 29 3b 0d 0a 20 20   te('ORD: ');..               
+0180  20 20 77 72 69 74 65 6c 6e 28 52 65 73 75 6c 74     writeln(Result             
+0190  29 3b 0d 0a 20 20 65 6e 64 3b 0d 0a 65 6e 64 3b   );..  end;..end;             
+01a0  0d 0a                                             ..                           
+
+Frame 62 (191 on wire, 191 captured)
+    Arrival Time: Oct 17, 2001 19:03:10.356263
+    Time delta from previous packet: 6.109493 seconds
+    Time relative to first packet: 78.693331 seconds
+    Frame Number: 62
+    Packet Length: 191 bytes
+    Capture Length: 191 bytes
+Ethernet II
+    Destination: 00:c0:49:40:9f:fe (US_40:9f:fe)
+    Source: 00:a0:c9:0a:ee:6e (Intel_0a:ee:6e)
+    Type: IP (0x0800)
+Internet Protocol, Src Addr: 172.17.31.230 (172.17.31.230), Dst Addr: 205.188.9.135 (205.188.9.135)
+    Version: 4
+    Header length: 20 bytes
+    Differentiated Services Field: 0x00 (DSCP 0x00: Default; ECN: 0x00)
+        0000 00.. = Differentiated Services Codepoint: Default (0x00)
+        .... ..0. = ECN-Capable Transport (ECT): 0
+        .... ...0 = ECN-CE: 0
+    Total Length: 177
+    Identification: 0x7801
+    Flags: 0x04
+        .1.. = Don't fragment: Set
+        ..0. = More fragments: Not set
+    Fragment offset: 0
+    Time to live: 128
+    Protocol: TCP (0x06)
+    Header checksum: 0xdf0a (correct)
+    Source: 172.17.31.230 (172.17.31.230)
+    Destination: 205.188.9.135 (205.188.9.135)
+Transmission Control Protocol, Src Port: nimreg (1059), Dst Port: aol (5190), Seq: 1278070, Ack: 2626529898
+    Source port: nimreg (1059)
+    Destination port: aol (5190)
+    Sequence number: 1278070
+    Next sequence number: 1278207
+    Acknowledgement number: 2626529898
+    Header length: 20 bytes
+    Flags: 0x0018 (PSH, ACK)
+        0... .... = Congestion Window Reduced (CWR): Not set
+        .0.. .... = ECN-Echo: Not set
+        ..0. .... = Urgent: Not set
+        ...1 .... = Acknowledgment: Set
+        .... 1... = Push: Set
+        .... .0.. = Reset: Not set
+        .... ..0. = Syn: Not set
+        .... ...0 = Fin: Not set
+    Window size: 9077
+    Checksum: 0x831c (correct)
+AOL Instant Messenger
+    Command Start: 0x2a
+    Channel ID: 0x02
+    Sequence Number: 7933
+    Data Field Length: 131
+    FNAC
+        FNAC Family ID: 0x0004
+        FNAC Subtype ID: 0x0006
+        Screen Name: 3192979
+
+0000  00 c0 49 40 9f fe 00 a0 c9 0a ee 6e 08 00 45 00   ..I@.......n..E.             
+0010  00 b1 78 01 40 00 80 06 df 0a ac 11 1f e6 cd bc   ..x.@...........             
+0020  09 87 04 23 14 46 00 13 80 76 9c 8d aa 6a 50 18   ...#.F...v...jP.             
+0030  23 75 83 1c 00 00 2a 02 1e fd 00 83 00 04 00 06   #u....*.........             
+0040  00 00 00 01 00 06 73 78 16 00 00 58 00 00 00 01   ......sx...X....             
+0050  07 33 31 39 32 39 37 39 00 02 00 5f 05 01 00 01   .3192979..._....             
+0060  01 01 01 00 56 00 00 00 00 73 65 20 65 73 74 6f   ....V....se esto             
+0070  75 72 61 20 76 6f 63 65 20 70 72 65 63 69 73 61   ura voce precisa             
+0080  20 75 73 61 72 20 75 6d 20 74 69 70 6f 20 6d 61    usar um tipo ma             
+0090  69 6f 72 2c 20 6e 61 6f 20 74 65 6d 20 6e 61 64   ior, nao tem nad             
+00a0  61 20 64 6f 20 74 69 70 6f 20 6e 75 6d 65 72 69   a do tipo numeri             
+00b0  63 20 64 69 67 69 74 73 2e 2e 2e 00 06 00 00      c digits.......              
+
+Frame 86 (176 on wire, 176 captured)
+    Arrival Time: Oct 17, 2001 19:03:32.849849
+    Time delta from previous packet: 22.493586 seconds
+    Time relative to first packet: 101.186917 seconds
+    Frame Number: 86
+    Packet Length: 176 bytes
+    Capture Length: 176 bytes
+Ethernet II
+    Destination: 00:a0:c9:0a:ee:6e (Intel_0a:ee:6e)
+    Source: 00:c0:49:40:9f:fe (US_40:9f:fe)
+    Type: IP (0x0800)
+Internet Protocol, Src Addr: 205.188.9.135 (205.188.9.135), Dst Addr: 172.17.31.230 (172.17.31.230)
+    Version: 4
+    Header length: 20 bytes
+    Differentiated Services Field: 0x00 (DSCP 0x00: Default; ECN: 0x00)
+        0000 00.. = Differentiated Services Codepoint: Default (0x00)
+        .... ..0. = ECN-Capable Transport (ECT): 0
+        .... ...0 = ECN-CE: 0
+    Total Length: 162
+    Identification: 0x250d
+    Flags: 0x04
+        .1.. = Don't fragment: Set
+        ..0. = More fragments: Not set
+    Fragment offset: 0
+    Time to live: 44
+    Protocol: TCP (0x06)
+    Header checksum: 0x860e (correct)
+    Source: 205.188.9.135 (205.188.9.135)
+    Destination: 172.17.31.230 (172.17.31.230)
+Transmission Control Protocol, Src Port: aol (5190), Dst Port: nimreg (1059), Seq: 2626529898, Ack: 1278207
+    Source port: aol (5190)
+    Destination port: nimreg (1059)
+    Sequence number: 2626529898
+    Next sequence number: 2626530020
+    Acknowledgement number: 1278207
+    Header length: 20 bytes
+    Flags: 0x0018 (PSH, ACK)
+        0... .... = Congestion Window Reduced (CWR): Not set
+        .0.. .... = ECN-Echo: Not set
+        ..0. .... = Urgent: Not set
+        ...1 .... = Acknowledgment: Set
+        .... 1... = Push: Set
+        .... .0.. = Reset: Not set
+        .... ..0. = Syn: Not set
+        .... ...0 = Fin: Not set
+    Window size: 16384
+    Checksum: 0x393c (correct)
+AOL Instant Messenger
+    Command Start: 0x2a
+    Channel ID: 0x02
+    Sequence Number: 578
+    Data Field Length: 116
+    FNAC
+        FNAC Family ID: 0x0004
+        FNAC Subtype ID: 0x0007
+        Screen Name: 3192979
+
+0000  00 a0 c9 0a ee 6e 00 c0 49 40 9f fe 08 00 45 00   .....n..I@....E.             
+0010  00 a2 25 0d 40 00 2c 06 86 0e cd bc 09 87 ac 11   ..%.@.,.........             
+0020  1f e6 14 46 04 23 9c 8d aa 6a 00 13 80 ff 50 18   ...F.#...j....P.             
+0030  40 00 39 3c 00 00 2a 02 02 42 00 74 00 04 00 07   @.9<..*..B.t....             
+0040  00 00 8b 4b 26 54 3b cd f2 5d 00 01 2d 0b 00 01   ...K&T;..]..-...             
+0050  07 33 31 39 32 39 37 39 00 00 00 05 00 01 00 02   .3192979........             
+0060  00 50 00 06 00 04 00 13 00 13 00 0f 00 04 00 00   .P..............             
+0070  59 ed 00 02 00 04 34 10 91 c0 00 03 00 04 3b cd   Y.....4.......;.             
+0080  98 70 00 02 00 2a 05 01 00 01 01 01 01 00 21 00   .p...*........!.             
+0090  00 00 00 54 65 6d 20 61 6c 67 75 6d 20 6d 61 69   ...Tem algum mai             
+00a0  6f 72 20 71 75 65 20 6c 6f 6e 67 77 6f 72 64 3f   or que longword?             
+
+Frame 130 (267 on wire, 267 captured)
+    Arrival Time: Oct 17, 2001 19:05:03.355543
+    Time delta from previous packet: 90.505694 seconds
+    Time relative to first packet: 191.692611 seconds
+    Frame Number: 130
+    Packet Length: 267 bytes
+    Capture Length: 267 bytes
+Ethernet II
+    Destination: 00:c0:49:40:9f:fe (US_40:9f:fe)
+    Source: 00:a0:c9:0a:ee:6e (Intel_0a:ee:6e)
+    Type: IP (0x0800)
+Internet Protocol, Src Addr: 172.17.31.230 (172.17.31.230), Dst Addr: 205.188.9.135 (205.188.9.135)
+    Version: 4
+    Header length: 20 bytes
+    Differentiated Services Field: 0x00 (DSCP 0x00: Default; ECN: 0x00)
+        0000 00.. = Differentiated Services Codepoint: Default (0x00)
+        .... ..0. = ECN-Capable Transport (ECT): 0
+        .... ...0 = ECN-CE: 0
+    Total Length: 253
+    Identification: 0x9901
+    Flags: 0x04
+        .1.. = Don't fragment: Set
+        ..0. = More fragments: Not set
+    Fragment offset: 0
+    Time to live: 128
+    Protocol: TCP (0x06)
+    Header checksum: 0xbdbe (correct)
+    Source: 172.17.31.230 (172.17.31.230)
+    Destination: 205.188.9.135 (205.188.9.135)
+Transmission Control Protocol, Src Port: nimreg (1059), Dst Port: aol (5190), Seq: 1278207, Ack: 2626530020
+    Source port: nimreg (1059)
+    Destination port: aol (5190)
+    Sequence number: 1278207
+    Next sequence number: 1278420
+    Acknowledgement number: 2626530020
+    Header length: 20 bytes
+    Flags: 0x0018 (PSH, ACK)
+        0... .... = Congestion Window Reduced (CWR): Not set
+        .0.. .... = ECN-Echo: Not set
+        ..0. .... = Urgent: Not set
+        ...1 .... = Acknowledgment: Set
+        .... 1... = Push: Set
+        .... .0.. = Reset: Not set
+        .... ..0. = Syn: Not set
+        .... ...0 = Fin: Not set
+    Window size: 8955
+    Checksum: 0x3226 (correct)
+AOL Instant Messenger
+    Command Start: 0x2a
+    Channel ID: 0x02
+    Sequence Number: 7934
+    Data Field Length: 207
+    FNAC
+        FNAC Family ID: 0x0004
+        FNAC Subtype ID: 0x0006
+        Screen Name: 3192979
+
+0000  00 c0 49 40 9f fe 00 a0 c9 0a ee 6e 08 00 45 00   ..I@.......n..E.             
+0010  00 fd 99 01 40 00 80 06 bd be ac 11 1f e6 cd bc   ....@...........             
+0020  09 87 04 23 14 46 00 13 80 ff 9c 8d aa e4 50 18   ...#.F........P.             
+0030  22 fb 32 26 00 00 2a 02 1e fe 00 cf 00 04 00 06   ".2&..*.........             
+0040  00 00 00 02 00 06 d6 31 18 00 22 2d 00 00 00 01   .......1.."-....             
+0050  07 33 31 39 32 39 37 39 00 02 00 ab 05 01 00 01   .3192979........             
+0060  01 01 01 00 a2 00 00 00 00 6e 6f 20 63 61 73 6f   .........no caso             
+0070  20 64 6f 20 73 79 62 69 6c 20 6e 61 6f 20 73 65    do sybil nao se             
+0080  69 2c 20 6d 61 73 20 6e 6f 20 76 69 72 74 75 61   i, mas no virtua             
+0090  6c 20 70 61 73 63 61 6c 20 73 65 20 65 75 20 64   l pascal se eu d             
+00a0  65 72 20 22 75 73 65 73 20 55 73 65 33 32 22 20   er "uses Use32"              
+00b0  74 6f 64 61 73 20 61 75 74 6f 6d 61 74 69 63 61   todas automatica             
+00c0  6d 65 6e 74 65 20 66 69 63 61 6d 20 63 6f 6d 20   mente ficam com              
+00d0  6f 20 64 6f 62 72 6f 20 64 6f 20 74 61 6d 61 6e   o dobro do taman             
+00e0  68 6f 20 3a 29 0d 0a 0d 0a 61 63 68 6f 20 71 75   ho :)....acho qu             
+00f0  65 20 6c 6f 6e 67 77 6f 72 64 20 65 27 20 61 20   e longword e' a              
+0100  6d 61 69 6f 72 2e 20 00 06 00 00                  maior. ....                  

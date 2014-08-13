@@ -1,0 +1,178 @@
+#ifdef __IBMC__
+ #pragma strings(readonly)
+#endif
+
+ #include <icqkernel.h>
+ #include <stdio.h>
+ #include <string.h>
+ #include <malloc.h>
+ #include <time.h>
+ #include <ctype.h>
+
+ #include "icqcore.h"
+
+/*---[ Definicoes ]------------------------------------------------------------------------------------------*/
+
+ #pragma pack(1)
+
+ struct rtfBlock
+ {
+    HICQ       icq;
+    const char *src;
+    char       *dst;
+ };
+
+/*---[ Prototipos ]------------------------------------------------------------------------------------------*/
+
+ static void   analiseRTF(struct rtfBlock *);
+ static char * copyString(struct rtfBlock *,char *, const char *);
+
+/*---[ Constantes ]------------------------------------------------------------------------------------------*/
+
+
+/*---[ Implementacao ]---------------------------------------------------------------------------------------*/
+
+ BOOL EXPENTRY icqInsertRTFMessage(HICQ icq, ULONG uin, USHORT type, time_t tm, ULONG flags, const char *txt)
+ {
+    struct rtfBlock     rtf;
+    char                *buffer;
+    int                 sz;
+
+    if(txt)
+       sz = strlen(txt);
+    else
+       sz = 0;
+
+    if(!sz || (icq->modeCaps & ICQMF_RTF))
+       return icqInsertMessage(icq, uin, type, tm, flags, sz, txt);
+
+    /* Retirar a formatacao RTF da mensagem */
+
+#ifdef EXTENDED_LOG
+    icqWriteSysLog(icq,PROJECT,txt);
+#endif
+
+    buffer = malloc(sz+5);
+
+    if(!buffer)
+    {
+       icqWriteSysLog(icq,PROJECT,"Memory allocation error when converting RTF message");
+       icqAbend(icq,0);
+       return -1;
+    }
+
+    CHKPoint();
+    while(*txt && *txt != '{')
+       txt++;
+
+    rtf.icq = icq;
+    rtf.src = txt;
+    rtf.dst = buffer;
+
+    analiseRTF(&rtf);
+
+    *rtf.dst = 0;
+
+    DBGMessage(buffer);
+
+    icqInsertMessage(icq, uin, type, tm, flags, strlen(buffer), buffer);
+
+    free(buffer);
+
+    return -1;
+
+ }
+
+ static void analiseRTF(struct rtfBlock *rtf)
+ {
+    char *buffer = malloc(strlen(rtf->src)+5);
+    char *ptr;
+
+    if(!buffer)
+    {
+       icqWriteSysLog(rtf->icq,PROJECT,"Memory allocation error when processing RTF message");
+       icqAbend(rtf->icq,0);
+       return;
+    }
+
+    DBGMessage(rtf->src);
+
+    if(*rtf->src == '{')
+       rtf->src++;
+
+    ptr = buffer;
+
+    while(*rtf->src && *rtf->src != '}')
+    {
+       if(*rtf->src == '{')
+          analiseRTF(rtf);
+       else
+          *(ptr++) = *(rtf->src++);
+    }
+
+    CHKPoint();
+
+    if(*rtf->src == '}')
+       rtf->src++;
+
+    *ptr = 0;
+
+    ptr = buffer;
+
+    DBGMessage(ptr);
+    while(*ptr)
+    {
+       if(*ptr == '\\')
+       {
+          if(!strncmp(ptr,"\\pard",5))
+          {
+             CHKPoint();
+             while(!isspace(*ptr) && *ptr)
+                ptr++;
+             ptr = copyString(rtf,ptr,"\\par");
+             DBGMessage(ptr);
+          }
+
+       }
+       if(*ptr)
+          ptr++;
+    }
+    CHKPoint();
+    free(buffer);
+ }
+
+ static char * copyString(struct rtfBlock *rtf,char *src, const char *delimiter)
+ {
+    int sz = strlen(delimiter);
+
+    while(*src)
+    {
+       if(*src == '\\')
+       {
+          if(!strncmp(src,"\\\\",2))
+          {
+             *(rtf->dst++) = '\\';
+             src += 2;
+          }
+          else if(!strncmp(src,delimiter,sz))
+          {
+             return src+sz;
+          }
+          else
+          {
+             while(*src && *src != '\\' && !isspace(*src))
+                src++;
+          }
+
+       }
+       else
+       {
+          *(rtf->dst++) = *(src++);
+       }
+    }
+
+    return src;
+ }
+
+
+

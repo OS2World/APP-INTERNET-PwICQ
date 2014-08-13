@@ -1,0 +1,237 @@
+/*
+ * MSGDLG.C - Message dialog editor
+ */
+
+ #define INCL_WIN
+ #include <os2.h>
+
+ #include <string.h>
+ #include <time.h>
+ #include <malloc.h>
+
+ #include "icqskmgr.h"
+ #include "msgdlg.h"
+
+
+ /*---[ Types/Structs/Defines ]----------------------------------------------------------------------*/
+
+ #pragma pack(1)
+ struct parm
+ {
+    USHORT      cb;
+    HICQ        icq;
+    ULONG       uin;
+    USHORT      type;
+    HMSG        msg;
+ };
+
+ typedef struct msgwindow
+ {
+    HICQ        icq;
+    BOOL        out;
+    ULONG       uin;
+    USHORT      type;
+    void        ( * _System format)(HICQ, ULONG, BOOL, ICQMSG *, HWND, USHORT, USHORT);
+    char        buffer[0x0100];
+ } MSGWINDOW;
+
+ /*---[ Prototipes ]---------------------------------------------------------------------------------*/
+
+ static void createMsgWin(HWND,struct parm *);
+ static void destroyMsgWin(HWND);
+ static void ajustMsgType(HWND, MSGWINDOW *, HMSG);
+ static void ajustMsgSize(HWND, MSGWINDOW *, HMSG, USHORT, USHORT);
+ static void resize(HWND,PSWP);
+
+ MRESULT EXPENTRY procMsgWindow(HWND, ULONG, MPARAM, MPARAM);
+
+/*---[ Implementation ]-----------------------------------------------------------------------------*/
+
+ void openMessageWindow(HWND hwnd, HICQ icq, ULONG uin, USHORT type, HMSG msg)
+ {
+    struct parm p;
+
+    p.cb   = sizeof(struct parm);
+    p.icq  = icq;
+    p.uin  = uin;
+    p.type = type;
+    p.msg  = msg;
+
+    WinLoadDlg( HWND_DESKTOP,           /* parent is desk top */
+                hwnd,                   /* owner is main frame */
+                procMsgWindow,          /* dialog procedure */
+                module,                 /* load from resource file */
+                1,                      /* dialog resource id */
+                &p);                    /* no dialog parameters */
+ }
+
+ MRESULT EXPENTRY procMsgWindow(HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2)
+ {
+    switch(msg)
+    {
+    case WM_INITDLG:
+       createMsgWin(hwnd,PVOIDFROMMP(mp2));
+       return WinDefDlgProc(hwnd,msg,mp1,mp2);
+
+    case WM_DESTROY:
+       destroyMsgWin(hwnd);
+       return WinDefDlgProc(hwnd,msg,mp1,mp2);
+
+    case WM_ADJUSTWINDOWPOS:
+       resize(hwnd,PVOIDFROMMP(mp1));
+       break;
+
+    default:
+       return WinDefDlgProc(hwnd,msg,mp1,mp2);
+    }
+
+    return 0;
+
+ }
+
+ static void resize(HWND hwnd, PSWP swp)
+ {
+    MSGWINDOW   *ctl = WinQueryWindowPtr(hwnd,QWL_USER);
+    SWP		s;
+
+    DBGTracex(ctl);
+
+    if(ctl)
+    {
+       DBGTrace(swp->cx);
+       DBGTrace(swp->cy);
+       WinQueryWindowPos(WinWindowFromID(hwnd,FID_TITLEBAR),&s);
+       ajustMsgSize(hwnd, ctl, NULL, swp->cx, s.cy-2);
+    }
+ }
+
+ static void createMsgWin(HWND hwnd, struct parm *p)
+ {
+    MSGWINDOW           *ctl    = malloc(sizeof(MSGWINDOW));
+    const MSGMGR        *mgr    = NULL;
+    HMSG                msg     = p->msg;
+    SWP                 swp;
+    HWND                h;
+
+    DBGTracex(ctl);
+    DBGTracex(hwnd);
+
+    if(!ctl)
+    {
+       WinPostMsg(hwnd,WM_CLOSE,0,0);
+       return;
+    }
+
+    memset(ctl,0,sizeof(MSGWINDOW));
+
+    ctl->out   = (msg == NULL);
+    ctl->icq   = p->icq;
+    ctl->uin   = p->uin;
+    ctl->type  = p->type;
+
+/*
+    WinQueryWindowPos(h,&swp);
+    ctl->cx   = swp.cx;
+    ctl->cy   = swp.cy;
+*/
+
+    DBGTracex(ctl->type);
+
+    WinSetWindowPtr(hwnd,QWL_USER,ctl);
+
+    if(p->msg && p->msg->mgr)
+    {
+       ctl->format = p->msg->mgr->formatWindow;
+    }
+    else if( (mgr = icqQueryMessageManager(ctl->icq, ctl->type)) != NULL )
+    {
+       ctl->format = mgr->formatWindow;
+    }
+
+    if(!msg)
+    {
+       /* Create a clean messsage identifier to force the formatter fill the window controls */
+       memset(ctl->buffer,0,0xFF);
+       msg          = (HMSG) ctl->buffer;
+       msg->mgr     = mgr;
+    }
+
+    DBGTracex(mgr);
+    DBGTracex(ctl->format);
+
+    ajustMsgType(hwnd, ctl,msg);
+
+    h = WinWindowFromID(hwnd,IDC_URGENT);
+    WinEnableWindow(h,FALSE);
+
+    h = WinWindowFromID(hwnd,IDC_AUTOOPEN);
+    WinEnableWindow(h,FALSE);
+
+ }
+
+ static void ajustMsgSize(HWND hwnd, MSGWINDOW *ctl, HMSG msg, USHORT cx, USHORT cy)
+ {
+    if(ctl->format)
+       ctl->format(ctl->icq, ctl->uin, ctl->out, msg, hwnd, cx, cy);
+
+    WinSetWindowPos(    WinWindowFromID(hwnd, ctl->out ? IDC_URGENT : IDC_AUTOOPEN),
+                        0,
+                        4,4,
+                        0,0,
+                        SWP_MOVE);
+
+
+ }
+
+ static void ajustMsgType(HWND hwnd, MSGWINDOW *ctl, HMSG msg)
+ {
+    char                buffer[0x0100];
+    SWP                 swp;
+
+    if(ctl->out)
+    {
+       SHOW(IDC_URGENT);
+       HIDE(IDC_AUTOOPEN);
+    }
+    else
+    {
+       HIDE(IDC_URGENT);
+       SHOW(IDC_AUTOOPEN);
+    }
+
+    WinQueryWindowPos(hwnd,&swp);
+    ajustMsgSize(hwnd,ctl,msg,swp.cx,swp.cy);
+
+    icqQueryMessageTitle(ctl->icq, ctl->uin, ctl->out, msg, buffer, 0xFF);
+    WinSetWindowText(hwnd,buffer);
+
+ }
+
+ static void destroyMsgWin(HWND hwnd)
+ {
+    MSGWINDOW *ctl = WinQueryWindowPtr(hwnd,QWL_USER);
+
+    DBGTracex(ctl);
+
+    if(ctl)
+       free(ctl);
+
+
+ }
+
+/*
+ static void resize(HWND hwnd, USHORT cx, USHORT cy)
+ {
+    MSGWINDOW *ctl = WinQueryWindowPtr(hwnd,QWL_USER);
+
+    if(!ctl)
+       return;
+
+    ajustMsgSize(hwnd, ctl, NULL, cx, cy);
+
+ }
+
+
+*/
+
+

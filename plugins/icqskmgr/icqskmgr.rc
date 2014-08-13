@@ -1,0 +1,143 @@
+#define INCL_WIN
+#define INCL_NLS
+
+#define __OS2__
+#include "os2.h"
+#include "msgdlg.h"
+
+ icon 1         pwicq.ico
+
+ icon 105       online.ico
+ icon 106       away.ico
+ icon 140       na.ico
+ icon 112       busy.ico
+ icon 142       dnd.ico
+ icon 113       fchat.ico
+ icon 114       invisible.ico
+ icon 107       offline.ico
+
+ bitmap 1000    skinPreview.bmp
+ bitmap 1001    aboutSkin.bmp
+
+#ifdef PROJECT
+
+ACCELTABLE 1
+BEGIN
+    VK_F4,      ICQMSGC_CLOSE,      AF_VIRTUALKEY|AF_ALT
+    VK_NEWLINE, ICQMSGC_SEND,       AF_VIRTUALKEY
+    VK_F12,     2000,               AF_VIRTUALKEY|AF_ALT
+    VK_F11,     2001,               AF_VIRTUALKEY|AF_ALT
+    VK_F10,     2002,               AF_VIRTUALKEY|AF_ALT
+END
+
+#endif
+
+STRINGTABLE
+BEGIN
+        1100,                   "Send Message"
+        1102,                   "Send URL"
+        1147,                   "Send File"
+        1116,                   "Update basic info"
+        1117,                   "Remove from list"
+        1131,                   "User information"
+        1150,		          	"About user"
+        1108,                   "Ask for authorization"
+        1129,                   "Send authorization"
+END
+
+STRINGTABLE
+BEGIN
+        1017,                   "Shutdown"
+        1016,                   "Update all users"
+        1038,                   "Disconnect"
+  	    1011,			        "Search/Add"
+  	    1027,                   "Configure"
+        1026,                   "About pwICQ"
+        1050,			        "About Me"
+END
+
+
+STRINGTABLE
+BEGIN
+        1201,                   "pwICQ"
+        1202,                   "System"
+        1203,                   "Deleting ICQ#%d"
+        1204,                   "Remove %s (ICQ#%d) from contact-list?"
+END
+
+
+STRINGTABLE
+BEGIN
+        22,   "Window\nWindow Options"
+        23,   "Skin\nSkin Options"
+END
+
+DLGTEMPLATE 21
+BEGIN
+        DIALOG "User is not available", 100, 20, 77, 242, 100, FS_DLGBORDER | FS_MOUSEALIGN | WS_VISIBLE | WS_CLIPSIBLINGS | WS_SAVEBITS, FCF_TITLEBAR | FCF_SYSMENU
+        PRESPARAMS PP_FONTNAMESIZE "8.Helv"
+        BEGIN
+                CONTROL "", 106, 27, 84, 85, 8, WC_ENTRYFIELD, ES_LEFT | ES_AUTOSCROLL | ES_MARGIN | ES_READONLY | ES_ANY | WS_VISIBLE | WS_GROUP
+                CONTROL "", 108, 27, 71, 85, 8, WC_ENTRYFIELD, ES_LEFT | ES_AUTOSCROLL | ES_MARGIN | ES_READONLY | ES_ANY | WS_VISIBLE | WS_GROUP
+                CONTROL "", 107, 148, 84, 85, 8, WC_ENTRYFIELD, ES_LEFT | ES_AUTOSCROLL | ES_MARGIN | ES_READONLY | ES_ANY | WS_VISIBLE | WS_GROUP
+                CONTROL "", 109, 148, 71, 85, 8, WC_ENTRYFIELD, ES_LEFT | ES_AUTOSCROLL | ES_MARGIN | ES_READONLY | ES_ANY | WS_VISIBLE | WS_GROUP
+                CONTROL "", 113, 3, 15, 235, 46, WC_MLE, MLS_BORDER | MLS_WORDWRAP | MLS_VSCROLL | WS_VISIBLE | WS_GROUP
+                CONTROL "Don't show for this user", 112, 1, 2, 88, 8, WC_BUTTON, BS_AUTOCHECKBOX | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+                CONTROL "Close", 111, 200, 1, 40, 11, WC_BUTTON, BS_PUSHBUTTON | BS_DEFAULT | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+                CONTROL "E-Mail:", 101, 120, 84, 23, 8, WC_STATIC, SS_TEXT | DT_LEFT | DT_VCENTER | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+                CONTROL "Name:", 102, 120, 71, 25, 8, WC_STATIC, SS_TEXT | DT_LEFT | DT_VCENTER | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+                CONTROL "Nick:", 103, 5, 84, 19, 8, WC_STATIC, SS_TEXT | DT_LEFT | DT_VCENTER | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+                CONTROL "ICQ#", 104, 5, 71, 17, 8, WC_STATIC, SS_TEXT | DT_LEFT | DT_VCENTER | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+                CONTROL "User", 105, 1, 66, 239, 34, WC_STATIC, SS_GROUPBOX | DT_LEFT | DT_TOP | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+                CONTROL "", 110, 1, 13, 239, 53, WC_STATIC, SS_GROUPBOX | DT_LEFT | DT_TOP | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+        END
+
+END
+
+DLGTEMPLATE 22
+BEGIN
+	DIALOG "", 100, 53, 66, 295, 171, NOT FS_DLGBORDER | NOT WS_SAVEBITS | WS_VISIBLE | WS_CLIPSIBLINGS, FCF_NOBYTEALIGN
+	BEGIN
+		CONTROL "Never", 101, 15, 145, 86, 10, WC_BUTTON, BS_AUTORADIOBUTTON | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+		CONTROL "Only on mode change", 102, 15, 134, 110, 10, WC_BUTTON, BS_AUTORADIOBUTTON | WS_VISIBLE | WS_TABSTOP
+		CONTROL "Always", 103, 15, 123, 100, 10, WC_BUTTON, BS_AUTORADIOBUTTON | WS_VISIBLE | WS_TABSTOP
+		CONTROL "Never", 105, 157, 145, 86, 10, WC_BUTTON, BS_AUTORADIOBUTTON | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+		CONTROL "Only on mode change", 106, 157, 134, 105, 10, WC_BUTTON, BS_AUTORADIOBUTTON | WS_VISIBLE | WS_TABSTOP
+		CONTROL "Always", 107, 157, 123, 101, 10, WC_BUTTON, BS_AUTORADIOBUTTON | WS_VISIBLE | WS_TABSTOP
+		CONTROL "Detect URL from clipboard", 124, 9, 93, 129, 10, WC_BUTTON, BS_AUTOCHECKBOX | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+		CONTROL "Close on ESC Key", 125, 9, 82, 99, 10, WC_BUTTON, BS_AUTOCHECKBOX | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+		CONTROL "Open next after send", 109, 9, 71, 130, 10, WC_BUTTON, BS_AUTOCHECKBOX | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+		CONTROL "Only when requested (F4)", 121, 157, 90, 127, 10, WC_BUTTON, BS_AUTORADIOBUTTON | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+		CONTROL "Marked text", 122, 157, 79, 105, 10, WC_BUTTON, BS_AUTORADIOBUTTON | WS_VISIBLE | WS_TABSTOP
+		CONTROL "All", 123, 157, 68, 101, 10, WC_BUTTON, BS_AUTORADIOBUTTON | WS_VISIBLE | WS_TABSTOP
+		CONTROL "Change tasklist icon", 900, 9, 120, 135, 43, WC_STATIC, SS_GROUPBOX | DT_LEFT | DT_TOP | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+		CONTROL "Change Title", 103, 151, 120, 135, 43, WC_STATIC, SS_GROUPBOX | DT_LEFT | DT_TOP | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+		CONTROL "Quote", 900, 151, 65, 135, 43, WC_STATIC, SS_GROUPBOX | DT_LEFT | DT_TOP | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+		CONTROL "Main window", 104, 3, 115, 289, 56, WC_STATIC, SS_GROUPBOX | DT_LEFT | DT_TOP | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+		CONTROL "Message window", 108, 3, 59, 289, 56, WC_STATIC, SS_GROUPBOX | DT_LEFT | DT_TOP | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+		CONTROL "URL Management", 110, 3, 4, 289, 55, WC_STATIC, SS_GROUPBOX | DT_LEFT | DT_TOP | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+		CONTROL "Browser:", 111, 8, 39, 39, 8, WC_STATIC, SS_TEXT | DT_LEFT | DT_VCENTER | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+		CONTROL "", 112, 50, 39, 195, 8, WC_ENTRYFIELD, ES_LEFT | ES_AUTOSCROLL | ES_MARGIN | ES_ANY | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+		CONTROL "Browse", 113, 250, 36, 40, 14, WC_BUTTON, BS_PUSHBUTTON | BS_NOPOINTERFOCUS | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+		CONTROL "Enable Open button in URL messages", 114, 48, 26, 239, 10, WC_BUTTON, BS_AUTOCHECKBOX | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+		CONTROL "Enable \"Send to Browser\" button in URL messages", 115, 48, 17, 240, 9, WC_BUTTON, BS_AUTOCHECKBOX | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+		CONTROL "Enable \"About User\" menu (Need restart)", 116, 48, 8, 235, 9, WC_BUTTON, BS_AUTOCHECKBOX | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+	END
+
+END
+
+DLGTEMPLATE 23
+BEGIN
+	DIALOG "", 100, 53, 66, 295, 171, NOT FS_DLGBORDER | NOT WS_SAVEBITS | WS_VISIBLE | WS_CLIPSIBLINGS, FCF_NOBYTEALIGN
+	BEGIN
+		CONTROL "", 102, 8, 82, 171, 81, WC_LISTBOX, LS_NOADJUSTPOS | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+		CONTROL "Preview", 105, 8, 18, 174, 8, WC_BUTTON, BS_AUTOCHECKBOX | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+		CONTROL "Load skin when selected", 101, 8, 8, 170, 8, WC_BUTTON, BS_AUTOCHECKBOX | WS_VISIBLE | WS_GROUP | WS_TABSTOP
+		CONTROL "Available skins", 104, 3, 35, 182, 136, WC_STATIC, SS_GROUPBOX | DT_LEFT | DT_TOP | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+		CONTROL "Skin Preview", 103, 189, 3, 103, 168, WC_STATIC, SS_GROUPBOX | DT_LEFT | DT_TOP | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+		CONTROL 1000, 1000, 194, 7, 93, 152, WC_STATIC, SS_BITMAP | WS_VISIBLE | WS_GROUP
+		CONTROL 1001, 1001, 7, 39, 173, 41, WC_STATIC, SS_BITMAP | WS_VISIBLE | WS_GROUP
+		CONTROL "Options", 106, 3, 3, 182, 32, WC_STATIC, SS_GROUPBOX | DT_LEFT | DT_TOP | DT_MNEMONIC | WS_VISIBLE | WS_GROUP
+	END
+
+END

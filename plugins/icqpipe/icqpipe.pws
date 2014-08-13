@@ -1,0 +1,27 @@
+
+[filenumbers]
+0=204
+1=1
+2=24
+3=16
+4=10
+
+[filemarkers]
+0=
+1=
+2=
+3=
+4=
+
+[executer]
+RunInTerminal=true
+
+[Project DBase]
+ShowLocals=true
+
+[filelist]
+0=/mnt/os2data/data/ibmcpp/sources/icq2/include/icqdefs.h
+1=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqpipe/icqpipe.c
+2=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqpipe/config.c
+3=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqpipe/makefile
+4=/mnt/os2data/data/ibmcpp/sources/icq2/plugins/icqpipe/lnxpipe.c

@@ -1,0 +1,10 @@
+LIBRARY      ICQPIPE
+DATA         MULTIPLE READWRITE PRELOAD NONSHARED
+
+EXPORTS      icqmsg_Configure
+             icqmsg_Start
+             icqmsg_Terminate
+	     icqmsg_addSendTo
+
+
+

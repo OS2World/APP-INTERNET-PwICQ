@@ -1,0 +1,558 @@
+/*
+ * LOADBTM.C - Funcao para carga de uma imagem
+ */
+
+#define INCL_DOSMEMMGR
+#define INCL_GPI
+#include "skin.h"
+
+#include <mmioos2.h>
+
+#include <string.h>
+#include <malloc.h>
+
+#pragma library("mmpm2.lib")
+
+#define BITCOUNT 24
+
+#define WRITE_LOG stdout
+
+/*---[ Prototipos ]---------------------------------------------------------------*/
+
+static BOOL isMasc(RGB *);
+
+/*---[ Implementacao ]------------------------------------------------------------*/
+
+void loadTransparent( HAB hab, HDC hdc, HPS hps, XBITMAP *x, PSZ FileName)
+{
+   BITMAPINFOHEADER2    bmih;
+   BITMAPINFOHEADER     pbmpData;       /* bit-map information header           */
+   BITMAPINFO2          info;
+   HBITMAP              hbmOld;
+   RGB                  *buffer;
+   RGB                  *bits;
+   HBITMAP              base    = LoadBitmap(hab,hdc,hps,FileName);
+   int                  sz;
+   int                  f,l;
+   POINTL               p       = {0,0};
+
+#ifdef WRITE_LOG
+   fprintf(WRITE_LOG,"\n\nLendo: %s\n\n",FileName);
+#endif
+
+   DBGMessage(FileName);
+
+   if(x->masc)
+      GpiDeleteBitmap(x->masc);
+
+   if(x->image)
+      GpiDeleteBitmap(x->image);
+
+   memset(x,0,sizeof(XBITMAP));
+
+   if(!base)
+      return;
+
+   /* Obtem parametros da imagem */
+   pbmpData.cbFix = sizeof(pbmpData);
+   GpiQueryBitmapParameters(base, &pbmpData);
+
+   sz = (((BITCOUNT*pbmpData.cx + 31)/32)*1*4) *pbmpData.cy;
+   DBGTrace(sz);
+   DBGTrace(pbmpData.cx * pbmpData.cy * sizeof(RGB));
+
+   if( DosAllocMem( (PVOID) &buffer,sz+32,PAG_WRITE | PAG_READ | PAG_COMMIT) )
+   {
+      DBGMessage("Erro de alocacao de memoria");
+      return;
+   }
+
+   /* Constroi a mascara */
+
+   memset(&bmih,0, sizeof(BITMAPINFOHEADER2));
+   bmih.cbFix        = sizeof(bmih);
+   bmih.cx           = pbmpData.cx;
+   bmih.cy           = pbmpData.cy;
+   bmih.cPlanes      = 1;
+   bmih.cBitCount    = BITCOUNT;
+
+   x->masc        = GpiCreateBitmap(   *hps,
+                                       &bmih,
+                                       0L,
+                                       NULL,
+                                       NULL);
+
+   hbmOld = GpiSetBitmap(*hps, x->masc);
+
+   p.x = p.y = 0;
+   WinDrawBitmap(    *hps,
+                     base,
+                     0,
+                     &p,
+                     CLR_BLACK,
+                     CLR_WHITE,
+                     DBM_NORMAL);
+
+   CHKPoint();
+
+   for(l=0;l < bmih.cy;l++)
+   {
+      memset(&info,0,sizeof(info));
+      info.cbFix     = sizeof(info);
+      info.cPlanes   = 1;
+      info.cBitCount = BITCOUNT;
+      info.cx        = pbmpData.cx;
+      info.cy        = pbmpData.cy;
+
+      GpiQueryBitmapBits(*hps, l, 1, (UCHAR *) buffer, &info);
+      bits = buffer;
+
+
+      for(f=0;f<info.cx;f++)
+      {
+
+#ifdef WRITE_LOG
+         fprintf(WRITE_LOG,"r:%03d g:%03d b:%03d\n",(int) bits->bRed, (int) bits->bGreen, (int) bits->bBlue);
+#endif
+         if(isMasc(bits))
+            bits->bRed = bits->bBlue = bits->bGreen = 0xFF;
+         else
+            bits->bRed = bits->bBlue = bits->bGreen = 0x00;
+         bits++;
+      }
+
+      GpiSetBitmapBits(*hps, l, 1, (UCHAR *) buffer, &info);
+   }
+
+   GpiSetBitmap(*hps, hbmOld);
+
+   /* Constroi a imagem */
+
+   CHKPoint();
+
+   memset(&bmih,0, sizeof(BITMAPINFOHEADER2));
+   bmih.cbFix        = sizeof(bmih);
+   bmih.cx           = pbmpData.cx;
+   bmih.cy           = pbmpData.cy;
+   bmih.cPlanes      = 1;
+   bmih.cBitCount    = BITCOUNT;
+   x->image      = GpiCreateBitmap(    *hps,
+                                       &bmih,
+                                       0L,
+                                       NULL,
+                                       NULL);
+
+   hbmOld = GpiSetBitmap(*hps, x->image);
+
+   p.x = p.y = 0;
+   WinDrawBitmap(    *hps,
+                     base,
+                     0,
+                     &p,
+                     CLR_BLACK,
+                     CLR_WHITE,
+                     DBM_NORMAL);
+
+
+   for(l=0;l < pbmpData.cy;l++)
+   {
+      memset(&info,0,sizeof(info));
+      info.cbFix     = sizeof(info);
+      info.cPlanes   = 1;
+      info.cBitCount = BITCOUNT;
+      info.cx        = pbmpData.cx;
+      info.cy        = pbmpData.cy;
+
+      GpiQueryBitmapBits(*hps, l, 1, (UCHAR *) buffer, &info);
+      bits = buffer;
+
+      for(f=0;f<pbmpData.cx;f++)
+      {
+         if(isMasc(bits))
+            bits->bRed = bits->bBlue = bits->bGreen = 0x00;
+         bits++;
+      }
+
+      GpiSetBitmapBits(*hps, l, 1, (UCHAR *) buffer, &info);
+   }
+
+   GpiSetBitmap(*hps, hbmOld);
+
+   /* Destroi o bitmap base */
+   GpiDeleteBitmap(base);
+
+   DosFreeMem(buffer);
+}
+
+
+
+HBITMAP LoadBitmap ( HAB hab,
+                     HDC hdc,
+                     HPS hps,
+                     PSZ pszFileName )
+{
+    HBITMAP       hbm;
+    MMIOINFO      mmioinfo;
+    MMFORMATINFO  mmFormatInfo;
+    HMMIO         hmmio;
+    ULONG         ulImageHeaderLength;
+    MMIMAGEHEADER mmImgHdr;
+    ULONG         ulBytesRead;
+    ULONG         dwNumRowBytes;
+    PBYTE         pRowBuffer;
+    ULONG         dwRowCount;
+    SIZEL         ImageSize;
+    ULONG         dwHeight, dwWidth;
+    SHORT         wBitCount;
+    FOURCC        fccStorageSystem;
+    ULONG         dwPadBytes;
+    ULONG         dwRowBits;
+    ULONG         ulReturnCode;
+    ULONG         dwReturnCode;
+    HBITMAP       hbReturnCode;
+    LONG          lReturnCode;
+    FOURCC        fccIOProc;
+
+    DBGMessage(pszFileName);
+
+    ulReturnCode = mmioIdentifyFile ( pszFileName,
+                                      0L,
+                                      &mmFormatInfo,
+                                      &fccStorageSystem,
+                                      0L,
+                                      0L);
+
+    /*
+     *  If this file was NOT identified, then this function won't
+     *  work, so return an error by indicating an empty bitmap.
+     */
+
+    if ( ulReturnCode == MMIO_ERROR )
+    {
+         return (0L);
+    }
+
+    /*
+     *  If mmioIdentifyFile did not find a custom-written IO proc which
+     *  can understand the image file, then it will return the DOS IO Proc
+     *  info because the image file IS a DOS file.
+     */
+
+    if( mmFormatInfo.fccIOProc == FOURCC_DOS )
+    {
+
+         WinMessageBox( HWND_DESKTOP,
+                        HWND_DESKTOP,
+                        "Image file could not be interpreted by any permanently or temporarily installed IO procedures.",
+                        pszFileName,
+                        (HMODULE) NULL,
+                        (ULONG) MB_OK | MB_MOVEABLE |
+                                MB_ERROR );
+         return ( 0L );
+    }
+
+    /*
+     *  Ensure this is an IMAGE IOproc, and that it can read
+     *  translated data
+     */
+
+    if ( (mmFormatInfo.ulMediaType != MMIO_MEDIATYPE_IMAGE) ||
+         ((mmFormatInfo.ulFlags & MMIO_CANREADTRANSLATED) == 0) )
+    {
+
+         WinMessageBox( HWND_DESKTOP,
+                        HWND_DESKTOP,
+                        "No IMAGE IO Procedures exist which can translate the data in the image file specified.",
+                        pszFileName,
+                        (HMODULE) NULL,
+                        (ULONG) MB_OK | MB_MOVEABLE |
+                                MB_ERROR );
+         return (0L);
+    }
+    else
+    {
+         fccIOProc = mmFormatInfo.fccIOProc;
+    }
+
+    /* Clear out and initialize mminfo structure */
+
+    memset ( &mmioinfo,
+             0L,
+             sizeof ( MMIOINFO ) );
+
+    mmioinfo.fccIOProc = fccIOProc;
+    mmioinfo.ulTranslate = MMIO_TRANSLATEHEADER | MMIO_TRANSLATEDATA;
+
+    hmmio = mmioOpen ( (PSZ) pszFileName,
+                       &mmioinfo,
+                       MMIO_READ | MMIO_DENYWRITE | MMIO_NOIDENTIFY );
+
+    if ( ! hmmio )
+    {
+         /* If file could not be opened, return with error */
+         return (0L);
+    }
+
+    dwReturnCode = mmioQueryHeaderLength ( hmmio,
+                                         (PLONG)&ulImageHeaderLength,
+                                           0L,
+                                           0L);
+
+    if ( ulImageHeaderLength != sizeof ( MMIMAGEHEADER ) )
+    {
+         /* We have a problem.....possibly incompatible versions */
+
+         ulReturnCode = mmioClose (hmmio, 0L);
+
+         return (0L);
+    }
+
+    ulReturnCode = mmioGetHeader ( hmmio,
+                                   &mmImgHdr,
+                                   (LONG) sizeof ( MMIMAGEHEADER ),
+                                   (PLONG)&ulBytesRead,
+                                   0L,
+                                   0L);
+
+    if ( ulReturnCode != MMIO_SUCCESS )
+    {
+         /* Header unavailable */
+
+         ulReturnCode = mmioClose (hmmio, 0L);
+
+         return (0L);
+    }
+
+    /*
+     *  Determine the number of bytes required, per row.
+     *      PLANES MUST ALWAYS BE = 1
+     */
+
+    dwHeight = mmImgHdr.mmXDIBHeader.BMPInfoHeader2.cy;
+    dwWidth = mmImgHdr.mmXDIBHeader.BMPInfoHeader2.cx;
+    wBitCount = mmImgHdr.mmXDIBHeader.BMPInfoHeader2.cBitCount;
+    dwRowBits = dwWidth * mmImgHdr.mmXDIBHeader.BMPInfoHeader2.cBitCount;
+    dwNumRowBytes = dwRowBits >> 3;
+
+    /*
+     *  Account for odd bits used in 1bpp or 4bpp images that are
+     *  NOT on byte boundaries.
+     */
+
+    if ( dwRowBits % 8 )
+    {
+         dwNumRowBytes++;
+    }
+
+    /*
+     *  Ensure the row length in bytes accounts for byte padding.
+     *  All bitmap data rows must are aligned on LONG/4-BYTE boundaries.
+     *  The data FROM an IOProc should always appear in this form.
+     */
+
+    dwPadBytes = ( dwNumRowBytes % 4 );
+
+    if ( dwPadBytes )
+    {
+         dwNumRowBytes += 4 - dwPadBytes;
+    }
+
+    /* Allocate space for ONE row of pels */
+
+    if ( DosAllocMem( (PPVOID)&pRowBuffer,
+                      (ULONG)dwNumRowBytes,
+                      fALLOC))
+    {
+         ulReturnCode = mmioClose (hmmio, 0L);
+
+         return(0L);
+    }
+
+    /* ***************************************************
+       Create a memory presentation space that includes
+       the memory device context obtained above.
+       ***************************************************/
+
+    ImageSize.cx = dwWidth;
+    ImageSize.cy = dwHeight;
+
+    /* ***************************************************
+       Create an uninitialized bitmap.  This is where we
+       will put all of the bits once we read them in.
+       ***************************************************/
+
+    hbm = GpiCreateBitmap ( *hps,
+                            &mmImgHdr.mmXDIBHeader.BMPInfoHeader2,
+                            0L,
+                            NULL,
+                            NULL);
+
+    if ( !hbm )
+    {
+         ulReturnCode = mmioClose (hmmio, 0L);
+
+         return(0L);
+    }
+
+    /* ***************************************************
+       Select the bitmap into the memory device context.
+       *************************************************** */
+
+    hbReturnCode = GpiSetBitmap ( *hps,
+                                  hbm );
+
+    /****************************************************************
+        LOAD THE BITMAP DATA FROM THE FILE
+            One line at a time, starting from the BOTTOM
+     *************************************************************** */
+
+    for ( dwRowCount = 0; dwRowCount < dwHeight; dwRowCount++ )
+    {
+         ulBytesRead = (ULONG) mmioRead ( hmmio,
+                                          pRowBuffer,
+                                          dwNumRowBytes );
+
+         if ( !ulBytesRead )
+         {
+              break;
+         }
+
+         /*
+          *  Allow context switching while previewing.. Couldn't get
+          *  it to work. Perhaps will get to it when time is available...
+          */
+
+         lReturnCode = GpiSetBitmapBits ( *hps,
+                                          (LONG) dwRowCount,
+                                          (LONG) 1,
+                                          (PBYTE) pRowBuffer,
+                                          (PBITMAPINFO2) &mmImgHdr.mmXDIBHeader.BMPInfoHeader2);
+
+    }
+
+    ulReturnCode = mmioClose (hmmio, 0L);
+
+    DosFreeMem(pRowBuffer);
+
+    return(hbm);
+}
+
+void drawIcon(HPS hps, XBITMAP *b, USHORT id, USHORT x, USHORT y)
+{
+   BITMAPINFOHEADER     bmpData;
+   POINTL               aptl[4];
+   USHORT               fator;
+
+   DBGTracex(b->masc);
+
+   if(!b->masc)
+      return;
+
+   bmpData.cbFix = sizeof(bmpData);
+   GpiQueryBitmapParameters(b->masc, &bmpData);
+
+   aptl[0].x = x;
+   aptl[0].y = y;
+   aptl[1].x = x+bmpData.cy;
+   aptl[1].y = y+bmpData.cy;
+
+   fator = bmpData.cy * id;
+   DBGTrace(fator);
+
+   aptl[2].x = fator;
+   aptl[2].y = 0;
+   aptl[3].x = fator + bmpData.cy;
+   aptl[3].y = bmpData.cy;
+
+   GpiSetColor(hps,CLR_WHITE);
+   GpiSetBackColor(hps,CLR_BLACK);
+
+   GpiWCBitBlt( hps,
+                b->masc,
+                4,
+                aptl,
+                ROP_SRCAND,
+                BBO_IGNORE);
+
+/*
+   GpiWCBitBlt( hps,
+                b->image,
+                4,
+                aptl,
+                ROP_SRCPAINT,
+                BBO_IGNORE);
+*/
+   aptl[0].x += bmpData.cy + 10;
+
+}
+
+void drawTransparent(HPS hps, PPOINTL p, XBITMAP *b)
+{
+   BITMAPINFOHEADER     bmpData;
+   POINTL               aptl[4];
+
+   if(!b->masc)
+      return;
+
+   bmpData.cbFix = sizeof(bmpData);
+   GpiQueryBitmapParameters(b->masc, &bmpData);
+
+   aptl[0].x = p->x;
+   aptl[0].y = p->y;
+   aptl[1].x = p->x+bmpData.cx;
+   aptl[1].y = p->y+bmpData.cy;
+
+   aptl[2].x = 0;
+   aptl[2].y = 0;
+   aptl[3].x = bmpData.cx;
+   aptl[3].y = bmpData.cy;
+
+   DBGTrace(bmpData.cx);
+   DBGTrace(bmpData.cy);
+   GpiSetColor(hps,CLR_WHITE);
+   GpiSetBackColor(hps,CLR_BLACK);
+
+   WinDrawBitmap(    hps,
+                     b->masc,
+                     0,
+                     p,
+                     CLR_BLACK,
+                     CLR_WHITE,
+                     DBM_NORMAL);
+
+   p->y += 40;
+   WinDrawBitmap(    hps,
+                     b->image,
+                     0,
+                     p,
+                     CLR_BLACK,
+                     CLR_WHITE,
+                     DBM_NORMAL);
+
+/*
+   GpiWCBitBlt( hps,
+                b->masc,
+                4,
+                aptl,
+                ROP_SRCAND,
+                BBO_OR);
+
+   GpiWCBitBlt( hps,
+                b->image,
+                4,
+                aptl,
+                ROP_SRCPAINT,
+                BBO_OR);
+*/
+}
+
+BOOL validXBitmap(XBITMAP *btm)
+{
+   return btm->masc != NULLHANDLE;
+}
+
+static BOOL isMasc(RGB *r)
+{
+   return r->bRed == 254 && r->bGreen == 2 && r->bBlue == 254;
+}
+

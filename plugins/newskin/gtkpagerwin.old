@@ -1,0 +1,271 @@
+/*
+ * gtkmsgwin.c - GTK Message Window
+ */
+
+
+ #include <malloc.h>
+ #include <string.h>
+ #include <unistd.h>
+ #include <pwicqgui.h>
+
+/*---[ Constants ]------------------------------------------------------------*/
+
+ #pragma pack(1)
+
+ static const BUTTONLIST buttonList[] =
+ {
+#ifdef GTK2
+    { MSGID_CLOSEBUTTON,   "_Close"       },
+    { MSGID_NEXTBUTTON,    "_Next"        },
+    { MSGID_SENDBUTTON,    "_Send"        },
+    { MSGID_REPLYBUTTON,   "_Reply"       },
+    { MSGID_ACCEPTBUTTON,  "Acce_pt"      },
+	{ MSGID_REFUSEBUTTON,  "Re_fuse"      },
+    { MSGID_ADDBUTTON,     "_Add"         }
+#else
+    { MSGID_CLOSEBUTTON,   "Close"        },
+    { MSGID_NEXTBUTTON,    "Next"         },
+    { MSGID_SENDBUTTON,    "Send"         },
+    { MSGID_REPLYBUTTON,   "Reply"        },
+    { MSGID_ACCEPTBUTTON,  "Accept"       },
+	{ MSGID_REFUSEBUTTON,  "Refuse"       },
+    { MSGID_ADDBUTTON,     "Add"          }
+#endif	
+ };
+
+ static const struct _userButton
+ {
+	USHORT id;
+	USHORT icon;
+ } userButtons[] =
+ {
+	{ MSGID_INFOBUTTON,  ICQICON_USERINFO },
+	{ MSGID_ABOUTBUTTON, ICQICON_ABOUT    }
+ };
+
+/*---[ Prototipes ]-----------------------------------------------------------*/
+
+ static void destroy( GtkWidget *, ICQMSGDIALOG *);
+
+/*---[ Implementation ]-------------------------------------------------------*/
+
+ hWindow icqskin_createButtonBar(hWindow ret, int sz, const BUTTONLIST *buttonList)
+ { 
+    /* Create button bar */
+	
+	int     f;
+	hWindow temp;
+    hWindow hBox = gtk_hbox_new(FALSE,0);
+
+    gtk_box_pack_start(GTK_BOX(hBox), gtk_label_new(""), TRUE, TRUE, 0);
+	
+	for(f=0;f<sz;f++)
+	{
+#ifdef GTK2	
+       temp = gtk_button_new_with_mnemonic(buttonList[f].wText);
+#else
+	   temp = gtk_button_new_with_label(buttonList[f].wText);
+#endif	
+       icqskin_setDlgItemHandle(ret, buttonList[f].id, temp);
+       gtk_box_pack_end(GTK_BOX(hBox), temp, FALSE, FALSE, 0);
+	}
+	
+	return hBox;
+ }
+
+ 
+ hWindow icqskin_createUserBox(hWindow ret, ICQMSGDIALOG *wnd, SKINDATA *skn)
+ {
+	static const char *normal = "8.Helv";
+#ifdef GTK2
+	static const char *bold   = "8.Helv.Bold";
+#endif	
+	int               f;
+	GtkWidget         *temp;
+	GtkWidget         *hBox;
+    GtkWidget         *box;
+    GtkRequisition    size;
+	
+	hBox = gtk_table_new(1,6,FALSE);
+
+    temp  = gtk_pixmap_new(skn->iPixmap[ICQICON_OFFLINE],skn->iBitmap[ICQICON_OFFLINE]);
+    icqskin_setDlgItemHandle(ret, MSGID_USERMODE, temp);
+	
+    gtk_table_attach(GTK_TABLE(hBox), temp, 0, 1, 0, 1, 0, 0, 2, 2);
+    gtk_object_set_user_data(GTK_OBJECT(temp), (gpointer) wnd);	
+	DBGTracex(temp);
+	
+	temp  = gtk_label_new("Nick:");
+	icqskin_setFont(temp,normal);
+	gtk_misc_set_alignment(GTK_MISC(temp), 0, .5);
+    icqskin_setDlgItemHandle(ret, MSGID_NICK, temp);
+    gtk_table_attach(GTK_TABLE(hBox), temp, 1, 2, 0, 1, 0, 0, 2, 2);
+
+#ifdef GTK2
+    temp = gtk_label_new("N/A");
+	icqskin_setFont(temp,bold);
+#else
+    temp = gtk_entry_new();
+    gtk_entry_set_editable(GTK_ENTRY(temp),FALSE);
+#endif	
+	gtk_misc_set_alignment(GTK_MISC(temp), 0, .5);
+    icqskin_setDlgItemHandle(ret, MSGID_NICKENTRY, temp);
+    gtk_widget_size_request(temp,&size);
+    gtk_widget_set_usize(temp,10,size.height);
+    gtk_table_attach(GTK_TABLE(hBox), temp, 2, 3, 0, 1,GTK_EXPAND|GTK_SHRINK|GTK_FILL,0, 2, 2);
+
+	temp = gtk_label_new("Name:");
+	icqskin_setFont(temp,normal);
+	gtk_misc_set_alignment(GTK_MISC(temp), 0, .5);
+    icqskin_setDlgItemHandle(ret, MSGID_NAMEENTRY, temp);
+    gtk_table_attach(GTK_TABLE(hBox), temp, 3, 4, 0, 1, 0, 0, 2, 2);
+
+#ifdef GTK2
+    temp = gtk_label_new("N/A");
+	icqskin_setFont(temp,bold);
+#else
+    temp = gtk_entry_new();
+    gtk_entry_set_editable(GTK_ENTRY(temp),FALSE);
+#endif	
+	gtk_misc_set_alignment(GTK_MISC(temp), 0, .5);
+    icqskin_setDlgItemHandle(ret, MSGID_NAMEENTRY, temp);
+    gtk_widget_size_request(temp,&size);
+    gtk_widget_set_usize(temp,10,size.height);
+    gtk_table_attach(GTK_TABLE(hBox), temp, 4, 5, 0, 1,GTK_EXPAND|GTK_SHRINK|GTK_FILL,0, 2, 2);
+	
+	/* Button bar */
+    box = gtk_hbox_new(FALSE,0);
+
+	for(f=0;f<(sizeof(userButtons)/sizeof(struct _userButton));f++)
+	{
+       temp = gtk_button_new();
+       icqskin_setDlgItemHandle(ret, userButtons[f].id, temp);
+       gtk_container_add(GTK_CONTAINER(temp),gtk_pixmap_new(skn->iPixmap[userButtons[f].icon],skn->iBitmap[userButtons[f].icon]));
+       gtk_button_set_relief(GTK_BUTTON(temp),GTK_RELIEF_NONE);
+	   gtk_box_pack_end(GTK_BOX(box), temp, FALSE, FALSE, 0);
+	}
+
+    gtk_table_attach(GTK_TABLE(hBox), box, 4, 5, 0, 1,GTK_SHRINK|GTK_FILL,0, 2, 2);
+
+    temp = gtk_frame_new("User");
+    gtk_container_add (GTK_CONTAINER(temp), hBox);
+	
+	return temp;
+ }	
+
+ hWindow icqskin_createPagerWindow(HICQ icq)
+ {
+	SKINDATA       *skn   = icqGetSkinDataBlock(icq);
+	hWindow        ret    = 0;
+	
+	ICQMSGDIALOG   *wnd;
+	int            sz;
+	GtkWidget      *vBox;
+	GtkWidget      *temp;
+	GtkWidget      *hBox;
+	GtkWidget      *Box;
+	
+    sz  = sizeof(ICQMSGDIALOG) + (MSG_WINDOW_COMPONENTS * sizeof(hWindow));
+	wnd = malloc(sz);
+
+	if(!wnd)
+	   return 0;
+
+	memset(wnd,0,sz);
+	wnd->fr.sz      = sizeof(ICQMSGDIALOG);
+	wnd->fr.icq     = icq;
+	wnd->fr.childs  = MSG_WINDOW_COMPONENTS;
+    ret             = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
+    icqskin_setWindowManagerName(ret,"Pager");
+	
+    icqskin_setWindowDataBlock(ret,wnd);	
+
+    gtk_signal_connect( GTK_OBJECT(ret),"destroy",GTK_SIGNAL_FUNC(destroy),wnd );
+	
+	vBox = gtk_vbox_new(FALSE,0);
+	
+	/* Create top bar */
+	temp = icqskin_createUserBox(ret,wnd,skn);
+    gtk_box_pack_start(GTK_BOX(vBox), temp, FALSE, FALSE, 0);
+
+    /* Create text areas */	
+	Box = gtk_vbox_new(FALSE,0);
+
+#ifdef GTK2
+    temp = gtk_text_view_new();
+    icqskin_setDlgItemHandle(ret, MSGID_EDITBOX, temp);
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(temp),GTK_WRAP_WORD);
+    hBox = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(hBox),GTK_POLICY_NEVER,GTK_POLICY_ALWAYS);
+    gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(hBox),GTK_SHADOW_ETCHED_IN);
+    gtk_container_add(GTK_CONTAINER(hBox),temp);
+#endif	
+	
+#ifdef GTK1
+    temp = gtk_text_new(NULL,NULL);
+    icqskin_setDlgItemHandle(ret, MSGID_EDITBOX, temp);
+    gtk_widget_set_usize(temp,10,10);
+    gtk_text_set_editable(GTK_TEXT(temp),FALSE);
+    gtk_text_set_word_wrap(GTK_TEXT(temp),TRUE);
+    hBox = gtk_hbox_new(FALSE,0);
+    gtk_box_pack_start(GTK_BOX(hBox), temp,TRUE,TRUE,0);
+    gtk_box_pack_start(GTK_BOX(hBox), gtk_vscrollbar_new(GTK_TEXT(temp)->vadj),FALSE,FALSE,0);
+#endif	
+
+    gtk_box_pack_start(GTK_BOX(Box), hBox,TRUE,TRUE,0);
+
+    hBox = gtk_hbox_new(FALSE,0);
+    temp = gtk_entry_new();
+    icqskin_setDlgItemHandle(ret, MSGID_ENTRY, temp);
+    gtk_entry_set_editable(GTK_ENTRY(temp),FALSE);
+    gtk_box_pack_start(GTK_BOX(hBox), temp,TRUE,TRUE,0);
+	
+#ifdef GTK2
+    temp = gtk_button_new_with_mnemonic("_Browse");
+#else
+    temp = gtk_button_new_with_label("Browse");
+#endif	
+    icqskin_setDlgItemHandle(ret, MSGID_BROWSEBUTTON, temp);
+    gtk_box_pack_end(GTK_BOX(hBox), temp,FALSE,FALSE,0);
+
+    gtk_box_pack_start(GTK_BOX(Box), hBox,FALSE,FALSE,0);
+
+    temp = gtk_frame_new(NULL);
+    gtk_container_add(GTK_CONTAINER(temp), Box);
+    gtk_box_pack_start(GTK_BOX(vBox), temp, TRUE,TRUE, 0);
+
+
+    /* Create button bar */
+	temp = icqskin_createButtonBar(ret,(sizeof(buttonList)/sizeof(BUTTONLIST)),buttonList);
+    gtk_box_pack_end(GTK_BOX(vBox), temp, FALSE, FALSE, 0);
+
+	/* Put the box in the window, show contents */
+    gtk_widget_show_all(GTK_WIDGET(vBox));
+    gtk_container_add(GTK_CONTAINER(ret), vBox);
+
+    return ret;
+ }
+
+ static void destroy(GtkWidget *hwnd, ICQMSGDIALOG *cfg )
+ {
+	/* Message window is beeing closed */
+	DBGMessage("Closing message window");
+	
+	if(cfg && cfg->fr.sz == sizeof(ICQMSGDIALOG))
+	{
+	   DBGMessage("Releasing message window");
+       icqskin_terminateMessageEditor(cfg->fr.icq, hwnd);
+   	   memset(cfg,0,sizeof(ICQMSGDIALOG));
+	   free(cfg);
+	}
+#ifdef DEBUG
+	else
+	{
+	   DBGMessage("********* INVALID MESSAGE WINDOW");
+	}
+#endif	
+
+	
+ }
+

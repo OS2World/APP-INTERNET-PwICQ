@@ -1,0 +1,177 @@
+/*
+ * lnxloader.c - Modulo de carga para a versao linux
+ */
+ 
+ #include <string.h>
+ #include <stdio.h>
+ #include <sys/time.h>
+ #include <signal.h>
+
+ #include <icqkernel.h>
+ #include <pwmacros.h>
+
+#ifdef ICQSTATIC
+ #include ICQSTATIC
+#endif
+
+#ifdef __cplusplus
+   extern "C" {
+#endif
+
+
+/*---[ Definicoes ]--------------------------------------------------------------*/
+
+
+/*---[ Prototipos ]--------------------------------------------------------------*/
+
+ static void  textMode(HICQ);
+ 
+ void _System icqloader_setStartupStage(HICQ,int);
+	  
+ static void  startTimer(void);
+ static void  onTimer(int);
+	  
+/*---[ Static ]------------------------------------------------------------------*/
+
+ static const char *ident   = "pwICQ Loader Build " BUILD " by " USER "@" HOSTNAME;
+
+ static HICQ    icq         = NULL;
+ static BOOL	active	    = FALSE;
+
+/*---[ Implementacao ]-----------------------------------------------------------*/
+
+#ifdef __DLL__
+   #error Shared lib nao utiliza loader
+#endif
+
+ int main(int numpar, char *param[])
+ {
+    ULONG	sknParm;
+	int	    rc			= 0;
+	
+	rc = icqChkCmdLine(numpar,param);
+	
+	if(rc)
+	   return rc;
+
+    icq = icqCoreStartup(numpar,param,icqloader_setStartupStage);
+    
+    if(!icq)
+       return -1;
+
+    if(icq->sz != sizeof(ICQ))
+    {
+       fprintf(stderr,"*** Invalid core identifier");
+    }
+    else
+    {
+	   
+       DBGMessage(ident);
+
+	   if(icq->cntlFlags & ICQFC_NOGUI)
+	   {
+	      textMode(icq);
+	   }
+       else if(!icq->skin)
+       {
+          icqWriteSysLog(icq,PROJECT,"Unable to load GUI module");
+       }
+       else if(icq->skin->sz != sizeof(SKINMGR))
+       {
+          icqWriteSysLog(icq,PROJECT,"Invalid or incompatible GUI module");
+       }
+       else
+       {
+		  icqWriteSysLog(icq,PROJECT,ident);
+		  
+		  if(! (icq->skin->flags & SKINMGR_HASTIMER) )
+			 startTimer();
+		  
+          CHKPoint();
+	      DBGTracex(icq->skin->loadSkin);
+		  
+		  if(icq->skin->loadSkin)
+             sknParm = icq->skin->loadSkin(icq, (STATUSCALLBACK *) icqloader_setStartupStage,numpar,param);
+		  else
+             sknParm = 0;			
+
+	      if(sknParm)
+	      {
+	         active = TRUE;
+             icq->skin->executeSkin(icq,sknParm);
+             active = FALSE;
+             icqTerminate(icq);
+          }
+       }
+    }
+
+    icqCoreTerminate(icq);
+
+    icq = NULL;
+
+    DBGMessage("Terminado");
+        
+    return rc;
+ }
+
+ static void startTimer(void)
+ {
+    struct itimerval	timer, 
+    			otimer;
+ 
+
+    timer.it_interval.tv_sec  =
+    timer.it_value.tv_sec     = 0;
+   
+    timer.it_interval.tv_usec = 
+    timer.it_value.tv_usec    = 100000L;
+
+    signal(SIGALRM,onTimer);
+    setitimer(ITIMER_REAL,&timer,&otimer);
+
+ }
+
+ void onTimer(int sig)
+ {
+    if(active)
+       icqkrnl_Timer(icq);
+ }
+   
+ void _System icqloader_setStartupStage(HICQ icq, int sts)
+ {
+	DBGTrace(sts);
+#ifdef STATIC_REGISTER	   
+    if(sts == 1)
+	   STATIC_REGISTER(icq);
+#endif	   
+
+    
+ }
+ 
+ static void textMode(HICQ icq)
+ {
+    char cmdLine[0x0100];
+	int  rc;
+	
+    startTimer();
+	
+	if(!icqInitialize(icq,(STATUSCALLBACK *) icqloader_setStartupStage))
+	{
+   	   printf("\npwICQ Text mode interface enabled\n");
+       while(icqIsActive(icq))
+       {
+          memset(cmdLine,0,0x0100);
+          fgets(cmdLine,0xFF,stdin);
+          CHKPoint();
+          rc = icqExecuteCmd(icq, cmdLine);
+          CHKPoint();
+          printf("\nrc=%d\n",rc);
+       }
+	}
+ }
+
+ 
+#ifdef __cplusplus
+   }
+#endif
+

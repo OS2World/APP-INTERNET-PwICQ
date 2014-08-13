@@ -1,0 +1,162 @@
+ <WARPIN>
+ <HEAD>
+ <PCK INDEX=1
+      PACKAGEID="Perry Werneck\pwICQ\Base Package$$$VRS$$$"
+      TARGET="?:\pwICQ" BASE SELECT
+      TITLE="Base pwICQ package"
+      CREATEOBJECT="WPProgram|pwICQ|<WP_DESKTOP>|EXENAME=$(1)\pwicq.exe;STARTUPDIR=$(1);OBJECTID=<PWICQSTART>"
+      KILLPROCESS="pwicq.exe"
+
+      >This package contains the base files required to run pwICQ, the premiere ICQ clone for OS/2.</PCK>
+
+<GROUP TITLE="Plug-ins (optional)">
+ <PCK INDEX=2
+      PACKAGEID="Perry Werneck\pwICQ\ICQNews Plug-in$$$VRS$$$"
+      TARGET="?:\pwICQ\Plugins"
+      TITLE="ICQNews pwICQ Plug-in"
+      REQUIRES=1
+      >ICQNews fetches online news sources and displays them in a mini-scroller (optional).</PCK>
+
+ <PCK INDEX=3
+      PACKAGEID="Perry Werneck\pwICQ\ICQPipe Plug-in$$$VRS$$$"
+      TARGET="?:\pwICQ\Plugins"
+      TITLE="ICQPipe pwICQ Plug-in"
+      REQUIRES=1
+      >ICQPipe provides a system pipe interface for monitoring pwICQ (optional).</PCK>
+
+ <PCK INDEX=11
+      PACKAGEID="Perry Werneck\pwICQ\Extras:Mini-Window (Plugin Version)$$$VRS$$$"
+      TARGET="?:\pwICQ\Plugins"
+      TITLE="Mini Window Plugin"
+      REQUIRES=1
+      >An unbelievably small PM status window for pwICQ.(optional)</PCK>
+
+</GROUP>
+
+<GROUP TITLE="Message REXX scripts">
+ <PCK INDEX=4
+      PACKAGEID="Perry Werneck\pwICQ\BR Scripts$$$VRS$$$"
+      TARGET="?:\pwICQ\Scripts"
+      TITLE="pwICQ Scripts (Brazilian Portuguese)"
+      REQUIRES=1
+      >This package contains Brazilian Portuguese REXX message scripts (optional).</PCK>
+
+ <PCK INDEX=5
+      PACKAGEID="Perry Werneck\pwICQ\Scripts$$$VRS$$$"
+      TARGET="?:\pwICQ\Scripts" SELECT
+      TITLE="pwICQ Scripts (English)"
+      REQUIRES=1
+      >This package contains English REXX message scripts (optional).</PCK>
+</GROUP>
+
+<GROUP TITLE="Development">
+
+<GROUP TITLE="REXX API">
+ <PCK INDEX=6
+      PACKAGEID="Perry Werneck\pwICQ\REXX API DLL$$$VRS$$$"
+      TARGET="?:\OS2\DLL"
+      TITLE="pwICQ Rexx interface API DLL"
+      REQUIRES=1
+      >This package contains the REXX API DLL for support/remote control (optional)</PCK>
+
+ <PCK INDEX=7
+      PACKAGEID="Perry Werneck\pwICQ\REXX API example scripts$$$VRS$$$"
+      TARGET="?:\pwICQ"
+      TITLE="pwICQ Rexx API"
+      REQUIRES=6
+      >This package contains the REXX API sample scripts for support/remote control (optional)</PCK>
+</GROUP>
+
+ <PCK INDEX=8
+      PACKAGEID="Perry Werneck\pwICQ\Plug-in Toolkit$$$VRS$$$"
+      TARGET="?:\pwICQ\Toolkit"
+      TITLE="pwICQ Plug-in Toolkit"
+      >This package contains the necessary files to develop new plug-ins for pwICQ (optional)</PCK>
+</GROUP>
+
+<GROUP TITLE="Extra components">
+ <PCK INDEX=9
+      PACKAGEID="Perry Werneck\pwICQ\Extras:Mini-Window (.EXE Version)$$$VRS$$$"
+      TARGET="?:\pwICQ"
+      TITLE="Mini Window"
+      REQUIRES=1
+      >An unbelievably small PM status window for pwICQ.(optional)</PCK>
+
+ <PCK INDEX=10
+      PACKAGEID="Perry Werneck\pwICQ\Extras:Netscape plug-in$$$VRS$$$"
+      TARGET="?:\Netscape\Program\Plugins"
+      TITLE="Netscape Plug-in"
+      REQUIRES=1
+      >A Netscape Navigator/Communicator plug-in that allows you to send messages from the browser (optional)</PCK>
+</GROUP>
+
+ </HEAD>
+ <!-- Page definitions... -->
+ <BODY>
+ <!-- page 1: introductory page -->
+ <PAGE INDEX=1 TYPE=README>
+ <NEXTBUTTON TARGET=2>~Next</NEXTBUTTON>
+ <README FORMAT=HTML>
+ <B>
+ <PRE>
+                _
+               |_|  __   ___
+  ___ __  _  _  _  / _| / _ \
+ | _ |\ \/ \/ /| |/ |_ | |_| |_
+ | __| \__/\_/ |_|\___| \_____/
+ |_|   (c)$$$YEAR$$$ by Perry Werneck
+
+          version $$$VERSION$$$
+         build $$$BUILD$$$
+</PRE>
+</B>
+</README>
+<TEXT>Click on "Next" to continue...</TEXT>
+ </PAGE>
+
+
+ <!-- page 2: features page -->
+ <PAGE INDEX=2 TYPE=TEXT>
+ <NEXTBUTTON TARGET=3>~Next</NEXTBUTTON>
+
+ <TEXT>
+        Welcome to pwICQ!
+
+
+ pwICQ is the premiere Mirabilis ICQ clone for OS/2. It provides most (if not all) of the features of the original ICQ, plus other exclusive features.
+
+
+ >>> Main features:
+
+ - Full message support, including extended types and urgent messages;
+ - v5 encryption compatible;
+ - File Transfer support;
+ - Chat (2-person only);
+ - Advanced behavior control (auto-lockup/auto-away/auto-open);
+ - Codepage conversion (including Russian/Cyrillic);
+ - Rexx API and control;
+ - Optional mini-window control;
+ - Optional Netscape plug-in for White-pages support;
+ - Extensible functions through plug-in interface;
+ - Customizable REXX message scripts;
+
+
+ Select "Next" to continue.
+ Select "Cancel" to abort installation.</TEXT>
+ </PAGE>
+ <!-- The TYPE=CONTAINER will list the packages which can be installed. -->
+ <PAGE INDEX=3 TYPE=CONTAINER>
+ <NEXTBUTTON TARGET=4>~Next</NEXTBUTTON>
+  <TEXT>
+ On this page, you may deselect the package if it is already installed or change the package's target path. </TEXT>
+ </PAGE>
+ <!-- Display another TEXT page to inform the user
+         that installation will begin. We use the TARGET=0
+         with the NEXTBUTTON tag which starts installation. -->
+ <PAGE INDEX=4 TYPE=TEXT>
+ <NEXTBUTTON TARGET=0>I~nstall</NEXTBUTTON>
+ <TEXT>
+ Press "Install" to begin installing this archive.</TEXT>
+ </PAGE>
+ </BODY>
+ </WARPIN>

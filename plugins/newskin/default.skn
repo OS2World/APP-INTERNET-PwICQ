@@ -1,0 +1,218 @@
+#
+# pwICQ Version 2 skin definition file
+#
+
+[Description]
+
+   Name=Basic Skin
+   Author=Perry Werneck
+   UIN=27241234
+   Contact=pwicq.devel@terra.com.br
+
+[Main]
+
+   TitleLeft=TitleLeft.gif
+   TitleStretch=TitleStretch.gif
+   TitleRight=TitleRight.gif
+
+   TopLeft=TopLeft.gif
+   TopRight=TopRight.gif
+
+   MidLeft=MidLeft.gif
+   MidStretch=MidStretch.gif
+   MidRight=MidRight.gif
+
+   BottomLeft=BottomLeft.gif
+   BottomMidLeft=BottomMidLeft.gif
+   BottomStretch=BottomStretch.gif
+   BottomMidRight=BottomMidRight.gif
+   BottomRight=BottomRight.gif
+
+   UserList=10,75,-40,-95,TreeIcons.gif,Selected.gif
+   UserList.Font=8.Helv.Bold
+
+   ScrollBar=-20,75,9,-100,scbar.gif
+
+   Background=209,209,209
+   Foreground=255,255,255
+   SelectedBackground=0,0,128
+   SelectedForeground=255,255,255
+   Online=0,0,128
+   Offline=128,0,0
+   OnlineWaiting=0,0,64
+   OfflineWaiting=64,0,0
+
+   ModeButton=-3,3,-68,22,button.gif
+   ModeButton.Foreground=255,255,0
+   ModeButton.Font=8.Helv.Bold
+
+   SysButton=3,3,60,22,button.gif
+   SysButton.Foreground=255,255,0
+   SysButton.Font=8.Helv.Bold
+   SysButton.Image=pwICQ.gif
+
+   SysMsgButton=20,28,-40,20,button2.gif,button3.gif,button4.gif
+   SysMsgButton.Font=8.Helv.Bold
+   SysMsgButton.Foreground=255,255,255
+
+   SearchButton=20,53,-40,20,button2.gif,button3.gif,button4.gif
+   SearchButton.Font=8.Helv.Bold
+   SearchButton.Foreground=255,255,255
+
+[Menu.Main]
+
+   Font=8.Helv
+
+   Background=178,178,178
+   Foreground=0,0,0
+   SelectedBackground=139,119,179
+   SelectedForeground=255,255,255
+   Border=0,0,0
+   SelectionBar=MenuSelected.gif
+
+   # Bottom,Left,Top,Right
+   Margin=4,10,4,4
+
+   Shadow=138,138,138
+   SelectedShadow=32,32,32
+
+   TitleLeft=MenuTopLeft.gif
+   TitleStretch=MenuTopStretch.gif
+   TitleRight=MenuTopRight.gif
+
+   MidLeft=MenuMidLeft.gif
+   MidStretch=MenuMidStretch.gif
+   MidRight=MenuMidRight.gif
+
+   BottomLeft=MenuBottomLeft.gif
+   BottomStretch=MenuBottomStretch.gif
+   BottomRight=MenuBottomRight.gif
+
+[Menu.Configuration]
+
+   Font=8.Helv.Bold
+
+   Background=178,178,178
+   Foreground=0,0,0
+   SelectedBackground=139,119,179
+   SelectedForeground=255,255,255
+
+   Border=0,0,0
+   SelectionBar=MenuSelected.gif
+
+   # Bottom,Left,Top,Right
+   Margin=4,18,4,4
+
+   Shadow=138,138,138
+   SelectedShadow=32,32,32
+
+   TitleLeft=ConfigTopLeft.gif
+   TitleStretch=MenuTopStretch.gif
+   TitleRight=MenuTopRight.gif
+
+   MidLeft=ConfigMidLeft.gif
+   MidStretch=MenuMidStretch.gif
+   MidRight=MenuMidRight.gif
+
+   BottomLeft=ConfigBottomLeft.gif
+   BottomStretch=MenuBottomStretch.gif
+   BottomRight=MenuBottomRight.gif
+
+[Menu]
+
+   Font=8.Helv
+
+   Background=209,209,209
+   Foreground=0,0,0
+   Shadow=138,138,138
+
+   SelectedBackground=0,0,179
+   SelectedForeground=255,255,255
+   SelectedShadow=32,32,32
+
+[Chat]
+
+   Static.Font=8.Helv
+   Static.Foreground=0,0,0
+
+   Field.Font=8.Helv.Bold
+   Field.Foreground=0,0,64
+
+   Button.Foreground=0,0,64
+   Button.DisabledForeground=64,64,64
+   Button.Font=8.Helv
+
+   Button.Normal=button_normal.gif
+   Button.Pressed=button_press.gif
+   Button.MouseOver=button_over.gif
+
+   Edit.Foreground=0,0,0
+   Edit.Background=254,254,182
+   Edit.Font=8.Helv
+
+   History.Foreground=255,255,0
+   History.Background=0,0,0
+   History.Font=8.Helv
+
+[Pager]
+
+   Static.Font=8.Helv
+   Static.Foreground=0,0,0
+
+   Field.Font=8.Helv.Bold
+   Field.Foreground=0,0,64
+
+   Button.Foreground=0,0,64
+   Button.DisabledForeground=64,64,64
+   Button.Font=8.Helv
+
+   Button.Normal=button_normal.gif
+   Button.Pressed=button_press.gif
+   Button.MouseOver=button_over.gif
+
+   Edit.Foreground=0,0,0
+   Edit.Background=254,254,182
+   Edit.Font=8.Helv
+
+   Entry.Foreground=0,0,0
+   Entry.Background=254,254,182
+   Entry.Font=8.Helv
+
+[Config]
+
+   Static.Font=8.Helv
+   Static.Foreground=0,0,0
+
+   Field.Font=8.Helv.Bold
+   Field.Foreground=0,0,64
+
+   Button.Foreground=0,0,64
+   Button.DisabledForeground=64,64,64
+   Button.Font=8.Helv
+
+#   Button.Normal=button_normal.gif
+#   Button.Pressed=button_press.gif
+#   Button.MouseOver=button_over.gif
+
+   Edit.Foreground=0,0,0
+   Edit.Background=254,254,182
+   Edit.Font=8.Helv
+
+   Tree.Foreground=0,255,0
+   Tree.Background=0,32,0
+   Tree.Font=8.Helv
+   Tree.Icons=cfgtree.gif
+
+   Entry.Foreground=0,0,0
+   Entry.Background=254,254,182
+   Entry.Font=8.Helv
+
+   Title.BgImage=ConfigTitle.gif
+   Title.Font=8.Helv.Bold
+   Title.Foreground=0,0,32
+   Title.Margin=4
+
+   SysConfig.BgImage=sysconfig.gif
+   UserConfig.BgImage=userinfo.gif
+
+

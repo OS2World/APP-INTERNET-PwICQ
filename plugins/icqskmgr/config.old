@@ -1,0 +1,326 @@
+/*
+ * config.c - Configuration dialog box
+ */
+
+ #pragma strings(readonly)
+ #define INCL_DOSFILEMGR   /* File Manager values */
+ #define INCL_DOSERRORS    /* DOS error values */
+
+ #include <stdio.h>
+ #include <string.h>
+ #include <io.h>
+
+ #include "icqskmgr.h"
+
+/*---[ Prototipes ]------------------------------------------------------------------------------------------*/
+
+ static int   _System optLoad(const DLGHELPER *,HWND,HICQ,ULONG,char *);
+ static int   _System optSave(const DLGHELPER *,HWND,HICQ,ULONG,char *);
+
+ static int   _System optClick(const DLGHELPER *,HWND,HICQ,ULONG,  USHORT, char * );
+
+ static int   _System skLoad(const DLGHELPER *,HWND,HICQ,ULONG,char *);
+ static int   _System skSave(const DLGHELPER *,HWND,HICQ,ULONG,char *);
+
+ static void  _System skSelected(const DLGHELPER *, HWND, HICQ, ULONG, USHORT, ULONG, char *);
+
+ const DLGMGR options   = {     sizeof(DLGMGR),
+                                NULL,                   // Configure
+                                optLoad,                // Load
+                                optSave,                // Save
+                                NULL,                   // Cancel
+                                NULL,                   // Event
+                                NULL,                   // selected
+                                optClick,               // click
+                                NULL,                   // changed
+                                NULL		// sysButton
+                        };
+
+ const DLGMGR skins     = {     sizeof(DLGMGR),
+                                NULL,                   // Configure
+                                skLoad,                 // Load
+                                skSave,                 // Save
+                                NULL,                   // Cancel
+                                NULL,                   // Event
+                                skSelected,             // selected
+                                NULL,                   // click
+                                NULL,                   // changed
+                                NULL		        // sysButton
+                        };
+
+/*---[ Implementing ]----------------------------------------------------------------------------------------*/
+
+ void EXPENTRY icqskmgr_ConfigPage(HICQ icq, void *lixo, ULONG uin, USHORT type, HWND hwnd, const DLGINSERT *mgr, char *buffer)
+ {
+    if(type != 1)
+       return;
+
+    if(mgr->sz != sizeof(DLGINSERT))
+    {
+       icqWriteSysLog(icq,PROJECT,"Invalid dialog loader");
+       return;
+    }
+
+    mgr->insert(hwnd, module, 22, &options, CFGWIN_OPTIONS);
+    mgr->insert(hwnd, module, 23, &skins,   CFGWIN_OPTIONS);
+
+ }
+
+ static int optLoad(const DLGHELPER *dlg, HWND hwnd, HICQ icq, ULONG uin, char *buffer)
+ {
+    if(dlg->sz != sizeof(DLGHELPER))
+       return -1;
+
+    dlg->setTextLimit(hwnd,112,0xFF);
+
+    dlg->loadRadioButton(hwnd,0,101,"TaskICON", 3,2);   // Change ICON
+    dlg->loadRadioButton(hwnd,0,105,"TaskTITLE",3,2);   // Change Title
+    dlg->loadRadioButton(hwnd,0,121,"Quote",3,1);       // Quote
+
+    dlg->loadCheckBox(hwnd,0,124,"Chk4URL",    TRUE);   // Detect URL
+    dlg->loadCheckBox(hwnd,0,125,"ESC2Close",  TRUE);   // Close on ESC
+    dlg->loadCheckBox(hwnd,0,109,"NextOnSend", TRUE);   // Next after send
+
+    dlg->loadString(hwnd,0,112,"browser",0xFF,"mozilla.exe");
+
+    dlg->loadCheckBox(hwnd,0,114,"urlOpen",    TRUE);   // Enable "Open" Button
+    dlg->loadCheckBox(hwnd,0,115,"urlSend",    FALSE);  // Enable "Send to Browser" Button
+    dlg->loadCheckBox(hwnd,0,116,"urlInfo",    FALSE);  // Enable "Open Information" Menu
+
+
+    return 0;
+ }
+
+ static int optSave(const DLGHELPER *dlg, HWND hwnd, HICQ icq, ULONG uin, char *buffer)
+ {
+    if(dlg->sz != sizeof(DLGHELPER))
+       return -1;
+
+    dlg->saveRadioButton(hwnd,0,101,"TaskICON",3);
+    dlg->saveRadioButton(hwnd,0,105,"TaskTITLE",3);
+    dlg->saveRadioButton(hwnd,0,121,"Quote",3);
+
+    dlg->saveCheckBox(hwnd,0,124,"Chk4URL");
+    dlg->saveCheckBox(hwnd,0,125,"ESC2Close");
+    dlg->saveCheckBox(hwnd,0,109,"NextOnSend");
+
+    dlg->saveString(hwnd,0,112,"browser",0xFF);
+
+    dlg->saveCheckBox(hwnd,0,114,"urlOpen");
+    dlg->saveCheckBox(hwnd,0,115,"urlSend");
+    dlg->saveCheckBox(hwnd,0,116,"urlInfo");
+
+    return 0;
+ }
+
+ static int _System optClick(const DLGHELPER *dlg, HWND hwnd, HICQ icq, ULONG uin, USHORT id, char *buffer)
+ {
+    if(id != 113)
+       return 0;
+
+    dlg->browseFiles(hwnd,112,0,"browser","*.exe", "Select Browser", NULL, NULL);
+
+    return id;
+ }
+
+ static int skLoad(const DLGHELPER *dlg, HWND hwnd, HICQ icq, ULONG uin, char *buffer)
+ {
+    char                *ptr;
+    HDIR                hDir;
+    FILEFINDBUF3        fl;
+    ULONG               fCount;
+    int                 rc;
+    char		*f;
+    int			qtd        = 1;
+
+    if(dlg->sz != sizeof(DLGHELPER))
+       return -1;
+
+    icqLoadString(icq, "skinpath", "", buffer, 0xFF);
+
+    DBGMessage(buffer);
+
+    if(!*buffer)
+       icqQueryPath(icq,"skins\\",buffer,0xF0);
+
+    ptr = buffer+strlen(buffer);
+
+    strncat(buffer,"*.skn",0xFF);
+    DBGMessage(buffer);
+
+    if(!*buffer)
+       return -1;
+
+    fCount = 1;
+    hDir   = HDIR_CREATE;
+    rc     = DosFindFirst(buffer,&hDir,FILE_NORMAL,&fl,sizeof(FILEFINDBUF3),&fCount,FIL_STANDARD);
+
+    while(!rc)
+    {
+       for(f=fl.achName;*f && *f != '.';f++);
+       *f = 0;
+
+       DBGMessage(fl.achName);
+       dlg->listBoxInsert(hwnd,102,qtd++,fl.achName);
+
+       fCount = 1;
+       rc     = DosFindNext(hDir,&fl,sizeof(FILEFINDBUF3),&fCount);
+    }
+
+    DosFindClose(hDir);
+
+    dlg->loadCheckBox(hwnd, 0, 105, "SkinPreview",  TRUE);
+    dlg->loadCheckBox(hwnd, 0, 101, "SkinLoad",     FALSE);
+
+    return 0;
+ }
+
+ static int skSave(const DLGHELPER *dlg, HWND hwnd, HICQ icq, ULONG uin, char *buffer)
+ {
+    if(dlg->sz != sizeof(DLGHELPER))
+       return -1;
+
+    dlg->saveCheckBox(hwnd,0,105,"SkinPreview");
+    dlg->saveCheckBox(hwnd,0,101,"SkinLoad");
+
+    if(dlg->listBoxQueryText(hwnd,102,0,0xFF,buffer) > 0)
+    {
+       strncat(buffer,".skn",0xFF);
+       DBGMessage(buffer);
+       icqSaveString(icq, "skin", buffer);
+    }
+
+    return 0;
+ }
+
+ static void _System skSelected(const DLGHELPER *dl, HWND hwnd, HICQ icq, ULONG uin, USHORT id, ULONG hdl, char *buffer)
+ {
+    int  	sz;
+    int  	rc;
+    HWND 	hBtm;
+    HPS         hps;
+    HBITMAP 	bitmap;
+
+    DBGTrace(id);
+
+    if(id != 102)
+       return;
+
+    DBGTrace(hdl);
+
+    if(dl->getCheckBox(hwnd,101))
+    {
+       icqLoadString(icq, "skinpath", "", buffer, 0xFF);
+       sz = strlen(buffer);
+
+       if(dl->listBoxQueryText(hwnd,id,hdl,0xFF-sz,buffer+sz) < 1)
+          return;
+
+       strncat(buffer,".skn",0xFF);
+       *(buffer+0xFF) = 0;
+
+       DBGMessage(buffer);
+
+       rc = sknLoadNewSkin(mainWindow,winElements,buffer);
+       if(rc)
+          icqWriteSysRC(icq, PROJECT, rc, "Failure changing skin");
+    }
+
+    if(dl->getCheckBox(hwnd,105))
+    {
+       icqLoadString(icq, "skinpath", "", buffer, 0xFF);
+       sz = strlen(buffer);
+
+       if(dl->listBoxQueryText(hwnd,id,hdl,0xFF-sz,buffer+sz) < 1)
+          return;
+
+       strncat(buffer,"\\preview.jpg",0xFF);
+       *(buffer+0xFF) = 0;
+
+       DBGMessage(buffer);
+       DBGTrace(access(buffer,4));
+
+       hBtm = WinWindowFromID(hwnd,1000);
+       DBGTracex(hBtm);
+
+       bitmap = (HBITMAP) WinSendMsg(hBtm,SM_QUERYHANDLE,0,0);
+       DBGTracex(bitmap);
+
+       WinShowWindow(hBtm,FALSE);
+
+       if(bitmap)
+       {
+          GpiDeleteBitmap(bitmap);
+          bitmap = 0;
+       }
+
+       if(access(buffer,4))
+       {
+          DBGMessage("Carregar o preview default");
+          hps    = WinGetPS(hBtm);
+          bitmap = GpiLoadBitmap(hps, module, 1000, 141, 304);
+          WinReleasePS(hps);
+       }
+       else
+       {
+          DBGMessage("Carregar o preview");
+          bitmap = sknLoadBitmap(hwnd, buffer);
+          DBGTracex(bitmap);
+       }
+
+       WinSendMsg(hBtm,SM_SETHANDLE,(MPARAM) bitmap, 0);
+
+       WinShowWindow(hBtm,TRUE);
+       WinInvalidateRect(hBtm,0,TRUE);
+
+    }
+
+    /* Troca a imagem de about */
+
+    icqLoadString(icq, "skinpath", "", buffer, 0xFF);
+    sz = strlen(buffer);
+
+    if(dl->listBoxQueryText(hwnd,id,hdl,0xFF-sz,buffer+sz) < 1)
+       return;
+
+    strncat(buffer,"\\about.jpg",0xFF);
+    *(buffer+0xFF) = 0;
+
+    DBGMessage(buffer);
+    DBGTrace(access(buffer,4));
+
+    hBtm = WinWindowFromID(hwnd,1001);
+    DBGTracex(hBtm);
+
+    bitmap = (HBITMAP) WinSendMsg(hBtm,SM_QUERYHANDLE,0,0);
+    DBGTracex(bitmap);
+
+    WinShowWindow(hBtm,FALSE);
+
+    if(bitmap)
+    {
+       GpiDeleteBitmap(bitmap);
+       bitmap = 0;
+    }
+
+    if(access(buffer,4))
+    {
+       DBGMessage("Carregar o about default");
+       hps    = WinGetPS(hBtm);
+       bitmap = GpiLoadBitmap(hps, module, 1001, 257, 80);
+       WinReleasePS(hps);
+    }
+    else
+    {
+       DBGMessage("Carregar o preview");
+       bitmap = sknLoadBitmap(hwnd, buffer);
+       DBGTracex(bitmap);
+    }
+
+    WinSendMsg(hBtm,SM_SETHANDLE,(MPARAM) bitmap, 0);
+
+    WinShowWindow(hBtm,TRUE);
+    WinInvalidateRect(hBtm,0,TRUE);
+
+ }
+

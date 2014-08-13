@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>
+	OSCAR Protocol: Section 7: Messeging
+    </title>
+  </head>
+
+  <body bgcolor="#FFFFFF" link="#444444" vlink="#666666">
+    <table width="1" border="0" align="center">
+      <tr>
+	<td><img src="/images/blank.gif" height="1" width="540">
+      </tr>
+      <tr>
+	<td align="right">
+	  <img src="/faim/faim.gif" border="0" width="111" height="50"><br>
+	  <A href="/pst/"><img src="/pst/pst_small.gif" border="0"></a>
+	</td>
+      </tr>
+      <tr>
+	<td align="center">
+	  <b><font size="+1">AIM/Oscar Protocol Specification: Section 7: Messeging</font></b>
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  <hr noshade>
+	  <table width="100%" border="0" align="center">
+	    <tr>
+	      <td width="1%" valign="top">
+		<img src="/images/blank.gif" width="5" height="1" border="0"><br>
+	      </td>
+	      <td width="1%" bgcolor="#BBBBBB">
+
+	      </td>
+	      <td width="1%">
+		<img src="/images/blank.gif" width="5" height="1" border="0">
+	      </td>
+	      <td width="98%">
+		<img src="/images/blank.gif" width="460" height="1" border="0"><br>
+
+		<font size="+1"><b>7.0 Messeging</b></font>
+		<p>
+		  So now we get to the purpose of this whole thing: messaging.  Instant messages are strings of ASCII codes that get sent in very-near-real-time between users of the Basic OSCAR Service (BOS).  At no time does one client directly locate another client, or even know the location of any other client.  All messages are sent to the message server, which then relays them to their destination client(s).  
+		</p>
+		<p>
+		  The text of a message is usually in the form of an HTML-like encoding that AOL calls "text/x-aol-rtf" (MIME format notation).  For all intents and purposes, it's a subset of HTML.  But, just like with HTML, you don't have to use HTML to be HTML.  Sending straight ASCII text works just fine as well.  The AOL-sourced AIM clients always use HTML even if you don't type or use any.  They will usually append at least the &lt;HTML&gt;, &lt;BODY&gt;, and &lt;FONT&gt; tags (and their appropriate closing tags) even if you didn't intend to use any.  The server does not touch the message at all.  
+		</p>
+		<p>
+		  Sending and receiving instant messages (from now on called IMs), is really quite simple.  There are some things that can make it go funny, though.  I don't have all those things documented yet.
+		</p>
+		<b>7.1 Sending IMs</b>
+		<p>
+		  Below is the command structure for the "Send IM" command.  I have found, that depending on which message server you end up with, you may have problems when using the command structure defined below.  I can't explain this behavior, but it has happened a couple of times before.  Just logging out and then back in again (usually getting another server) lets you send messages just fine.  Also, changing some of the fields of this command can still get it through the server, but the distant-end client will fail (actually, I've found several combinations that crash the AIM Java client quite messily).  Just use with care.
+		</p>
+		<center><B>Fig 7.1.1 Send IM Command</b> (Family 0x02)</center>
+		<table border="2" align="centeR">
+		  <tr><td>Position</td><td>Length</td><td>Data</td></tr>
+		  <tr><td>1</td><td>Word</td><td>0x0004</td></tr>
+		  <tr><Td>3</td><td>Word</td><td>0x0006</td></tr>
+		  <tr><Td>5</tD><td>Word</td><td>0x0000</td></tr>
+		  <tr><td>7</td><td>DWord</td><td>Request ID</td></tr>
+		  <tr><td>11</td><td>DWord</td><Td>Unknown Purpose (leave as 0x00s)</td></tr>
+		  <tr><Td>15</td><td>Word</td><td>0x0001</td></tr>
+		  <tr><td>17</td><td>Byte</td><td>Destination SN Length</td></tR>
+		  <tr><Td>18</td><td>ASCII String</td><td>Destination SN (unterminated)</td></tr>
+		  <tr><td>19</td><td>Word</td><td>0x0002</td></tr>
+		  <tr><Td>21</td><td>Word</td><td>Message Length + 0x0D</td></tr>
+		  <tr><td>23</td><td>Byte</td><td>0x05</td></tr>
+		  <tr><td>24</td><td>Word</td><td>0x0100</td></tr>
+		  <tr><Td>26</td><td>Word</td><td>0x0101</td></tr>
+		  <tr><td>28</td><td>Word</td><td>0x0101</td></tr>
+		  <tr><Td>30</td><td>Word</td><td>Message Length + 0x04</td></tr>
+		  <tr><td>32</td><td>Word</td><td>0x0000</td></tr>
+		  <tr><Td>34</td><td>Word</td><td>0x0000</td></tr>
+		  <tr><Td>35</td><td>ASCII String</td><td>Message (unterminated)</td></tr>
+		</table>
+		<p></p>
+		<u>7.1.1 Errors Dealing with "Send IM" Command</u>
+		<p>
+		</p>
+		<b>7.2 Receiving IMs</b>
+		<p>
+		  Receiving IMs is gernerally quite simple.  The same member information that comes in the "oncoming buddy" command (see figure 5.1.1) is sent here, in the same format and same order.  And because of that, the space between the SN and the start of the message will be variable depending on the class of the source SN.
+		</p>
+		<center><B>Fig 7.2.1 Incoming IM Command</b> (Family 0x02)</center>
+		<table border="2" align="centeR">
+		  <tr><td>Position</td><td>Length</td><td>Data</td></tr>
+		  <tr><td>1</td><td>Word</td><td>0x0004</td></tr>
+		  <tr><Td>3</td><td>Word</td><td>0x0007</td></tr>
+		  <tr><Td>5</td><td>Word</td><td>0x0000</td></tr>
+		  <tr><td>7</td><td>QWord+DWord</td><td>Unknown Gibberish</td></tr>
+		  <tr><td>19</td><td>Word</td><td>0x0001</td></tr>
+		  <tr><td>21</td><td>Byte</td><td>SN Length</tD></tr>
+		  <tr><td>23</td><Td>ASCII String</td><Td>Source Screen Name</td></tr>
+		  <tr><Td>24*</td><td>Word</td><td>Warning Level of Sender</td></tr>
+		  <tr><Td>26*</td><td>Word</td><td>Class Part One</td></tr>
+		  <tr><Td>28</td><td>Word</td><td>0x0001</td></tr>
+		  <tr><td>30</td><Td>Word</td><Td>0x0002</td></tr>
+		  <Tr><Td>32*</td><Td>Word</td><td>Class Part Two</td></tr>
+		  <tr><Td>34</td><td>Word</td><td>0x0003</td></tr>
+		  <tr><td>36</td><td>Word</td><td>0x0004</td></tr>
+		  <tr><Td>38*</td><td>DWord</td><td>Member Since date</td></tr>
+		  <tr><td>40</td><td>Word</tD><td>0x0003</td></tr>
+		  <Tr><td>42</td><td>Word</td><td>0x0004</tD></tr>
+		  <tr><td>44*</td><td>DWord</td><td>On Since date</td></tr>
+		  <tr><td>48+</td><td>Word</td><td>0x0004</td></tr>
+		  <tr><td>50+</td><td>Word</td><td>0x0002</td></tr>
+		  <tr><td>52+*</td><td>Word</td><td>Idle Time</td></tR>
+		  <tr><Td>54</td><Td>Word</td><td>0x0002</td></tr>
+		  <tr><Td>56</td><td>Word</td><td>Message length + 0x0D</td></tr>
+		  <tr><td>58</td><td>7 bytes</td><td>0x5101111</td></tr>
+		  <tr><td>65</td><td>Word</td><td>Message Length + 0x04</td></tr>
+		  <tr><td>67</td><td>DWord</td><td>0x0000</td></tr>
+		  <tr><Td>71</td><td>ASCII String</td><td>Message (unterminated)</td></tr>
+		  <tr><td colspan="3">* Not present for commands from AOL members</td></tr>
+		  <tr><Td colspan="3">+ See notes in section 5.1 on these fields (they're the same)</td></tr>
+		</table>
+		<p></p>
+		<u>7.2.1 Errors Associated with Receiving IMs</u>
+		<p>
+		</p>
+		<p></p>
+
+
+
+	      </td>
+
+	      <td width="1%">
+		<img src="/images/blank.gif" width="10" height="1" border="0">
+	      </td>
+	      <td width="1%" bgcolor="#BBBBBB">
+		&nbsp;
+	      </td>
+	      <td width="1%" valign="top">
+		<img src="/images/blank.gif" width="50" height="1" border="0"><br>
+		<a href="/pst/"><img src="/pst/bar_home.gif" width="50" height="15" border="0"></a><br>
+		<a href="/pst/software/"><img src="/pst/bar_software.gif" width="50" height="15" border="0"></a>
+	      </td>
+	    </tr>
+	  </table>
+	  <hr noshade>
+	  <Center>
+	    <address><a href="mailto:afritz@iname.com">Adam Fritzler</a></address>
+	      <!-- Created: Sat Jun 20 20:35:10 MST 1998 -->
+	    <!-- hhmts start -->
+Last modified: Fri Jul 24 14:16:56 MST 1998
+<!-- hhmts end -->	
+	  </center>
+	</td>
+      </tr>
+    </table>
+  </body>
+</html>

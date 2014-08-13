@@ -1,0 +1,157 @@
+/*
+ * OS2REXX.C - Interface REXX para o pwICQ IPC
+ */
+
+#ifndef __OS2__
+   #error Only for OS2 version
+#endif
+
+ #pragma strings(readonly)
+
+ #define INCL_REXXSAA
+ #define INCL_ERRORS
+ #include <os2.h>
+
+ #include <stdlib.h>
+
+ #include <rexxsaa.h>
+
+ #include <pwMacros.h>
+
+ #include <icqqueue.h>
+
+ #include "os2rexx.h"
+
+/*---[ Structs ]-------------------------------------------------------------------------------------------*/
+
+ #pragma pack(1)
+
+ typedef struct fncEntry
+ {
+    PSZ     rxName;
+    PSZ     cName;
+ } fncEntry, *fncEntryPtr;
+
+ #pragma pack()
+
+/*---[ Statics ]-------------------------------------------------------------------------------------------*/
+
+ static fncEntry RxFncTable[] =
+ {
+      { "rxICQQueryBuild",      "rxICQQueryBuild"   },
+      { "rxICQSetMode",         "rxICQSetMode"      },
+      { "rxICQQueryUIN",        "rxICQQueryUIN"     },
+
+      { "rxICQDropFuncs",       "rxICQDropFuncs"    }
+ };
+
+ static const char *DLLNAME = "ICQIPC";
+
+
+/*---[ Implementacao ]-------------------------------------------------------------------------------------*/
+
+ULONG APIENTRY rxICQLoadFuncs(  CHAR *name,
+                                ULONG numargs,
+                                RXSTRING args[],
+                                CHAR *queuename,
+                                RXSTRING *retstr )
+  {
+    int         entries;
+    int         j;
+    int         rc      = 0;
+
+    DBGMessage("*** Iniciando carga das funcoes");
+
+    entries           = sizeof( RxFncTable ) / sizeof( fncEntry );
+    retstr->strlength = 0;
+
+    for( j = 0; j < entries && !rc; ++j )
+       rc = RexxRegisterFunctionDll( RxFncTable[ j ].rxName,(PSZ) DLLNAME,RxFncTable[ j ].cName );
+
+    CopyInteger(rc, retstr );
+
+    return( VALID_ROUTINE );
+
+}
+
+ULONG APIENTRY rxICQQueryBuild( CHAR *name,
+                                ULONG numargs,
+                                RXSTRING args[],
+                                CHAR *queuename,
+                                RXSTRING *retstr )
+  {
+    CopyString( BUILD, retstr);
+    return( VALID_ROUTINE );
+  }
+
+ULONG EXPENTRY rxICQDropFuncs(  CHAR *name,
+                                ULONG numargs,
+                                RXSTRING args[],
+                                CHAR *queuename,
+                                RXSTRING *retstr )
+  {
+    int entries;
+    int j;
+
+    retstr->strlength = 0;
+
+    if( numargs > 0 )
+        return( INVALID_ROUTINE );
+
+    entries = sizeof( RxFncTable ) / sizeof( fncEntry );
+
+    for( j = 0; j < entries; ++j )
+        RexxDeregisterFunction( RxFncTable[ j ].rxName );
+
+    RexxDeregisterFunction( "rxICQLoadFuncs" );
+
+    CopyInteger(entries, retstr );
+
+
+    return( VALID_ROUTINE );
+
+}
+
+ULONG EXPENTRY rxICQSetMode(    CHAR *name,
+                                ULONG numargs,
+                                RXSTRING args[],
+                                CHAR *queuename,
+                                RXSTRING *retstr )
+  {
+     int rc;
+
+     if( numargs != 2 )
+        return( INVALID_ROUTINE );
+
+     DBGMessage(args[0].strptr);
+     DBGMessage(args[1].strptr);
+
+     rc = icqIPCSetModeByName(atoi(args[0].strptr),args[1].strptr);
+
+     DBGTrace(rc);
+
+     CopyInteger(rc, retstr );
+
+     return( VALID_ROUTINE );
+  }
+
+ULONG EXPENTRY rxICQQueryUIN(   CHAR *name,
+                                ULONG numargs,
+                                RXSTRING args[],
+                                CHAR *queuename,
+                                RXSTRING *retstr )
+  {
+     int 	rc;
+     ULONG	uin;
+
+     if( numargs )
+        return( INVALID_ROUTINE );
+
+     if(icqIPCQueryInstance(&uin))
+        CopyInteger(0, retstr );
+     else
+        CopyInteger(uin, retstr );
+
+     return( VALID_ROUTINE );
+  }
+
